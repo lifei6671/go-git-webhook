@@ -31,19 +31,20 @@ func NewMember() *Member {
 }
 
 //根据用户ID查找用户
-func (m *Member) Find(id int) (*Member,error) {
+func (m *Member) Find(id int) (error) {
 	o := orm.NewOrm()
-	user := Member{MemberId: id}
+	m.MemberId = id
 
-	err := o.Read(&user)
+	err := o.Read(m)
 
 	if err == orm.ErrNoRows {
 		return nil,ErrMemberNoExist
 	}
-	return &user,nil
+
+	return nil
 }
 
-
+//用户登录
 func (m *Member) Login(account string,password string) (*Member,error) {
 	o := orm.NewOrm()
 
@@ -60,4 +61,54 @@ func (m *Member) Login(account string,password string) (*Member,error) {
 	}
 
 	return member,ErrorMemberPasswordError
+}
+
+//分页获取用户列表
+func (m *Member) GetMemberList(pageIndex int,pageSize int) ([]Member,int64,error) {
+
+	offset  := (pageIndex -1) * pageSize
+
+	o := orm.NewOrm()
+
+	var members []Member
+
+	_,err := o.QueryTable(m.TableName()).Limit(pageSize).Offset(offset).OrderBy("-member_id").All(&members)
+
+	if err != nil {
+		return nil,err
+	}
+
+	count,err := o.QueryTable(m.TableName()).Count()
+
+	return members,count
+}
+
+//添加一个用户
+func (member *Member) Add () (error) {
+	o := orm.NewOrm()
+
+	hash ,err := passwords.PasswordHash(member.Password);
+
+	if  err != nil {
+		return err
+	}
+
+	member.Password = hash
+
+	_,err = o.Insert(member)
+
+	if err != nil {
+		return err
+	}
+	return  nil
+}
+
+//更新用户信息
+func (m *Member) Update(cols... string) (error) {
+	o := orm.NewOrm()
+
+	if _,err := o.Update(m,cols);err != nil {
+		return err
+	}
+	return nil
 }

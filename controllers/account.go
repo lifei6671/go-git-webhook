@@ -15,6 +15,7 @@ type AccountController struct {
 	BaseController
 }
 
+//用户登录
 func (c *AccountController) Login()  {
 	c.Prepare()
 
@@ -24,7 +25,8 @@ func (c *AccountController) Login()  {
 	if cookie,ok := c.GetSecureCookie(conf.GetAppKey(),"login");ok{
 
 		if err := gob.Decode(cookie,&remember); err == nil {
-			if member,err := models.NewMember().Find(remember.MemberId); err == nil {
+			member := models.NewMember()
+			if err := models.NewMember().Find(remember.MemberId); err == nil {
 				c.SetMember(*member)
 
 				c.Redirect(beego.URLFor("HomeController.Index"), 302)
@@ -85,4 +87,10 @@ func (c *AccountController) Logout(){
 	c.SetMember(models.Member{});
 
 	c.Redirect(beego.URLFor("AccountController.Login"),302)
+}
+
+func (c *AccountController) Lists (){
+	c.Prepare()
+
+
 }
