@@ -38,7 +38,7 @@ func (m *Member) Find(id int) (error) {
 	err := o.Read(m)
 
 	if err == orm.ErrNoRows {
-		return nil,ErrMemberNoExist
+		return ErrMemberNoExist
 	}
 
 	return nil
@@ -75,12 +75,12 @@ func (m *Member) GetMemberList(pageIndex int,pageSize int) ([]Member,int64,error
 	_,err := o.QueryTable(m.TableName()).Limit(pageSize).Offset(offset).OrderBy("-member_id").All(&members)
 
 	if err != nil {
-		return nil,err
+		return nil,0,err
 	}
 
 	count,err := o.QueryTable(m.TableName()).Count()
 
-	return members,count
+	return members,count,nil
 }
 
 //添加一个用户
@@ -107,7 +107,7 @@ func (member *Member) Add () (error) {
 func (m *Member) Update(cols... string) (error) {
 	o := orm.NewOrm()
 
-	if _,err := o.Update(m,cols);err != nil {
+	if _,err := o.Update(m,cols...);err != nil {
 		return err
 	}
 	return nil
