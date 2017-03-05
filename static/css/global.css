@@ -1,5 +1,6 @@
 body{
     background: #E5E5E5;
+    font-family:-apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif,"宋体" !important;
 }
 /***头部导航条样式***/
 .bs-docs-nav {
@@ -44,4 +45,21 @@ body{
     color: #ffffff;
     padding: 10px 0;
     font-size: 13px;
+}
+
+/*******/
+.login-body{
+    width: 350px;
+    margin: 15px auto;
+    padding-top: 120px;
+    min-height: 620px;
+}
+.login-body h1{
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing:normal;
+    line-height: 28px;
+}
+.login-body .form-group{
+    margin: 15px auto;
 }

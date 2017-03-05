@@ -38,7 +38,7 @@ func (c *BaseController) JsonResult(errCode int,errMsg string,data ...interface{
 	json := make(map[string]interface{},3)
 
 	json["errcode"] = errCode
-	json["errmsg"] = errMsg
+	json["message"] = errMsg
 
 	if len(data) > 0 && data[0] != nil{
 		json["data"] = data[0]

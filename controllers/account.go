@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"strings"
 	"fmt"
 	"time"
 	"go-git-webhook/modules/passwords"
@@ -40,33 +39,12 @@ func (c *AccountController) Login()  {
 	if c.Ctx.Input.IsPost() {
 		account := c.GetString("account")
 		password := c.GetString("passwd")
-		captcha := c.GetString("code")
-		code := c.GetSession("captcha").(string)
-		isRemember := c.GetString("is_remember")
-
-		if !strings.EqualFold(captcha,code){
-			c.JsonResult(500,"验证码不正确")
-			return
-		}
 
 		member,err := models.NewMember().Login(account,password)
 
 		//如果没有数据
 		if err == nil {
-			fmt.Println("isRemember=",isRemember)
 			c.SetMember(*member)
-			if strings.EqualFold(isRemember,"on") {
-
-				remember.MemberId = member.MemberId
-				remember.Account = member.Account
-				remember.Time = time.Now()
-
-				value,err := gob.Encode(remember)
-				fmt.Println(value)
-				if err == nil{
-					c.SetSecureCookie(conf.GetAppKey(),"login",value)
-				}
-			}
 			c.JsonResult(0,"ok")
 			c.StopRun()
 		}else{

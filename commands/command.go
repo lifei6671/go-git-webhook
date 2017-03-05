@@ -6,6 +6,7 @@ import (
 	"go-git-webhook/models"
 	_ "github.com/go-sql-driver/mysql"
 	_ "go-git-webhook/routers"
+	"fmt"
 )
 
 //注册数据库
@@ -18,6 +19,7 @@ func RegisterDataBase()  {
 
 	dataSource := username + ":" + password + "@tcp(" + host + ":" + port +")/" + database + "?charset=utf8&parseTime=true";
 
+	fmt.Println(dataSource);
 	orm.RegisterDataBase("default", "mysql", dataSource)
 }
 

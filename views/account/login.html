@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>用户登录 - GitWebHook</title>
     <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/font-awesome/css/font-awesome.css">
     <link rel="stylesheet" href="/static/css/global.css">
+    <script src="/static/js/jquery-1.12.4.min.js"></script>
+    <script src="/static/js/jquery.form.js"></script>
 
 
 </head>
@@ -19,39 +22,37 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a href="/" class="navbar-brand" se_prerender_url="complete">Go GitWebHook</a>
+            <a href="/" class="navbar-brand">Go GitWebHook</a>
         </div>
-        <nav class="collapse navbar-collapse">
-            <ul class="nav navbar-nav">
-                <li><a href="#">WebHook</a> </li>
-                <li><a href="#">Server</a> </li>
-                <li><a href="#">Member</a> </li>
-            </ul>
-            <ul class="nav navbar-nav navbar-right">
-                <li>
-                    <a href="http://www.bootcss.com/" target="_blank" style="padding: 9px;">
-                        <img src="/static/images/headimgurl.jpg" class="img-circle" height="32px">
-                    </a>
-                </li>
-            </ul>
-        </nav>
     </div>
 </header>
 <div class="container">
     <div class="bs-docs-container">
-        <div class="title">
-            <h3>WebHook List</h3>
-            <hr>
-        </div>
-        <div class="body">
-            <table class="table table-condensed">
-                <thead>
-                <tr><th width="5%">#</th><th width="15%">Repo</th><th>Shell</th><th width="15%">Server</th><th width="10%">LastHook</th><th width="10%">Status</th><th width="15%">Operate</th></tr>
-                </thead>
-            </table>
-        </div>
-        <div class="body-botton text-center">
-            <button class="btn btn-success btn-sm">添加新的 Git WebHook</button>
+        <div class="login-body text-center">
+            <h1>Welcome to Go GitWebHook</h1>
+            <p>Login with your <strong>Go GitWebHook</strong> ID</p>
+            <form class="form-inline" method="post" id="loginForm">
+                <div class="form-group">
+                    <label class="sr-only" for="inputAccount">Account</label>
+                    <div class="input-group">
+                        <div class="input-group-addon"><i class="fa fa-address-book"></i></div>
+                        <input type="text" class="form-control" id="inputAccount" name="inputAccount" placeholder="Account" style="width: 310px" autocomplete="off">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="sr-only">Password</label>
+                    <div class="input-group">
+                        <div class="input-group-addon"><i class="fa fa-key"></i></div>
+                        <input type="password" class="form-control" id="inputPassword" name="inputPassword" style="width: 310px" placeholder="Password" autocomplete="off">
+                    </div>
+                </div>
+                <div class="form-group" style="width: 100%">
+                    <button type="submit" class="btn btn-success" style="width: 100%" data-load-text="Logging" id="btnLogin">Login</button>
+                </div>
+                <div class="form-group text-danger" id="text-error-message">
+
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -62,5 +63,47 @@
             <span>版权所有</span>
         </div>
 </div>
+<script src="/static/bootstrap/js/bootstrap.js"></script>
+<script type="text/javascript">
+    $(function () {
+        var btnLogin = $("#btnLogin");
+        var inputAccount = $("#inputAccount");
+        var inputPassword = $("#inputPassword");
+
+        inputAccount.on("blur",function () {
+           inputAccount.closest(".form-group").removeClass("has-error");
+        });
+        inputPassword.on("blur",function () {
+            inputPassword.closest(".form-group").removeClass("has-error");
+        });
+
+       $("#loginForm").ajaxForm({
+           dataType : "json",
+           beforeSubmit : function () {
+             var account = $.trim(inputAccount.val());
+             if(account == ""){
+                 inputAccount.closest(".form-group").addClass("has-error");
+                 return false;
+             }
+             var password = $.trim(inputPassword.val());
+             if(password == ""){
+                 inputPassword.closest(".form-group").addClass("has-error");
+                 return false;
+             }
+             btnLogin.button("load");
+           },success : function (res) {
+                if(res.errcode === 0){
+                    window.location = "/";
+                }else{
+                    $("#text-error-message").text(res.message);
+                }
+           },error : function () {
+
+           },complete : function () {
+               btnLogin.button("reset");
+           }
+       });
+    });
+</script>
 </body>
 </html>
