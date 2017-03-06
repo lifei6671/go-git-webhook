@@ -7,6 +7,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	_ "go-git-webhook/routers"
 	"fmt"
+	_ "go-git-webhook/modules/filters"
 )
 
 //注册数据库
@@ -34,6 +35,7 @@ func RegisterModel()  {
 //注册orm命令行工具
 func RunCommand()  {
 	orm.RunCommand()
+	Install()
 }
 
 //启动Web监听

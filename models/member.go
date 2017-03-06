@@ -4,6 +4,7 @@ import (
 	"time"
 	"github.com/astaxie/beego/orm"
 	"go-git-webhook/modules/passwords"
+	"fmt"
 )
 
 type Member struct {
@@ -15,7 +16,7 @@ type Member struct {
 	Avatar string 		`orm:"size(1000);column(avatar)"`
 	CreateTime time.Time	`orm:"type(datetime);column(create_time);auto_now_add"`
 	CreateAt int		`orm:"type(int);column(create_at)"`
-	LastLoginTime time.Time	`orm:"type(datetime);column(last_login_time)"`
+	LastLoginTime time.Time	`orm:"type(datetime);column(last_login_time);null"`
 }
 
 func (m *Member) TableName() string {
@@ -25,6 +26,7 @@ func (m *Member) TableName() string {
 func (m *Member) TableEngine() string {
 	return "INNODB"
 }
+
 
 func NewMember() *Member {
 	return new(Member)
@@ -56,7 +58,12 @@ func (m *Member) Login(account string,password string) (*Member,error) {
 		return  member,ErrMemberNoExist
 	}
 
-	if ok,err := passwords.PasswordVerify(member.Password,password) ; ok && err == nil {
+	ok,err := passwords.PasswordVerify(member.Password,password) ;
+
+	fmt.Println(err)
+	fmt.Println(ok)
+
+	if ok && err == nil {
 		return member,nil
 	}
 

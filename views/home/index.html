@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>用户登录 - GitWebHook</title>
+    <title>Go GitWebHook List - GitWebHook</title>
     <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.css">
     <link rel="stylesheet" href="/static/css/global.css">
+    <script src="/static/js/jquery-1.12.4.min.js" type="text/javascript"></script>
+    <script src="/static/js/jquery.form.js" type="text/javascript"></script>
 </head>
 <body>
 <header class="navbar navbar-static-top bs-docs-nav">
@@ -17,18 +19,18 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a href="/" class="navbar-brand" se_prerender_url="complete">Go GitWebHook</a>
+            <a href="/" class="navbar-brand">Go GitWebHook</a>
         </div>
         <nav class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
-                <li><a href="#">WebHook</a> </li>
-                <li><a href="#">Server</a> </li>
-                <li><a href="#">Member</a> </li>
+                <li><a href="{{urlfor "HomeController.Index"}}">WebHook</a> </li>
+                <li><a href="{{urlfor "ServerController.Index"}}">Server</a> </li>
+                <li><a href="{{urlfor "MemberController.Index"}}">Member</a> </li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li>
-                    <a href="http://www.bootcss.com/" target="_blank" style="padding: 9px;">
-                        <img src="/static/images/headimgurl.jpg" class="img-circle" height="32px">
+                    <a href="{{urlfor "MemberController.My"}}" style="padding: 9px;">
+                        <img src="/static/images/headimgurl.jpg" class="img-circle" style="width: 32px;height: 32px;">
                     </a>
                 </li>
             </ul>
@@ -49,7 +51,27 @@
             </table>
         </div>
         <div class="body-botton text-center">
-            <button class="btn btn-success btn-sm">添加新的 Git WebHook</button>
+            <button class="btn btn-success btn-sm" id="addWebHookBtn">添加新的 Git WebHook</button>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="webHookModal" tabindex="-1" role="dialog" aria-labelledby="webHookModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="post" id="webHookForm">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="webHookTitle">New WebHook</h4>
+                </div>
+                <div class="modal-body">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -60,5 +82,7 @@
         <span>版权所有</span>
     </div>
 </div>
+<script src="/static/bootstrap/js/bootstrap.js" type="text/javascript"></script>
+<script src="/static/js/global.js" type="text/javascript"></script>
 </body>
 </html>

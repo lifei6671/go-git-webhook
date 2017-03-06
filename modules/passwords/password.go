@@ -16,7 +16,7 @@ import (
 
 const (
 	saltSize            = 16
-	delmiter            = "."
+	delmiter            = "$"
 	stretching_password = 500
 	salt_local_secret   = "ahfw*&TGdsfnbi*^Wt"
 )
@@ -40,7 +40,9 @@ func PasswordHash(pass string) (string, error) {
 		return "", err
 	}
 	interation_string := strconv.Itoa(interation)
-	return salt_secret + delmiter + interation_string + delmiter + hash + delmiter + salt, nil
+	password := salt_secret + delmiter + interation_string + delmiter + hash + delmiter + salt
+
+	return password, nil
 
 }
 //校验密码是否有效
@@ -54,7 +56,7 @@ func  PasswordVerify(hashing string, pass string) (bool, error) {
 		return false, err
 	}
 
-	if data["salt_secret"]+delmiter+data["interation_string"]+delmiter+has+delmiter+data["salt"] == hashing {
+	if (data["salt_secret"]+delmiter+data["interation_string"]+delmiter+has+delmiter+data["salt"]) == hashing {
 		return true, nil
 	} else {
 		return false, nil

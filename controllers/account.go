@@ -3,7 +3,6 @@ package controllers
 import (
 	"fmt"
 	"time"
-	"go-git-webhook/modules/passwords"
 	"github.com/astaxie/beego"
 	"go-git-webhook/modules/gob"
 	"go-git-webhook/conf"
@@ -34,11 +33,9 @@ func (c *AccountController) Login()  {
 		}
 	}
 
-	fmt.Println(passwords.PasswordHash("123456"))
-
 	if c.Ctx.Input.IsPost() {
-		account := c.GetString("account")
-		password := c.GetString("passwd")
+		account := c.GetString("inputAccount")
+		password := c.GetString("inputPassword")
 
 		member,err := models.NewMember().Login(account,password)
 

@@ -8,9 +8,9 @@ body{
     background-color: #1B1C1D;
     border-bottom: 0;
     color: #ffffff;
-    border-radius: 4px;
     -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 1px 5px rgba(0, 0, 0, 0.075);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 1px 5px rgba(0, 0, 0, 0.075);
+    box-shadow: 0 0 4px rgba(0,0,0,0.14),0 4px 8px rgba(0,0,0,0.28);
+    box-sizing: border-box;
 }
 
 .bs-docs-nav .navbar-brand,
@@ -51,8 +51,15 @@ body{
 .login-body{
     width: 350px;
     margin: 15px auto;
-    padding-top: 120px;
-    min-height: 620px;
+    padding-top: 60px;
+    min-height: 450px;
+}
+
+@media (min-width : 1400px) {
+    .login-body{
+        padding-top: 120px;
+        min-height: 620px;
+    }
 }
 .login-body h1{
     font-size: 20px;
