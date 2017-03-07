@@ -5,50 +5,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Server List - GitWebHook</title>
     <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/font-awesome/css/font-awesome.css">
     <link rel="stylesheet" href="/static/css/global.css">
     <script src="/static/js/jquery-1.12.4.min.js" type="text/javascript"></script>
     <script src="/static/js/jquery.form.js" type="text/javascript"></script>
+
 </head>
 <body>
-<header class="navbar navbar-static-top bs-docs-nav">
-    <div class="container">
-        <div class="navbar-header">
-            <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#bs-navbar" aria-controls="bs-navbar" aria-expanded="false">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a href="/" class="navbar-brand" se_prerender_url="complete">Go GitWebHook</a>
-        </div>
-        <nav class="collapse navbar-collapse">
-            <ul class="nav navbar-nav">
-                <li><a href="{{urlfor "HomeController.Index"}}">WebHook</a> </li>
-                <li><a href="{{urlfor "ServerController.Index"}}">Server</a> </li>
-                <li><a href="{{urlfor "MemberController.Index"}}">Member</a> </li>
-            </ul>
-            <ul class="nav navbar-nav navbar-right">
-                <li>
-                    <a href="{{urlfor "MemberController.My"}}" style="padding: 9px;">
-                        <img src="/static/images/headimgurl.jpg" class="img-circle" style="width: 32px;height: 32px;">
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </div>
-</header>
+{{template "widgets/head.html" .}}
 <div class="container">
     <div class="bs-docs-container">
         <div class="title">
-            <h3>WebHook List</h3>
+            <h3>Server List</h3>
             <hr>
         </div>
         <div class="body">
-            <table class="table table-condensed">
+            <table class="table table-striped" id="serverTable">
                 <thead>
-                <tr><th width="5%">#</th><th width="15%">Repo</th><th>Shell</th><th width="15%">Server</th><th width="10%">LastHook</th><th width="10%">Status</th><th width="15%">Operate</th></tr>
+                <tr>
+                    <th width="5%">#</th><th width="15%">Server Name</th><th>Server IP</th><th width="10%">Port</th><th width="10%">Status</th><th width="10%">Server Type</th><th width="15%">Create Time</th><th width="15%">Operate</th>
+                </tr>
                 </thead>
+                <tbody>
+                {{if .lists}}
+                    {{range $index,$item := .lists}}
+                        <tr>
+                            <td>{{$item.ServerId}}</td>
+                            <td>{{$item.Name}}</td>
+                            <td>{{$item.IpAddress}}</td>
+                            <td>{{$item.Port}}</td>
+                            <td>
+                                {{if eq $item.Status 0}}
+                                <span class="label label-success">正常</span>
+                                {{else}}
+                                <span class="label label-danger">禁用</span>
+                                {{end}}
+                            </td>
+                            <td>{{$item.Type}}</td>
+                            <td>{{dateformat $item.CreateTime "2006-01-02 15:04:05"}}</td>
+                            <td>
+                                <a href='{{urlfor "ServerController.Edit" ":id" $item.ServerId}}'  title="编辑" class="btn btn-default btn-sm edit-btn"><i class="fa fa-edit" aria-hidden="true"></i></a>
+                                <a href="###" title="删除" class="btn btn-default btn-sm delete-btn" data-id="{{$item.ServerId}}"><i class="fa fa-times" aria-hidden="true"></i></a>
+                            </td>
+                        </tr>
+                    {{end}}
+                {{end}}
+                </tbody>
             </table>
+            <nav>
+                {{.html}}
+            </nav>
         </div>
         <div class="body-botton text-center">
             <button class="btn btn-success btn-sm" id="addServerBtn">添加新的 Server</button>
@@ -59,7 +65,7 @@
 <div class="modal fade" id="serverModal" tabindex="-1" role="dialog" aria-labelledby="serverModalLabel">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
-            <form method="post" id="serverForm">
+            <form method="post" id="serverForm" action='{{urlfor "ServerController.Edit"}}'>
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title" id="webHookTitle">New WebHook</h4>
@@ -67,61 +73,87 @@
                 <div class="modal-body">
                     <div class="container-fluid">
                         <div class="row">
-                            <div class="col-lg-4">
+                            <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Server Name</label>
                                     <input type="text" name="name" id="serverName" placeholder="Server Name" class="form-control">
                                 </div>
                             </div>
-                            <div class="col-lg-4">
+                            <div class="col-lg-3">
                                 <div class="form-group">
-                                    <label>Server Ip</label>
-                                    <input type="text" name="ip" placeholder="Server IP" class="form-control">
+                                    <label for="serverIp">Server Ip</label>
+                                    <input type="text" name="ip" id="serverIp" placeholder="Server IP" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label for="serverPort">Server SSH Port</label>
+                                    <input type="text" name="port" id="serverPort" placeholder="Port" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label for="serverPort">Server SSH Account</label>
+                                    <input type="text" name="account" id="serverAccount" placeholder="Account" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-8">
+                                <div class="form-group">
+                                    <label for="serverTag">Tag <span class="text">(多个标签请用英文的“,”分割)</span></label>
+                                    <input type="text" name="tag" id="serverTag" placeholder="Tag" class="form-control">
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group">
-                                    <label>Server SSH Port/Server Client Port</label>
-                                    <input type="text" name="port" placeholder="Port" class="form-control">
+                                    <label for="serverType">Server Type</label>
+                                    <select name="type" id="serverType" class="form-control">
+                                        <option value="ssh">SSH</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-lg-12">
                                 <div class="form-group">
-                                    <label>Tag</label>
-                                    <input type="text" name="tag" placeholder="Tag" class="form-control">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <div class="form-group">
-                                    <label>SSH Private Key / Account Password</label>
-                                    <textarea class="form-control" name="key" placeholder="SSH Private Key / Account Password">
-
-                                </textarea>
+                                    <label for="serverKey">SSH Private Key / Account Password</label>
+                                    <textarea class="form-control" name="key" id="serverKey" placeholder="SSH Private Key / Account Password"></textarea>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
+                    <span class="text error-message" id="errorMessage" style="padding-right: 15px;"></span>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save changes</button>
+                    <button type="submit" class="btn btn-primary" id="saveServerBtn">Save changes</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-<div class="container-fluid navbar-fixed-bottom footer">
-    <div class="text-center">
-        <span>&copy; </span>
-        <span><a href="https://github.com/lifei6671/go-git-webhook" target="_blank">Go GitWebHook</a> </span>
-        <span>版权所有</span>
-    </div>
-</div>
+{{template  "widgets/foot.html" .}}
 <script src="/static/bootstrap/js/bootstrap.js" type="text/javascript"></script>
 <script src="/static/js/global.js" type="text/javascript"></script>
+<script type="text/javascript">
+    $(function () {
+       $("#serverTable").on("click",".delete-btn",function () {
+            var id = $(this).attr("data-id");
+            var $this = $(this);
+            $.ajax({
+                url : '{{urlfor "ServerController.Delete"}}',
+                data : {"id":id},
+                type : "POST",
+                dataType : "json",
+                success : function (res) {
+                    if(res.errcode === 0){
+                        $this.closest("tr").empty().remove()
+                    }
+                }
+            })
+        }) ;
+    });
+</script>
 </body>
 </html>

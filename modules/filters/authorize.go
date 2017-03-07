@@ -15,4 +15,5 @@ func init()  {
 
 	beego.InsertFilter("/member/*",beego.BeforeRouter,Authorize);
 	beego.InsertFilter("/",beego.BeforeRouter,Authorize);
+	beego.InsertFilter("/server",beego.BeforeRouter,Authorize)
 }

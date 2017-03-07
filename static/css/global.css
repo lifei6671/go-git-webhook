@@ -1,6 +1,24 @@
+@import url(https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic&subset=latin);
 body{
     background: #E5E5E5;
-    font-family:-apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif,"宋体" !important;
+    font-family:'Lato', 'Helvetica Neue', 'Microsoft Yahei', Arial, Helvetica, sans-serif,"宋体" !important;
+}
+.text{
+    font-size: 12px;
+    font-weight: normal;
+}
+label{
+    font-weight: 600 !important;
+    font-size: 13px;
+}
+.error-message{
+    color: red !important;
+}
+.table > tbody > tr > td {
+    vertical-align: inherit;
+}
+.tooltip{
+    font-weight: 200 !important;
 }
 /***头部导航条样式***/
 .bs-docs-nav {
