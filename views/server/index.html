@@ -29,25 +29,7 @@
                 <tbody>
                 {{if .lists}}
                     {{range $index,$item := .lists}}
-                        <tr>
-                            <td>{{$item.ServerId}}</td>
-                            <td>{{$item.Name}}</td>
-                            <td>{{$item.IpAddress}}</td>
-                            <td>{{$item.Port}}</td>
-                            <td>
-                                {{if eq $item.Status 0}}
-                                <span class="label label-success">正常</span>
-                                {{else}}
-                                <span class="label label-danger">禁用</span>
-                                {{end}}
-                            </td>
-                            <td>{{$item.Type}}</td>
-                            <td>{{dateformat $item.CreateTime "2006-01-02 15:04:05"}}</td>
-                            <td>
-                                <a href='{{urlfor "ServerController.Edit" ":id" $item.ServerId}}'  title="编辑" class="btn btn-default btn-sm edit-btn"><i class="fa fa-edit" aria-hidden="true"></i></a>
-                                <a href="###" title="删除" class="btn btn-default btn-sm delete-btn" data-id="{{$item.ServerId}}"><i class="fa fa-times" aria-hidden="true"></i></a>
-                            </td>
-                        </tr>
+                        {{template "server/index_list.html" $item}}
                     {{end}}
                 {{end}}
                 </tbody>

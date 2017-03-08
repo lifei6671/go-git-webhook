@@ -9,6 +9,7 @@ import (
 type BaseController struct {
 	beego.Controller
 	Member *models.Member
+	Scheme string
 }
 
 func (c *BaseController) Prepare (){
@@ -19,6 +20,12 @@ func (c *BaseController) Prepare (){
 		c.Member = &member
 		c.Data["Member"] = c.Member
 	}
+	scheme := "http"
+
+	if c.Ctx.Request.TLS != nil {
+		scheme = "https"
+	}
+	c.Scheme = scheme
 }
 
 //获取或设置当前登录用户信息,如果 MemberId 小于 0 则标识删除 Session
@@ -47,4 +54,18 @@ func (c *BaseController) JsonResult(errCode int,errMsg string,data ...interface{
 	c.Data["json"] = json
 	c.ServeJSON(true)
 	c.StopRun()
+}
+
+func (c *BaseController) UrlFor (endpoint string, values ...interface{}) string {
+
+	return c.BaseUrl() + beego.URLFor(endpoint,values...)
+}
+
+func (c *BaseController) BaseUrl() string {
+	scheme := "http://"
+
+	if c.Ctx.Request.TLS != nil {
+		scheme = "https://"
+	}
+	return scheme + c.Ctx.Request.Host
 }

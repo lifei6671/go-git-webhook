@@ -71,10 +71,10 @@ func (m *HookData) BranchName () (string,error){
 
 	branchName := branch.Tostring();
 
-	index := strings.Index(branchName,"/")
+	index := strings.IndexAny(branchName,"/")
 
 	if index > 0 {
-		branchName = string([]byte(branchName)[index+1:])
+		branchName = branchName[index+1:]
 	}
 	return branchName,nil
 }

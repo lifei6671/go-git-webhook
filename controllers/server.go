@@ -6,7 +6,6 @@ import (
 	"go-git-webhook/modules/pager"
 	"strconv"
 	"fmt"
-	"github.com/astaxie/beego/orm"
 )
 
 type ServerController struct {
@@ -125,19 +124,38 @@ func (c *ServerController) Edit()  {
 		if err := server.Save(); err != nil {
 			c.JsonResult(500, "Save failed:" + err.Error())
 		} else {
-			data := make(map[string]interface{}, 1)
+			data := make(map[string]interface{},5)
 
-			data["server_id"] = server.ServerId
-			data["ip_address"] = server.IpAddress
-			data["port"] = server.Port
-			data["account"] = server.Account
-			data["name"] = server.Name
-			data["type"] = server.Type
-			data["time"] = server.CreateTime.Format("2006-01-02 15:04:05")
-			data["status"] = server.Status
+			if id <= 0 {
+				c.TplName = "server/index_list.html"
+				c.Data["ServerId"] = server.ServerId
+				c.Data["Name"] = server.Name
+				c.Data["IpAddress"] = server.IpAddress
+				c.Data["Port"] = server.Port
+				c.Data["Tag"] = server.Tag
+				c.Data["Status"] = server.Status
+				c.Data["Type"] = server.Type
+				c.Data["CreateTime"] = server.CreateTime
+
+				view, err := c.RenderString()
+
+				if err != nil {
+					fmt.Println(err)
+				}
+				data["view"] = view
+			}
 
 
-			c.JsonResult(0, "ok", data)
+
+			data["errcode"] = 0
+			data["message"] = "ok"
+
+			data["data"] = server
+
+			c.Data["json"] = data
+			c.ServeJSON(true)
+			c.StopRun()
+
 		}
 	}
 

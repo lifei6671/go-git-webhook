@@ -2,6 +2,17 @@
 body{
     background: #E5E5E5;
     font-family:'Lato', 'Helvetica Neue', 'Microsoft Yahei', Arial, Helvetica, sans-serif,"宋体" !important;
+    scrollbar-face-color: #3f3f3f; /*ie立体滚动条的颜色*/
+    scrollbar-track-color: #ccc; /*图7,立体滚动条背景颜色*/
+}
+/*webkit滚动条滚动条整体部分*/
+::-webkit-scrollbar{
+    width: 8px;
+    background: #ccc;
+}
+/*webkit滚动条里面可以拖动的那部分*/
+::-webkit-scrollbar-thumb  {
+    background:#3f3f3f;
 }
 .text{
     font-size: 12px;
@@ -20,6 +31,8 @@ label{
 .tooltip{
     font-weight: 200 !important;
 }
+.CodeMirror { height: 250px; border: 1px solid #ddd; font-family: "Courier New", 'Source Sans Pro', Helvetica, Arial, sans-serif !important;font-size: 12px !important;}
+
 /***头部导航条样式***/
 .bs-docs-nav {
     margin-bottom: 0;
@@ -48,7 +61,7 @@ label{
     position: relative;
     background: #FFF;
     box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
-    margin: 15px auto;
+    margin: 70px auto 40px auto;
     padding: 0 15px;
     border-radius: .28571429rem;
     border: 1px solid rgba(34,36,38,.15);

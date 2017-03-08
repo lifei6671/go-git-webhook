@@ -29,7 +29,7 @@ func RegisterModel()  {
 	orm.RegisterModel(new(models.Member))
 	orm.RegisterModel(new(models.Server))
 	orm.RegisterModel(new(models.WebHook))
-	orm.RegisterModel(new(models.History))
+	orm.RegisterModel(new(models.Scheduler))
 }
 
 //注册orm命令行工具

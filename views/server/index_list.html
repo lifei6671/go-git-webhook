@@ -1,0 +1,19 @@
+<tr>
+    <td>{{.ServerId}}</td>
+    <td>{{.Name}}</td>
+    <td>{{.IpAddress}}</td>
+    <td>{{.Port}}</td>
+    <td>
+        {{if eq .Status 0}}
+        <span class="label label-success">正常</span>
+        {{else}}
+        <span class="label label-danger">禁用</span>
+        {{end}}
+    </td>
+    <td>{{.Type}}</td>
+    <td>{{dateformat .CreateTime "2006-01-02 15:04:05"}}</td>
+    <td>
+        <a href='{{urlfor "ServerController.Edit" ":id" .ServerId}}'  title="编辑" class="btn btn-default btn-sm edit-btn"><i class="fa fa-edit" aria-hidden="true"></i></a>
+        <a href="###" title="删除" class="btn btn-default btn-sm delete-btn" data-id="{{.ServerId}}"><i class="fa fa-times" aria-hidden="true"></i></a>
+    </td>
+</tr>

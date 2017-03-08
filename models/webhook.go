@@ -4,20 +4,21 @@ import (
 	"time"
 	"errors"
 	"github.com/astaxie/beego/orm"
-	"crypto/md5"
+	"go-git-webhook/modules/hash"
 )
 
 type WebHook struct {
-	WebHookId int			`orm:"pk;auto;unique;column(web_hook_id)"`
-	RepositoryName string		`orm:"size(255);column(repo_name);not null"`
-	BranchName string		`orm:"size(255);column(branch_name);not null"`
-	ServerId int			`orm:"type(int);column(server_id);not null"`
-	Tag string			`orm:"size(1000);column(tag)"`
-	Shell string			`orm:"size(1000);column(shell)"`
-	Status int			`orm:"type(int);column(status);default(0)"`
-	Key string			`orm:"size(1000);column(key)"`
-	LastExecTime time.Time		`orm:"type(datetime);column(last_exec_time)"`
-	CreateTime time.Time		`orm:"type(datetime);column(create_time);auto_now_add"`
+	WebHookId int			`orm:"pk;auto;unique;column(web_hook_id)" json:"web_hook_id"`
+	RepositoryName string		`orm:"size(255);column(repo_name);not null" json:"repository_name"`
+	BranchName string		`orm:"size(255);column(branch_name);not null" json:"branch_name"`
+	ServerId int			`orm:"type(int);column(server_id);not null" json:"-"`
+	Tag string			`orm:"size(1000);column(tag)" json:"tag"`
+	Shell string			`orm:"size(1000);column(shell)" json:"shell"`
+	Status int			`orm:"type(int);column(status);default(0)" json:"status"`
+	Key string			`orm:"size(255);column(key);unique" json:"key"`
+	Secure string			`orm:"size(255);column(secure);unique" json:"secure"`
+	LastExecTime time.Time		`orm:"type(datetime);column(last_exec_time);null" json:"last_exec_time"`
+	CreateTime time.Time		`orm:"type(datetime);column(create_time);auto_now_add" json:"create_time"`
 	CreateAt int			`orm:"type(int);column(create_at)"`
 }
 
@@ -63,6 +64,12 @@ func (m *WebHook) DeleteMulti (id ...int) error {
 	return errors.New("Invalid parameter")
 }
 
+func (m *WebHook) Delete() error {
+	o := orm.NewOrm()
+	_,err := o.Delete(m)
+
+	return err
+}
 func (m *WebHook) DeleteForServerId(serverId int) error {
 	o := orm.NewOrm()
 
@@ -74,18 +81,27 @@ func (m *WebHook) DeleteForServerId(serverId int) error {
 	return nil
 }
 
-func (m *WebHook) Save() {
+func (m *WebHook) FindByKey(key string) error {
+	o := orm.NewOrm()
+
+	if err := o.QueryTable(m.TableName()).Filter("key",key).One(m);err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *WebHook) Save() error {
 	o := orm.NewOrm()
 	var err error;
 
-	if m.ServerId > 0 {
+	if m.WebHookId > 0 {
 		_,err = o.Update(m)
 	}else{
-		md5Ctx := md5.New()
-		md5Ctx.Write([]byte(time.Now().String() + m.RepositoryName + m.BranchName ))
-		cipherStr := md5Ctx.Sum(nil)
+		key := (time.Now().String() + m.RepositoryName + m.BranchName )
 
-		m.Key = string(cipherStr)
+		m.Key = hash.Md5(key)
+
+		m.Secure = hash.Md5(key + key)
 
 		_,err = o.Insert(m)
 	}

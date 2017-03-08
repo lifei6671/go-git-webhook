@@ -1,0 +1,21 @@
+<tr>
+    <td>{{.WebHookId}}</td>
+    <td>{{.RepositoryName}}</td>
+    <td>{{.BranchName}}</td>
+    <td>{{.Tag}}</td>
+    <td>{{date .CreateTime "Y-m-d H:i:s"}}</td>
+    <td>
+        {{if eq .Status 0}}
+        <span class="label label-success">正常</span>
+        {{else}}
+        <span class="label label-danger">禁用</span>
+        {{end}}
+    </td>
+    <td>
+        <a href="###" title="拷贝Token" class="btn btn-default btn-sm copy-hook-btn" data-key="{{.Key}}" data-toggle="tooltip"><i class="fa fa-copy" aria-hidden="true"></i></a>
+        <a href='{{urlfor "HomeController.Edit" ":id" .WebHookId}}'  title="编辑" class="btn btn-default btn-sm edit-btn" data-toggle="tooltip"><i class="fa fa-edit" aria-hidden="true"></i></a>
+        <a href="###" title="删除" class="btn btn-default btn-sm delete-hook-btn" data-id="{{.WebHookId}}" data-toggle="tooltip"><i class="fa fa-times" aria-hidden="true"></i></a>
+        <a href="###" title="执行历史记录" data-id="{{.WebHookId}}" class="btn btn-default btn-sm" data-toggle="tooltip"><i class="fa fa-clock-o" aria-hidden="true"></i></a>
+        <a href="###" title="服务器列表" class="btn btn-default btn-sm" data-toggle="tooltip"><i class="fa fa-server" aria-hidden="true"></i></a>
+    </td>
+</tr>
