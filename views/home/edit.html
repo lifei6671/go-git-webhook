@@ -39,13 +39,19 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-9">
+                    <div class="col-lg-6">
                         <div class="form-group">
                             <label>URL</label>
                             <input type="text" readonly name="key" id="privateKey" placeholder="Git Web Hook URL" class="form-control" value="{{.HookUrl}}">
                         </div>
                     </div>
-                    <div class="col-lg-3">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label>Secure</label>
+                            <input type="text" readonly name="secure" id="secure" placeholder="Secure" class="form-control" value="{{.Model.Secure}}">
+                        </div>
+                    </div>
+                    <div class="col-lg-2">
                         <div class="form-group">
                             <div class="form-group">
                                 <label>Status</label>

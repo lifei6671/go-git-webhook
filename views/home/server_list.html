@@ -1,10 +1,212 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>WebHook the list of servers - GitWebHook</title>
+    {{template "widgets/headfile.html"}}
+    <link rel="stylesheet" href="/static/bootstrap/plugins/select2/css/select2.min.css">
+    <style type="text/css">
+        .select2-results__option:hover{
+            background: #5897fb;
+            color: #ffffff;
+            cursor: pointer;
+        }
+    </style>
+    {{if .dev}}
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/font-awesome/css/font-awesome.css">
+    <link rel="stylesheet" href="/static/codemirror/lib/codemirror.css">
+    <link rel="stylesheet" href="/static/css/global.css">
+    <script src="/static/js/jquery-1.12.4.min.js" type="text/javascript"></script>
+    <script src="/static/js/jquery.form.js" type="text/javascript"></script>
+    {{end}}
 </head>
 <body>
+{{template "widgets/head.html" .}}
+<div class="container">
+    <div class="bs-breadcrumb-container">
+        <ol class="breadcrumb">
+            <li> <i class="fa fa-home" aria-hidden="true"></i></li>
+            <li><a href="{{urlfor "HomeController.Index"}}">WebHook</a> </li>
+            <li>Servers</li>
+            <li>{{.Model.RepositoryName}}</li>
+        </ol>
 
+    </div>
+
+    <div class="bs-body-container">
+
+        <div class="title">
+            <h3>{{.Model.RepositoryName}} - 服务器列表</h3>
+            <hr>
+        </div>
+        <div class="body">
+            <table class="table table-condensed" id="tableServerList">
+                <thead>
+                <tr>
+                    <th width="5%">#</th>
+                    <th width="15%">Server Name</th>
+                    <th>Server IP</th>
+                    <th width="10%">Port</th>
+                    <th width="10%">Status</th>
+                    <th width="10%">Server Type</th>
+                    <th width="15%">Create Time</th>
+                    <th width="15%">Operate</th>
+                </tr>
+                </thead>
+                <tbody>
+                {{if .lists}}
+                    {{range $index,$item := .lists}}
+                        <tr data-id="{{.ServerId}}">
+                            <td>{{.RelationId}}</td>
+                            <td>{{.Name}}</td>
+                            <td>{{.IpAddress}}</td>
+                            <td>{{.Port}}</td>
+                            <td>
+                                {{if eq .Status 0}}
+                                <span class="label label-success">正常</span>
+                                {{else}}
+                                <span class="label label-danger">禁用</span>
+                                {{end}}
+                            </td>
+                            <td>{{.Type}}</td>
+                            <td>{{dateformat .CreateTime "2006-01-02 15:04:05"}}</td>
+                            <td>
+                                <a href="###" title="移除" class="btn btn-default btn-sm delete-btn" data-id="{{$item.ServerId}}"><i class="fa fa-times" aria-hidden="true"></i></a>
+                                <a href="###" title="执行历史记录" data-id="{{.WebHookId}}" class="btn btn-default btn-sm" data-toggle="tooltip"><i class="fa fa-clock-o" aria-hidden="true"></i></a>
+                            </td>
+                        </tr>
+                    {{end}}
+                {{end}}
+
+                </tbody>
+            </table>
+        </div>
+        <div class="body-botton text-center">
+            <a href="{{urlfor "HomeController.Index"}}" class="btn btn-success btn-sm">返回 WebHook List</a>
+            <button class="btn btn-success btn-sm" id="btnAddAssociationServer">关联 Server</button>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="addAssociationServerModal" tabindex="-1" role="dialog" aria-labelledby="addAssociationServerModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form action='{{urlfor "HomeController.AddServerForWebHook"}}' method="post" id="addAssociationServerForm">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="addAssociationServerModalLabel">Association Server</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div class="col-lg-12">
+                            <select id="selectAssociationServer" multiple="multiple" style="width: 100%" data-tags="true" data-allow-clear="true" data-placeholder="请输入服务器名称或标签"></select>
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="modal-footer">
+                    <span class="text error-message" id="errorMessage"></span>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" id="btnSaveAssociationServer" data-load-text="saving">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{{template "widgets/foot.html" .}}
+<script type="text/javascript" src="/static/bootstrap/plugins/select2/js/select2.js"></script>
+<script type="text/javascript">
+    function formatResult(repo) {
+
+        if (repo.loading) return repo.text;
+        if (!repo.hasOwnProperty("server_id")) return null;
+
+        return '<span class="select2-result-repository__server_id" data-id="'+repo.server_id+'">'+ repo.name +'</span>';
+    }
+    function formatRepoSelection(repo) {
+        return '<input name="server_id" type="hidden" value="'+repo.id +'">' + repo.name;
+    }
+    $(function () {
+        var addAssociationServerForm = $("#addAssociationServerForm");
+        var tableServerListElement = $("#tableServerList");
+
+        var modalCache = addAssociationServerForm.find(".modal-body").html();
+
+
+        addAssociationServerForm.ajaxForm({
+            dataType : "json",
+            beforeSubmit : function () {
+
+                addAssociationServerForm.find(".form-group").removeClass("has-error");
+                $("#btnSaveAssociationServer").button("load");
+                return true;
+            },
+            success : function (res) {
+                if(res.errcode === 0){
+
+                }else{
+                    $("#errorMessage").text(res.message);
+                }
+            },
+            error : function () {
+              $("#errorMessage").text("Internal Server Error");
+            },
+            complete : function () {
+                $("#btnSaveAssociationServer").button("reset");
+            }
+       }) ;
+       $("#btnAddAssociationServer").on("click",function () {
+            $("#addAssociationServerModal").modal("show");
+       });
+       $("#addAssociationServerModal").on("show.bs.modal",function () {
+
+          $(this).find(".modal-body").html(modalCache);
+
+          $("#selectAssociationServer").select2({
+              ajax: {
+                  url : addAssociationServerForm.attr("action"),
+                  dataType : "json",
+                  delay : 200 ,
+                  data : function (params) {
+                      return {
+                          keyword: params.term, 
+                          page: params.page
+                      };
+                  },processResults : function (res, params) {
+                      params.page = params.page || 1;
+
+                      if(res.errcode !== 0) {
+                          $("#errorMessage").text(res.message);
+                          return {
+                                results : null
+                          };
+                      }
+                      var data = $.map(res.data,function (obj) {
+                         obj.id = obj.server_id;
+                         obj.text = obj.name;
+                         return obj;
+                      });
+
+                      return {
+                          results: data,
+                          pagination: {
+                              more: false
+                          }
+                      };
+                  },
+                  cache: true
+              },
+              langCode : "zh-CN",
+              minimumInputLength: 1 ,
+              maximumInputLength : 20,
+              escapeMarkup: function (markup) { return markup; },
+              templateResult : formatResult,
+              templateSelection: formatRepoSelection
+          });
+       });
+    });
+</script>
 </body>
 </html>

@@ -207,3 +207,4 @@ func (c *ServerController) Delete() {
 
 	c.JsonResult(0,"ok")
 }
+

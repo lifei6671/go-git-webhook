@@ -52,6 +52,7 @@ func (c *HomeController) Index() {
 	c.Data["BaseUrl"] = c.BaseUrl()
 }
 
+//编辑
 func (c *HomeController) Edit() {
 	c.Prepare()
 	c.Layout = ""
@@ -111,6 +112,7 @@ func (c *HomeController) Edit() {
 			c.Data["Status"] = webHook.Status
 			c.Data["BaseUrl"] = c.BaseUrl()
 			c.Data["Key"] = webHook.Key
+			c.Data["Secure"] = webHook.Secure
 
 			view, err := c.RenderString()
 
@@ -147,10 +149,11 @@ func (c *HomeController) Edit() {
 	}else{
 		c.Data["Model"] = webHook
 
-		c.Data["HookUrl"] = c.UrlFor("HomeController.Callback",":key",webHook.Key)
+		c.Data["HookUrl"] = c.URLFor("HomeController.Payload",":key",webHook.Key)
 	}
 }
 
+//删除
 func (c *HomeController) Delete()  {
 	id,_ := c.GetInt("id",0)
 	if id <= 0 {
@@ -171,6 +174,7 @@ func (c *HomeController) Delete()  {
 	c.JsonResult(0,"ok")
 }
 
+//回调
 func (c *HomeController) Payload (){
 	c.TplName = ""
 
@@ -203,7 +207,7 @@ func (c *HomeController) Payload (){
 
 	c.Ctx.WriteString(branchName)
 
-
+	//#TODO 待完善
 	c.StopRun()
 }
 
@@ -212,4 +216,50 @@ func (c *HomeController) ServerList() {
 	c.TplName = "home/server_list.html"
 
 
+	id,err := strconv.Atoi(c.Ctx.Input.Param(":id"))
+
+	if err != nil || id <= 0{
+		c.ServerError("WebHook does not exist.")
+	}
+	webHook := models.NewWebHook()
+
+	if err := webHook.Find(id); err != nil {
+		c.ServerError("WebHook does not exist." )
+	}
+	if webHook.CreateAt != c.Member.MemberId {
+		c.Forbidden("")
+	}
+
+	c.Data["Model"] = webHook
+}
+
+func (c *HomeController) AddServerForWebHook() {
+	c.Prepare()
+
+	if c.Ctx.Input.IsPost() {
+
+		serverIds := c.GetStrings("server_id")
+		if len(serverIds) <= 0 {
+			c.JsonResult(500,"Server Id is require.")
+		}
+
+		fmt.Println(serverIds)
+
+	}
+
+	keyword := c.GetString("keyword","")
+
+	if keyword == "" {
+		c.JsonResult(500,"Keyword is require.")
+	}
+
+	serverList,err := models.NewServer().Search(keyword,c.Member.MemberId)
+
+	if err != nil {
+		c.JsonResult(500,"Query Result Error")
+	}
+
+	c.JsonResult(0,"ok",serverList)
+
+	c.StopRun()
 }

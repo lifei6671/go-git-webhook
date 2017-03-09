@@ -68,7 +68,7 @@ func GetPagesInfo(tableName string, currentpage int, pagesize int, conditions st
         po.CurrentPage = int(cp)
         _,_,_ pager := util.GetPagerLinks(&po, this.Ctx)
         this.Data["Email"] = html.HTML(pager)
-        this.TplNames = "test.html"
+        this.TplName = "test.html"
     }
 */
 func GetPagerLinks(po *PageOptions, ctx *context.Context) (int, int, orm.RawSeter, html.HTML) {

@@ -9,9 +9,9 @@ import (
 
 type WebHook struct {
 	WebHookId int			`orm:"pk;auto;unique;column(web_hook_id)" json:"web_hook_id"`
-	RepositoryName string		`orm:"size(255);column(repo_name);not null" json:"repository_name"`
-	BranchName string		`orm:"size(255);column(branch_name);not null" json:"branch_name"`
-	ServerId int			`orm:"type(int);column(server_id);not null" json:"-"`
+	RepositoryName string		`orm:"size(255);column(repo_name)" json:"repository_name"`
+	BranchName string		`orm:"size(255);column(branch_name)" json:"branch_name"`
+	ServerId int			`orm:"type(int);column(server_id)" json:"-"`
 	Tag string			`orm:"size(1000);column(tag)" json:"tag"`
 	Shell string			`orm:"size(1000);column(shell)" json:"shell"`
 	Status int			`orm:"type(int);column(status);default(0)" json:"status"`
@@ -101,7 +101,7 @@ func (m *WebHook) Save() error {
 
 		m.Key = hash.Md5(key)
 
-		m.Secure = hash.Md5(key + key)
+		m.Secure = hash.Md5(key + key + time.Now().String())
 
 		_,err = o.Insert(m)
 	}

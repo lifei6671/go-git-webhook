@@ -3,16 +3,17 @@ package models
 import (
 	"time"
 	"github.com/astaxie/beego/orm"
+	"fmt"
 )
 
 type Server struct {
 	ServerId int			`orm:"pk;auto;unique;column(server_id)" json:"server_id"`
-	Name string			`orm:"size(255);column(name);not null" json:"name"`
-	Type string			`orm:"size(255);column(type);not null;default(ssh)" json:"type"`
-	IpAddress string		`orm:"size(255);column(ip_address);not null" json:"ip_address"`
-	Port int			`orm:"type(int);column(port);not null" json:"port"`
-	Account string			`orm:"size(255);column(account);not null" json:"account"`
-	PrivateKey string		`orm:"type(text);column(private_key);not null" json:"private_key"`
+	Name string			`orm:"size(255);column(name)" json:"name"`
+	Type string			`orm:"size(255);column(type);default(ssh)" json:"type"`
+	IpAddress string		`orm:"size(255);column(ip_address)" json:"ip_address"`
+	Port int			`orm:"type(int);column(port)" json:"port"`
+	Account string			`orm:"size(255);column(account)" json:"account"`
+	PrivateKey string		`orm:"type(text);column(private_key)" json:"private_key"`
 	Tag string			`orm:"size(1000);column(tag)" json:"tag"`
 	Status int 			`orm:"type(int);column(status);default(0)" json:"status"`
 	CreateTime time.Time		`orm:"type(datetime);column(create_time);auto_now_add" json:"create_time"`
@@ -44,28 +45,7 @@ func (m *Server) Find(id int) (error) {
 	return nil;
 }
 
-//分页查询服务器
-func (m *Server) GetServerList(pageIndex int,pageSize int) ([]Server,int64,error) {
-	o := orm.NewOrm()
-	offset  := (pageIndex -1) * pageSize
-	var list []Server
-
-	_,err := o.QueryTable(m.TableName()).Limit(pageSize).Offset(offset).OrderBy("-member_id").All(&list)
-
-	if err != nil {
-		if err == orm.ErrNoRows {
-			return list,0,nil
-		}
-		return list,0,err
-	}
-	count,err := o.QueryTable(m.TableName()).Count()
-
-	if err != nil {
-		return list,0,err
-	}
-	return list,count,nil
-}
-
+//创建或更新
 func (m *Server) Save() error {
 	o := orm.NewOrm()
 	var err error;
@@ -78,9 +58,29 @@ func (m *Server) Save() error {
 
 	return err
 }
+
+//删除
 func (m *Server) Delete() error {
 	o := orm.NewOrm()
 	_,err := o.Delete(m)
 
 	return err
+}
+
+
+func (m *Server) Search(keyword string, memberId int) ([]Server,error) {
+	o := orm.NewOrm()
+
+	keyword = "%" + keyword + "%"
+
+	var servers []Server
+
+	_,err := o.Raw("SELECT * FROM servers WHERE create_at = ? AND (name LIKE ? OR servers.tag LIKE ?)",memberId,keyword,keyword).QueryRows(&servers)
+
+	if err != nil {
+		fmt.Println(err)
+		return servers,err
+	}
+
+	return servers,nil
 }

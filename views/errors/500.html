@@ -1,10 +1,59 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>500 - GitWebHook</title>
+    <meta charset="utf-8">
+    <meta name="author" content="SmartWiki" />
+    <link rel="shortcut icon" href="/favicon.ico">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="renderer" content="webkit" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>服务器错误 - SmartWebHook</title>
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic&subset=latin" rel="stylesheet" type="text/css">
+
+    <style type="text/css">
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            color: #B0BEC5;
+            display: table;
+            font-weight: 100;
+            font-family: 'Lato',"Microsoft Yahei","Helvetica Neue",Helvetica,Arial,sans-serif;
+            text-align: left;
+        }
+
+        .container {
+            text-align: center;
+            display: table-cell;
+            vertical-align: middle;
+        }
+
+        .content {
+            text-align: left;
+            display: inline-block;
+            color: red;
+            font-size: 50px;
+        }
+
+        .title {
+            font-size: 72px;
+            margin-bottom: 40px;
+            color: red;
+        }
+    </style>
 </head>
 <body>
-{{.Message}}
+<div class="container">
+    <div class="content">
+        <div class="title">HTTP 500 </div>
+        <div class="message">
+            {{.Model.Message}}
+        </div>
+    </div>
+</div>
 </body>
 </html>

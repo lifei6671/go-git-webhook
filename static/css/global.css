@@ -57,7 +57,8 @@ label{
 }
 
 /***中间部分***/
-.bs-docs-container{
+
+.bs-docs-container,.bs-breadcrumb-container{
     position: relative;
     background: #FFF;
     box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
@@ -66,6 +67,23 @@ label{
     border-radius: .28571429rem;
     border: 1px solid rgba(34,36,38,.15);
 }
+.bs-breadcrumb-container{
+    margin-bottom: 10px;
+    padding: 0;
+}
+.bs-breadcrumb-container .breadcrumb{
+   margin: 0;
+}
+.bs-body-container{
+    position: relative;
+    background: #FFF;
+    box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
+    margin: 10px auto 40px auto;
+    padding: 0 15px;
+    border-radius: .28571429rem;
+    border: 1px solid rgba(34,36,38,.15);
+}
+
 .body-botton{
     padding-bottom: 15px;
 }

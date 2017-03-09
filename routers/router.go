@@ -10,6 +10,8 @@ func init()  {
 
 	beego.Router("/hook/edit/?:id", &controllers.HomeController{},"*:Edit")
 	beego.Router("/hook/delete", &controllers.HomeController{},"post:Delete")
+	beego.Router("/hook/server_list/:id", &controllers.HomeController{},"*:ServerList")
+	beego.Router("/hook/server_list/add", &controllers.HomeController{},"*:AddServerForWebHook")
 
 	//用于GitHub Gogs Gitlab 等通知使用
 	beego.Router("/payload/:key",&controllers.HomeController{},"*:Payload")

@@ -69,3 +69,34 @@ func (c *BaseController) BaseUrl() string {
 	}
 	return scheme + c.Ctx.Request.Host
 }
+
+func (c *BaseController) NotFound(message interface{})  {
+	c.TplName = "errors/404.html"
+	c.Layout = ""
+	c.Data["Model"] = map[string]interface{}{"Message":message}
+
+	html,_ := c.RenderString()
+
+	c.Abort(html)
+}
+
+func (c *BaseController) Forbidden(message interface{}) {
+	c.TplName = "errors/403.html"
+	c.Layout = ""
+	c.Data["Model"] = map[string]interface{}{"Message":message}
+
+	html,_ := c.RenderString()
+
+	c.Abort(html)
+}
+
+func (c *BaseController) ServerError (message interface{}) {
+	c.TplName = "errors/500.html"
+	c.Layout = ""
+	c.Data["Model"] = map[string]interface{}{"Message":message}
+
+
+	html,_ := c.RenderString()
+
+	c.Abort(html)
+}
