@@ -30,6 +30,7 @@ func RegisterModel()  {
 	orm.RegisterModel(new(models.Server))
 	orm.RegisterModel(new(models.WebHook))
 	orm.RegisterModel(new(models.Scheduler))
+	orm.RegisterModel(new(models.Relation))
 }
 
 //注册orm命令行工具

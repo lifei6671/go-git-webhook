@@ -15,6 +15,6 @@
         <a href="###" title="拷贝Secure" class="btn btn-default btn-sm copy-hook-btn" data-key="{{.Key}}" data-secure="{{.Secure}}" data-toggle="tooltip"><i class="fa fa-copy" aria-hidden="true"></i></a>
         <a href='{{urlfor "HomeController.Edit" ":id" .WebHookId}}'  title="编辑" class="btn btn-default btn-sm edit-btn" data-toggle="tooltip"><i class="fa fa-edit" aria-hidden="true"></i></a>
         <a href="###" title="删除" class="btn btn-default btn-sm delete-hook-btn" data-id="{{.WebHookId}}" data-toggle="tooltip"><i class="fa fa-times" aria-hidden="true"></i></a>
-        <a href="{{urlfor "HomeController.ServerList" ":id" .WebHookId}}" title="服务器列表" class="btn btn-default btn-sm" data-toggle="tooltip"><i class="fa fa-server" aria-hidden="true"></i></a>
+        <a href="{{urlfor "RelationController.Index" ":id" .WebHookId}}" title="服务器列表" class="btn btn-default btn-sm" data-toggle="tooltip"><i class="fa fa-server" aria-hidden="true"></i></a>
     </td>
 </tr>

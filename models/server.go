@@ -4,6 +4,7 @@ import (
 	"time"
 	"github.com/astaxie/beego/orm"
 	"fmt"
+	"strconv"
 )
 
 type Server struct {
@@ -68,14 +69,24 @@ func (m *Server) Delete() error {
 }
 
 
-func (m *Server) Search(keyword string, memberId int) ([]Server,error) {
+func (m *Server) Search(keyword string, memberId int,excludeServerId ...int) ([]Server,error) {
 	o := orm.NewOrm()
 
 	keyword = "%" + keyword + "%"
 
+	sql := "SELECT * FROM servers WHERE create_at = ? AND (name LIKE ? OR servers.tag LIKE ?)"
+
+	if len(excludeServerId) > 0 {
+		sql += " AND server_id not in ("
+		for _,num := range excludeServerId {
+			sql += strconv.Itoa(num) + ","
+		}
+		sql += "0)"
+	}
+
 	var servers []Server
 
-	_,err := o.Raw("SELECT * FROM servers WHERE create_at = ? AND (name LIKE ? OR servers.tag LIKE ?)",memberId,keyword,keyword).QueryRows(&servers)
+	_,err := o.Raw(sql,memberId,keyword,keyword).QueryRows(&servers)
 
 	if err != nil {
 		fmt.Println(err)
@@ -83,4 +94,21 @@ func (m *Server) Search(keyword string, memberId int) ([]Server,error) {
 	}
 
 	return servers,nil
+}
+
+//根据server_id和用户id查询服务器信息列表
+func (m *Server) QueryServerByServerId(serverIds []int,memberId ...int) ([]*Server,error) {
+	o := orm.NewOrm()
+
+	query := o.QueryTable(m.TableName()).Filter("server_id__in",serverIds)
+
+	if len(memberId) > 0 {
+		query = query.Filter("create_at",memberId[0])
+	}
+
+	var servers []*Server
+
+	_,err := query.All(&servers)
+
+	return servers,err
 }

@@ -211,55 +211,6 @@ func (c *HomeController) Payload (){
 	c.StopRun()
 }
 
-func (c *HomeController) ServerList() {
-	c.Prepare()
-	c.TplName = "home/server_list.html"
 
 
-	id,err := strconv.Atoi(c.Ctx.Input.Param(":id"))
 
-	if err != nil || id <= 0{
-		c.ServerError("WebHook does not exist.")
-	}
-	webHook := models.NewWebHook()
-
-	if err := webHook.Find(id); err != nil {
-		c.ServerError("WebHook does not exist." )
-	}
-	if webHook.CreateAt != c.Member.MemberId {
-		c.Forbidden("")
-	}
-
-	c.Data["Model"] = webHook
-}
-
-func (c *HomeController) AddServerForWebHook() {
-	c.Prepare()
-
-	if c.Ctx.Input.IsPost() {
-
-		serverIds := c.GetStrings("server_id")
-		if len(serverIds) <= 0 {
-			c.JsonResult(500,"Server Id is require.")
-		}
-
-		fmt.Println(serverIds)
-
-	}
-
-	keyword := c.GetString("keyword","")
-
-	if keyword == "" {
-		c.JsonResult(500,"Keyword is require.")
-	}
-
-	serverList,err := models.NewServer().Search(keyword,c.Member.MemberId)
-
-	if err != nil {
-		c.JsonResult(500,"Query Result Error")
-	}
-
-	c.JsonResult(0,"ok",serverList)
-
-	c.StopRun()
-}

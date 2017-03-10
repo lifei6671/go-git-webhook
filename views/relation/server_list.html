@@ -58,23 +58,24 @@
                 <tbody>
                 {{if .lists}}
                     {{range $index,$item := .lists}}
-                        <tr data-id="{{.ServerId}}">
-                            <td>{{.RelationId}}</td>
-                            <td>{{.Name}}</td>
-                            <td>{{.IpAddress}}</td>
-                            <td>{{.Port}}</td>
+                        <tr>
+                            <td>{{$item.RelationId}}</td>
+                            <td>{{$item.Name}}</td>
+                            <td>{{$item.IpAddress}}</td>
+                            <td>{{$item.Port}}</td>
                             <td>
-                                {{if eq .Status 0}}
+                                {{if eq $item.Status 0}}
                                 <span class="label label-success">正常</span>
                                 {{else}}
                                 <span class="label label-danger">禁用</span>
                                 {{end}}
                             </td>
-                            <td>{{.Type}}</td>
-                            <td>{{dateformat .CreateTime "2006-01-02 15:04:05"}}</td>
+                            <td>{{$item.Type}}</td>
+                            <td>{{date $item.CreateTime "Y-m-d H:i:s"}}</td>
                             <td>
-                                <a href="###" title="移除" class="btn btn-default btn-sm delete-btn" data-id="{{$item.ServerId}}"><i class="fa fa-times" aria-hidden="true"></i></a>
-                                <a href="###" title="执行历史记录" data-id="{{.WebHookId}}" class="btn btn-default btn-sm" data-toggle="tooltip"><i class="fa fa-clock-o" aria-hidden="true"></i></a>
+                                <a href="###" data-url="{{urlfor "RelationController.DeleteServer" ":id" $item.RelationId}}" title="删除" class="btn btn-default btn-sm delete-server-btn" data-toggle="tooltip"><i class="fa fa-times" aria-hidden="true"></i></a>
+                                <a href="###" title="执行历史记录" data-id="{{$item.RelationId}}" class="btn btn-default btn-sm" data-toggle="tooltip"><i class="fa fa-clock-o" aria-hidden="true"></i></a>
+
                             </td>
                         </tr>
                     {{end}}
@@ -93,7 +94,8 @@
 <div class="modal fade" id="addAssociationServerModal" tabindex="-1" role="dialog" aria-labelledby="addAssociationServerModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form action='{{urlfor "HomeController.AddServerForWebHook"}}' method="post" id="addAssociationServerForm">
+            <form action='{{urlfor "RelationController.AddServer"}}' method="post" id="addAssociationServerForm">
+                <input type="hidden" name="web_hook_id" value="{{.Model.WebHookId}}">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title" id="addAssociationServerModalLabel">Association Server</h4>
@@ -145,7 +147,7 @@
             },
             success : function (res) {
                 if(res.errcode === 0){
-
+                    window.location.reload(true);
                 }else{
                     $("#errorMessage").text(res.message);
                 }
@@ -157,11 +159,12 @@
                 $("#btnSaveAssociationServer").button("reset");
             }
        }) ;
+
        $("#btnAddAssociationServer").on("click",function () {
             $("#addAssociationServerModal").modal("show");
        });
        $("#addAssociationServerModal").on("show.bs.modal",function () {
-
+           $("#errorMessage").text("");
           $(this).find(".modal-body").html(modalCache);
 
           $("#selectAssociationServer").select2({
@@ -170,8 +173,10 @@
                   dataType : "json",
                   delay : 200 ,
                   data : function (params) {
+                      var id = addAssociationServerForm.find("input[name='web_hook_id']").val()
                       return {
-                          keyword: params.term, 
+                          keyword: params.term,
+                          id : id,
                           page: params.page
                       };
                   },processResults : function (res, params) {
@@ -205,6 +210,18 @@
               templateResult : formatResult,
               templateSelection: formatRepoSelection
           });
+       });
+
+       $(".delete-server-btn").on("click",function () {
+           var $this = $(this);
+          var url = $(this).attr("data-url");
+          $.post(url,{},function (res) {
+              if(res.errcode === 0){
+                $this.closest("tr").empty().remove();
+              }else{
+                  alert(res.message);
+              }
+          },"json")
        });
     });
 </script>

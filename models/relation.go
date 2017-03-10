@@ -22,22 +22,69 @@ func (m *Relation) TableEngine() string {
 	return "INNODB"
 }
 
+func NewRelation() *Relation {
+	return &Relation{}
+}
+
 func (m *Relation) Save () error {
 
 	o := orm.NewOrm()
-
+	if o.QueryTable(m.TableName()).Filter("web_hook_id",m.WebHookId).Filter("server_id",m.ServerId).Exist() {
+		return ErrServerAlreadyExist
+	}
 	var err error
 
 	if m.RelationId > 0 {
 		if m.WebHookId <= 0 || m.ServerId <= 0 {
 			return errors.New("Data format error")
 		}
-		if o.QueryTable(m.TableName()).Filter("web_hook_id",m.WebHookId).Filter("server_id",m.ServerId).Exist() {
-			return nil
-		}
 		_,err = o.Update(m)
 	}else{
 		_,err =o.Insert(m)
 	}
 	return err
+}
+
+func (m *Relation) Delete()error {
+	o := orm.NewOrm()
+	_,err := o.Delete(m)
+
+	return err
+}
+
+func (m *Relation) Find(id int) error {
+	o := orm.NewOrm()
+
+	m.RelationId = id
+
+	if err := o.Read(m) ;err != nil {
+		return err
+	}
+	return nil;
+}
+
+type ServerRelation struct {
+	ServerId int
+	RelationId int
+	WebHookId int
+	Status int
+	Name string
+	IpAddress string
+	Port int
+	Type string
+	CreateTime time.Time
+	CreateAt int
+}
+
+func (m *Relation) QueryByWebHookId (webHookId int,memberId int) ( []*ServerRelation ,error){
+	o := orm.NewOrm()
+
+	var res []*ServerRelation
+
+	sql := "SELECT servers.*,relations.create_time,web_hook_id,relation_id FROM relations LEFT JOIN servers ON relations.server_id = servers.server_id WHERE web_hook_id = ? AND create_at = ? ORDER BY relation_id DESC "
+
+	_,err := o.Raw(sql,webHookId,memberId).QueryRows(&res)
+
+
+	return res,err
 }

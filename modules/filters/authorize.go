@@ -9,7 +9,8 @@ func init()  {
 	Authorize := func(ctx *context.Context) {
 		_, ok := ctx.Input.Session("uid").(int)
 		if !ok {
-			ctx.Redirect(302, "/login")
+
+			//ctx.Redirect(302, "/login")
 		}
 	}
 

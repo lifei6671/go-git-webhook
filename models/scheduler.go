@@ -7,6 +7,7 @@ type Scheduler struct {
 	SchedulerId int 		`orm:"pk;auto;unique;column(scheduler_id)" json:"scheduler_id"`
 	WebHookId int			`orm:"type(int);column(web_hook_id)" json:"web_hook_id"`
 	ServerId int			`orm:"type(int);column(server_id)" json:"server_id"`
+	RelationId int			`orm:"type(int);column(relation_id)" json:"relation_id"`
 	Status string			`orm:"column(status);default(wait)" json:"status"` //状态：wait 等待执行/executing 执行中/suspend 中断执行/ failure 执行失败/ success 执行成功
 	CreateTime time.Time		`orm:"type(datetime);column(create_time);auto_now_add" json:"create_time"` //添加时间
 	StartExecTime time.Time		`orm:"type(datetime);column(start_exec_time);null" json:"start_exec_time"` //开始执行时间
