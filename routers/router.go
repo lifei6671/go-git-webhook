@@ -14,10 +14,14 @@ func init()  {
 	beego.Router("/hook/server_list/:id", &controllers.RelationController{},"*:Index")
 	beego.Router("/hook/server_list/add", &controllers.RelationController{},"*:AddServer")
 	beego.Router("/hook/server_list/delete/:id", &controllers.RelationController{},"*:DeleteServer")
+
 	beego.Router("/hook/scheduler/:id", &controllers.SchedulerController{},"*:Index")
+	beego.Router("/hook/scheduler/:id/console/:scheduler_id", &controllers.SchedulerController{},"*:Console")
+	beego.Router("/hook/scheduler/:id/resume/:scheduler_id", &controllers.SchedulerController{},"*:Resume")
+	beego.Router("/hook/scheduler/:id/cancel/:scheduler_id", &controllers.SchedulerController{},"*:Cancel")
 
 	//用于GitHub Gogs Gitlab 等通知使用
-	beego.Router("/payload/:key",&controllers.HomeController{},"*:Payload")
+	beego.Router("/payload/:key",&controllers.PayloadController{},"*:Index")
 
 	beego.Router("/server", &controllers.ServerController{},"*:Index")
 	beego.Router("/server/edit/?:id", &controllers.ServerController{},"*:Edit")

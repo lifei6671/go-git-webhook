@@ -7,6 +7,7 @@ import (
 
 func main()  {
 
+	commands.RegisterLogger()
 	commands.RegisterDataBase()
 	commands.RegisterModel()
 	commands.RunCommand()

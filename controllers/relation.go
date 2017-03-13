@@ -146,14 +146,15 @@ func (c *RelationController) AddServer() {
 
 func (c *RelationController) DeleteServer() {
 	c.Prepare()
-	id ,err := strconv.Atoi(c.Ctx.Input.Param(":id"))
+	relation_id ,err := strconv.Atoi(c.Ctx.Input.Param(":id"))
 
 	if err != nil {
 		c.JsonResult(500,"Parameter error: web_hook_id is require.")
 	}
+
 	relation := models.NewRelation()
 
-	if err := relation.Find(id);err != nil {
+	if err := relation.Find(relation_id);err != nil {
 		fmt.Println("DeleteServer:",err)
 
 		c.JsonResult(404,"Server does not exist.")
@@ -176,3 +177,6 @@ func (c *RelationController) DeleteServer() {
 
 	c.JsonResult(0,"ok")
 }
+
+
+

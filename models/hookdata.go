@@ -12,6 +12,7 @@ var(
 	ErrBranchNameNoExist = errors.New("branch name does not exist")
 	ErrPushUserNoExist = errors.New("push user does not exist")
 	ErrNoData = errors.New("data does no exist")
+	ErrInvalidParameter = errors.New("Invalid parameter")
 )
 
 type HookData struct {

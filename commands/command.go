@@ -6,8 +6,8 @@ import (
 	"go-git-webhook/models"
 	_ "github.com/go-sql-driver/mysql"
 	_ "go-git-webhook/routers"
-	"fmt"
 	_ "go-git-webhook/modules/filters"
+	"github.com/astaxie/beego/logs"
 )
 
 //注册数据库
@@ -20,7 +20,6 @@ func RegisterDataBase()  {
 
 	dataSource := username + ":" + password + "@tcp(" + host + ":" + port +")/" + database + "?charset=utf8&parseTime=true";
 
-	fmt.Println(dataSource);
 	orm.RegisterDataBase("default", "mysql", dataSource)
 }
 
@@ -33,6 +32,12 @@ func RegisterModel()  {
 	orm.RegisterModel(new(models.Relation))
 }
 
+func RegisterLogger()  {
+	logs.SetLogger("console")
+	logs.SetLogger("file",`{"filename":"logs/log.log"}`)
+	logs.EnableFuncCallDepth(true)
+	logs.Async()
+}
 //注册orm命令行工具
 func RunCommand()  {
 	orm.RunCommand()

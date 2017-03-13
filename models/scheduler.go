@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"time"
+	"github.com/astaxie/beego/orm"
+)
 
 //任务调度器储存表
 type Scheduler struct {
@@ -26,3 +29,15 @@ func (m *Scheduler) TableEngine() string {
 	return "INNODB"
 }
 
+func NewScheduler() *Scheduler  {
+	return &Scheduler{}
+}
+
+func (m *Scheduler) InsertMulti(schedulers []Scheduler) (int64,error) {
+	if len(schedulers) <= 0 {
+		return 0,ErrInvalidParameter
+	}
+	o := orm.NewOrm()
+
+	return o.InsertMulti(len(schedulers),schedulers)
+}

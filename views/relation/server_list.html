@@ -74,7 +74,7 @@
                             <td>{{date $item.CreateTime "Y-m-d H:i:s"}}</td>
                             <td>
                                 <a href="###" data-url="{{urlfor "RelationController.DeleteServer" ":id" $item.RelationId}}" title="删除" class="btn btn-default btn-sm delete-server-btn" data-toggle="tooltip"><i class="fa fa-times" aria-hidden="true"></i></a>
-                                <a href="###" title="执行历史记录" data-id="{{$item.RelationId}}" class="btn btn-default btn-sm" data-toggle="tooltip"><i class="fa fa-clock-o" aria-hidden="true"></i></a>
+                                <a href="{{urlfor "SchedulerController.Index" ":id" $item.RelationId}}" title="执行历史记录" data-id="{{$item.RelationId}}" class="btn btn-default btn-sm" data-toggle="tooltip"><i class="fa fa-clock-o" aria-hidden="true"></i></a>
 
                             </td>
                         </tr>

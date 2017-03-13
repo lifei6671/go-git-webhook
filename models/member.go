@@ -9,7 +9,7 @@ import (
 
 type Member struct {
 	MemberId int		`orm:"pk;auto;unique;column(member_id)"`
-	Account string 		`orm:"size(255);column(account);not null"`
+	Account string 		`orm:"size(255);column(account)"`
 	Password string 	`orm:"size(1000);column(password)"`
 	Email string 		`orm:"size(255);column(email)"`
 	Phone string 		`orm:"size(255);column(phone)"`

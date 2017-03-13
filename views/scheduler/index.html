@@ -1,10 +1,125 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>执行任务列表 - GitWebHook</title>
+    {{template "widgets/headfile.html"}}    {{if .dev}}
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/font-awesome/css/font-awesome.css">
+    <link rel="stylesheet" href="/static/codemirror/lib/codemirror.css">
+    <link rel="stylesheet" href="/static/css/global.css">
+    <script src="/static/js/jquery-1.12.4.min.js" type="text/javascript"></script>
+    <script src="/static/js/jquery.form.js" type="text/javascript"></script>
+    {{end}}
+    <script type="text/javascript">
+        window.CONFIG = {
+            WebHookId : {{.Model.WebHookId}}
+        }
+    </script>
 </head>
 <body>
+{{template "widgets/head.html" .}}
+<div class="container">
+    <div class="bs-breadcrumb-container">
+        <ol class="breadcrumb">
+            <li> <i class="fa fa-home" aria-hidden="true"></i></li>
+            <li><a href="{{urlfor "HomeController.Index"}}">WebHook</a> </li>
+            <li><a href="{{urlfor "RelationController.Index" ":id" .Model.WebHookId}}">Servers</a> </li>
+            <li>Scheduler List</li>
+        </ol>
 
+    </div>
+    <div class="bs-body-container">
+        <div class="title">
+            <h3>Scheduler List</h3>
+            <hr>
+        </div>
+        <div class="body">
+            <table class="table table-condensed">
+                <thead>
+                <tr>
+                    <th width="5%">#</th>
+                    <th width="15%">Repo</th>
+                    <th width="15%">Branch Name</th>
+                    <th width="15%">Server Name</th>
+                    <th width="15%">Add Time</th>
+                    <th width="10%">Status</th>
+                    <th width="15%">Console</th>
+                </tr>
+                </thead>
+                <tbody>
+                {{if .lists}}
+                {{range $index,$item := .lists}}
+                <tr>
+                    <td>{{$item.SchedulerId}}</td>
+                    <td>{{$.Model.RepositoryName}}</td>
+                    <td>{{$.Model.BranchName}}</td>
+                    <td>{{$.Model.ServerName}}</td>
+                    <td>{{date $item.CreateTime "Y-m-d H:i:s"}}</td>
+                    <td>
+                        {{if eq $item.Status "wait"}}
+                        <span class="label label-default">等待执行</span>
+                        {{else if eq $item.Status "executing"}}
+                        <span class="label label-primary">正在执行</span>
+                        {{else if eq $item.Status "suspend"}}
+                        <span class="label label-warning">取消执行</span>
+                        {{else if eq $item.Status "failure"}}
+                        <span class="label label-danger">执行失败</span>
+                        {{else if eq $item.Status "success"}}
+                        <span class="label label-success">执行成功</span>
+                        {{else}}
+                        <span class="label label-default">未知状态</span>
+                        {{end}}
+                    </td>
+                    <td>
+                        {{if eq $item.Status "wait"}}
+                        <button id="btnStopScheduler" data-id="{{$item.SchedulerId}}" class="btn btn-default btn-sm btn-cancel-schedule" data-toggle="tooltip" title="取消任务"><i class="fa fa-power-off" aria-hidden="true"></i></button>
+                        {{end}}
+                        <button id="btnSchedulerResult"  data-id="{{$item.SchedulerId}}" class="btn btn-default btn-sm btn-schedule-console" data-toggle="tooltip" title="执行日志"><i class="fa fa-desktop" aria-hidden="true"></i></button>
+                    </td>
+                </tr>
+                {{end}}
+                {{else}}
+                <tr>
+                    <td colspan="7" class="text-center">暂无记录</td>
+                </tr>
+                {{end}}
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+</div>
+{{template "widgets/foot.html" .}}
+<script type="text/javascript">
+    $(function () {
+       $(".btn-cancel-schedule").on("click",function () {
+            var $this = $(this);
+            var id = $this.attr("data-id");
+            var url = "/hook/scheduler/" + window.CONFIG.WebHookId + "/cancel/" + id;
+
+            $.ajax({
+                url : url,
+                type :"POST",
+                dataType : "json",
+                success : function (res) {
+                    $this.removeAttr("disabled");
+                },
+                error : function () {
+                    $this.removeAttr("disabled");
+                }
+
+            });
+
+            $this.attr("disabled","disabled");
+
+       });
+
+       $(".btn-schedule-console").on("click",function () {
+
+       });
+    });
+</script>
 </body>
 </html>
