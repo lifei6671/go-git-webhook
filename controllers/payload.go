@@ -74,6 +74,7 @@ func (c *PayloadController) Index() {
 
 	if err != nil {
 		logs.Error(5001,err.Error())
+
 		c.Ctx.WriteString("Data error")
 		c.StopRun()
 	}
@@ -101,11 +102,12 @@ func (c *PayloadController) Index() {
 	if nums <=0 || err != nil {
 		if err != nil {
 			logs.Error(0,err.Error())
+
 		}
 		c.Ctx.WriteString("Data error")
 	}
 	for _, scheduler := range schedulerList {
-		tasks.SchedulerQueue <- tasks.Task{ SchedulerId : scheduler.SchedulerId }
+		tasks.Add(tasks.Task{ SchedulerId : scheduler.SchedulerId })
 	}
 
 	c.Ctx.WriteString("Work put into Queue.")

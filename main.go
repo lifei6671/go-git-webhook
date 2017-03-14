@@ -12,6 +12,7 @@ func main()  {
 	commands.RegisterModel()
 	commands.RunCommand()
 
+	commands.RegisterTaskQueue()
+
 	commands.Run()
 }
-

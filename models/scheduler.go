@@ -41,3 +41,12 @@ func (m *Scheduler) InsertMulti(schedulers []Scheduler) (int64,error) {
 
 	return o.InsertMulti(len(schedulers),schedulers)
 }
+
+func (m *Scheduler) QuerySchedulerByState(state string) ([]Scheduler,error) {
+	o := orm.NewOrm()
+
+	var results []Scheduler
+
+	_,err := o.QueryTable(m.TableName()).Filter("status",state).All(&results)
+	return results,err
+}

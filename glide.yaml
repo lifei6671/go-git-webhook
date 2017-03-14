@@ -1,0 +1,20 @@
+package: go-git-webhook
+import:
+- package: github.com/astaxie/beego
+  version: 323a1c4214101331a4b71922c23d19b7409ac71f
+  subpackages:
+  - config
+  - context
+  - grace
+  - logs
+  - orm
+  - session
+  - toolbox
+  - utils
+- package: github.com/go-sql-driver/mysql
+  version: 1421caf44f6464fd2ee8de694c7508ee13f92964
+- package: github.com/widuu/gojson
+  version: 7da9d2cd949b3f1b4e3039dd985773df8cf68a99
+- package: github.com/golang/crypto
+  subpackages:
+  - ssh

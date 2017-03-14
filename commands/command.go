@@ -8,6 +8,7 @@ import (
 	_ "go-git-webhook/routers"
 	_ "go-git-webhook/modules/filters"
 	"github.com/astaxie/beego/logs"
+	"go-git-webhook/tasks"
 )
 
 //注册数据库
@@ -33,10 +34,22 @@ func RegisterModel()  {
 }
 
 func RegisterLogger()  {
+
 	logs.SetLogger("console")
 	logs.SetLogger("file",`{"filename":"logs/log.log"}`)
 	logs.EnableFuncCallDepth(true)
 	logs.Async()
+}
+
+func RegisterTaskQueue()  {
+	tasks.Start()
+
+	if schedulerList,err := models.NewScheduler().QuerySchedulerByState("wait");err != nil {
+		for _,scheduler := range schedulerList {
+			tasks.Add(tasks.Task{SchedulerId: scheduler.SchedulerId})
+		}
+	}
+
 }
 //注册orm命令行工具
 func RunCommand()  {

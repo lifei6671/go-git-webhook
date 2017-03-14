@@ -1,79 +1,51 @@
 package tasks
 
 import (
-	"sync"
-	"bytes"
-	"github.com/astaxie/beego/logs"
+)
+import (
+	"go-git-webhook/modules/queue"
+	"go-git-webhook/conf"
+
 )
 
 var (
-	SyncRWLock = &sync.RWMutex{}
-	ConsoleMap 	= make(map[int]bytes.Buffer,20)
-	SchedulerQueue = make(chan Task,20)
+
+	queues = queue.NewQueue(conf.QueueSize())
+
+	queueState uint64 = 0
 )
-
-var(
-	taskState = 0
-)
-
-// 设置队列的容量
-func SetSchedulerQueueMaxCount(count int)  {
-	SyncRWLock.Lock()
-	queue := SchedulerQueue
-
-	SchedulerQueue = make(chan Task,count)
-
-	if len(queue) > 0 {
-		for _,item := range queue {
-			SchedulerQueue <- item
-		}
-	}
-
-	SyncRWLock.Unlock()
-}
-
 
 type Task struct {
 	SchedulerId int
 }
 
+func Add(task Task)  {
+	queues.Enqueue(task)
+}
 
 func Start() {
-	taskState = 1
-	for {
-		if taskState == 0{
-			logs.Info("%s","The queue has stopped")
-			break
-		}
-		if taskState == 2 {
-			continue
-		}
-		select {
-		case task,isClose := <-SchedulerQueue:
-			{
-				if !isClose {
-					logs.Info("channel closed!")
+	//如果等于0标识执行方法未开启
+	if queueState == 0 {
+		go func() {
+			queueState = 1
+			for {
+				//停止了队列读取
+				if queueState == 0 {
 					break
 				}
-				logs.Info("%s", "Start the task : ", task.SchedulerId)
+				value := queues.Dequue()
+
+				if _,ok := value.(Task);ok {
+
+					//fmt.Println(task.SchedulerId)
+				}
+
 			}
-		}
+		}()
 	}
-}
-//暂停
-func Paused()  {
-	taskState = 2
-}
-//恢复
-func Resume(){
-	taskState = 1
+
 }
 
 func Stop(){
-	taskState = 0
-}
-
-//获取队列状态
-func State() int {
-	return taskState
+	queueState = 0
 }
