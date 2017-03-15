@@ -63,7 +63,7 @@
                         {{else if eq $item.Status "executing"}}
                         <span class="label label-primary">正在执行</span>
                         {{else if eq $item.Status "suspend"}}
-                        <span class="label label-warning">取消执行</span>
+                        <span class="label label-warning">执行取消</span>
                         {{else if eq $item.Status "failure"}}
                         <span class="label label-danger">执行失败</span>
                         {{else if eq $item.Status "success"}}
@@ -75,6 +75,9 @@
                     <td>
                         {{if eq $item.Status "wait"}}
                         <button id="btnStopScheduler" data-id="{{$item.SchedulerId}}" class="btn btn-default btn-sm btn-cancel-schedule" data-toggle="tooltip" title="取消任务"><i class="fa fa-power-off" aria-hidden="true"></i></button>
+                        {{end}}
+                        {{if eq $item.Status "failure"}}
+                        <button id="btnReExecuteScheduler" data-id="{{$item.SchedulerId}}" class="btn btn-default btn-sm btn-cancel-schedule" data-toggle="tooltip" title="重新执行"><i class="fa fa-repeat" aria-hidden="true"></i></button>
                         {{end}}
                         <button id="btnSchedulerResult"  data-id="{{$item.SchedulerId}}" class="btn btn-default btn-sm btn-schedule-console" data-toggle="tooltip" title="执行日志"><i class="fa fa-desktop" aria-hidden="true"></i></button>
                     </td>
@@ -89,21 +92,52 @@
 
             </table>
         </div>
+        <div class="body-botton text-center">
+            <span class="text" style="padding-right: 15px;" id="errorMessage"></span>
+
+            <a href='{{urlfor "RelationController.Index" ":id" .Model.WebHookId}}' class="btn btn-success btn-sm">Back Server List</a>
+
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="consoleModal" tabindex="-1" role="dialog" aria-labelledby="consoleModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="consoleModalLabel">Console Log</h4>
+            </div>
+            <div class="modal-body">
+ <textarea name="shell" id="consoleContent" placeholder="" class="form-control" style="height: 150px;resize: none"></textarea>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
     </div>
 </div>
 {{template "widgets/foot.html" .}}
 <script type="text/javascript">
     $(function () {
+
        $(".btn-cancel-schedule").on("click",function () {
             var $this = $(this);
             var id = $this.attr("data-id");
-            var url = "/hook/scheduler/" + window.CONFIG.WebHookId + "/cancel/" + id;
+            var url = '{{urlfor "SchedulerController.Cancel" ":scheduler_id" ""}}' + id;
 
             $.ajax({
                 url : url,
                 type :"POST",
                 dataType : "json",
                 success : function (res) {
+                    if (res.errcode == 0){
+                        $this.closest("tr").find(".label-default").removeClass("label-default").addClass("label-warning").text("执行取消");
+                        $this.empty().remove()
+                    }else{
+                        alert(res.message);
+                    }
                     $this.removeAttr("disabled");
                 },
                 error : function () {
@@ -117,6 +151,18 @@
        });
 
        $(".btn-schedule-console").on("click",function () {
+            $("#consoleModal").modal("show");
+       });
+       $("#consoleModal").on("shown.bs.modal",function () {
+           CodeMirror.fromTextArea(document.getElementById("consoleContent"),{
+               lineNumbers: true,
+               mode: "text/x-sh",
+               lineWrapping : true,
+               matchBrackets: true,
+               autoCloseBrackets: true
+           });
+       });
+       $("#btnReExecuteScheduler").on("click",function () {
 
        });
     });

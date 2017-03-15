@@ -101,8 +101,10 @@ func (c *ServerController) Edit()  {
 		}
 		server := models.NewServer()
 
+
 		if id > 0{
-			if err := server.Find(id);err != nil {
+			server.ServerId = id
+			if err := server.Find();err != nil {
 				c.JsonResult(500,err.Error())
 			}
 			//如果不是本人创建则返回403
@@ -164,8 +166,9 @@ func (c *ServerController) Edit()  {
 		c.Abort("404")
 	}
 	server := models.NewServer()
+	server.ServerId = id
 
-	if err := server.Find(id); err != nil {
+	if err := server.Find(); err != nil {
 		c.Abort("404")
 	}
 	//如果不是本人创建则返回403
@@ -191,7 +194,9 @@ func (c *ServerController) Delete() {
 	}
 	server := models.NewServer()
 
-	if err := server.Find(id);err != nil {
+	server.ServerId = id
+
+	if err := server.Find();err != nil {
 		c.JsonResult(500,err.Error())
 	}
 	if server.CreateAt != c.Member.MemberId {

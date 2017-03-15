@@ -4,7 +4,6 @@ import (
 	"go-git-webhook/commands"
 )
 
-
 func main()  {
 
 	commands.RegisterLogger()
@@ -15,4 +14,6 @@ func main()  {
 	commands.RegisterTaskQueue()
 
 	commands.Run()
+
+
 }

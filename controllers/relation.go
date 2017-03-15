@@ -21,8 +21,9 @@ func (c *RelationController) Index() {
 		c.ServerError("WebHook does not exist.")
 	}
 	webHook := models.NewWebHook()
+	webHook.WebHookId = webHookId
 
-	if err := webHook.Find(webHookId); err != nil {
+	if err := webHook.Find(); err != nil {
 		c.ServerError("WebHook does not exist." )
 	}
 	if webHook.CreateAt != c.Member.MemberId {
@@ -53,8 +54,9 @@ func (c *RelationController) AddServer() {
 		}
 
 		webHook := models.NewWebHook()
+		webHook.WebHookId = webHookId
 
-		if err := webHook.Find(webHookId);err != nil {
+		if err := webHook.Find();err != nil {
 			c.JsonResult(404,"WebHook does not exist.")
 		}
 		if webHook.CreateAt != c.Member.MemberId {
@@ -89,6 +91,7 @@ func (c *RelationController) AddServer() {
 
 			relation.WebHookId = webHookId
 			relation.ServerId = server.ServerId
+			relation.MemberId = c.Member.MemberId
 
 			if err := relation.Save();err == nil {
 				temp := map[string]interface{} {
@@ -161,13 +164,15 @@ func (c *RelationController) DeleteServer() {
 	}
 
 	server := models.NewServer()
+	server.ServerId = relation.ServerId
 
-	if err := server.Find(relation.ServerId);err != nil || server.CreateAt != c.Member.MemberId {
+	if err := server.Find();err != nil || server.CreateAt != c.Member.MemberId {
 		c.JsonResult(403,"Permission denied")
 	}
 	webHook := models.NewWebHook()
+	webHook.WebHookId = relation.WebHookId
 
-	if err := webHook.Find(relation.WebHookId);err != nil || webHook.CreateAt != c.Member.MemberId{
+	if err := webHook.Find();err != nil || webHook.CreateAt != c.Member.MemberId{
 		c.JsonResult(403,"Permission denied")
 	}
 

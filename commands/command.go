@@ -9,6 +9,7 @@ import (
 	_ "go-git-webhook/modules/filters"
 	"github.com/astaxie/beego/logs"
 	"go-git-webhook/tasks"
+	"fmt"
 )
 
 //注册数据库
@@ -42,12 +43,14 @@ func RegisterLogger()  {
 }
 
 func RegisterTaskQueue()  {
-	tasks.Start()
 
-	if schedulerList,err := models.NewScheduler().QuerySchedulerByState("wait");err != nil {
+	schedulerList,err := models.NewScheduler().QuerySchedulerByState("wait");
+	if err == nil {
 		for _,scheduler := range schedulerList {
-			tasks.Add(tasks.Task{SchedulerId: scheduler.SchedulerId})
+			tasks.Add(tasks.Task{SchedulerId: scheduler.SchedulerId,WebHookId:scheduler.WebHookId,ServerId:scheduler.ServerId})
 		}
+	}else{
+		fmt.Println(err)
 	}
 
 }

@@ -107,7 +107,7 @@ func (c *PayloadController) Index() {
 		c.Ctx.WriteString("Data error")
 	}
 	for _, scheduler := range schedulerList {
-		tasks.Add(tasks.Task{ SchedulerId : scheduler.SchedulerId })
+		tasks.Add(tasks.Task{ SchedulerId : scheduler.SchedulerId ,ServerId:scheduler.ServerId,WebHookId:scheduler.WebHookId})
 	}
 
 	c.Ctx.WriteString("Work put into Queue.")

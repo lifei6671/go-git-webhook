@@ -2,45 +2,62 @@ package queue
 
 import (
 	"sync"
-	"container/list"
-	"runtime"
+	"time"
 )
 
 type Queue struct {
-	maxLength int
 	mutex *sync.RWMutex
-	cache *list.List
-	temp list.List
+	contents map[string]*Element
+	Handle func(interface{})
 }
 
-func NewQueue(maxLength int) *Queue  {
+func NewQueue(queueLength int) *Queue {
 	return &Queue{
-		maxLength	: maxLength,
-		mutex 		: &sync.RWMutex{},
-		cache 		: list.New(),
+		mutex	: &sync.RWMutex{},
+		contents: make(map[string]*Element,queueLength),
 	}
 }
 
-func (q *Queue) Enqueue(value interface{}) {
-	for q.cache.Len() >= q.maxLength {
-		runtime.Gosched()
-	}
+type Element struct {
+	mutex *sync.RWMutex
+	contents chan interface{}
+}
 
+func (self *Element) Push(value interface{}) {
+	self.contents <- value
+}
+
+
+func (self *Element) worker(worker func(interface{})) {
+
+	for {
+		select {
+		case element := <- self.contents : {
+			worker(element)
+		}
+		case <- time.After(time.Second * 1):
+			return
+		}
+	}
+}
+
+
+func (q *Queue) Enqueue(name string,value interface{})  {
 	q.mutex.Lock()
 	defer q.mutex.Unlock()
-	q.cache.PushBack(value)
-}
 
-func (q *Queue) Dequue() interface{} {
-	q.mutex.Lock()
-	defer q.mutex.Unlock()
-	if element := q.cache.Front();element != nil {
-		q.cache.Remove(element)
-		return element.Value
+	if element,ok := q.contents[name]; ok {
+		element.Push(value)
+	}else{
+		element := &Element{
+			mutex		: &sync.RWMutex{},
+			contents	: make(chan interface{},20),
+		}
+		element.Push(value)
+		q.contents[name] = element
+		if q.Handle != nil {
+			go element.worker(q.Handle)
+		}
+
 	}
-	return nil
-}
-func (q *Queue) Length() int  {
-
-	return q.cache.Len()
 }

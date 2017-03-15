@@ -34,10 +34,14 @@ func NewWebHook() *WebHook {
 	return &WebHook{}
 }
 
-func (m *WebHook) Find(id int) error {
+func (m *WebHook) Find() error {
+
+	if m.WebHookId <= 0 {
+		return ErrInvalidParameter
+	}
+
 	o := orm.NewOrm()
 
-	m.WebHookId = id
 
 	if err := o.Read(m) ;err != nil {
 		return err

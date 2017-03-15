@@ -35,10 +35,12 @@ func NewServer() *Server {
 }
 
 //根据ID查找对象
-func (m *Server) Find(id int) (error) {
-	o := orm.NewOrm()
+func (m *Server) Find() (error) {
 
-	m.ServerId = id
+	if m.ServerId <= 0 {
+		return ErrInvalidParameter
+	}
+	o := orm.NewOrm()
 
 	if err := o.Read(m) ;err != nil {
 		return err

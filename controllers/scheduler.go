@@ -67,7 +67,30 @@ func (c *SchedulerController) Console() {
 }
 
 func (c *SchedulerController) Cancel() {
+	schedulerId,err := strconv.Atoi(c.Ctx.Input.Param(":scheduler_id"))
 
+	if err != nil {
+		c.JsonResult(500,"Parameter error")
+	}
+
+	scheduler := models.NewScheduler()
+	scheduler.SchedulerId = schedulerId
+
+	if err := scheduler.Find();err != nil {
+		c.JsonResult(500,"Error 50001: Query data error")
+	}
+	deailed,err := models.FindRelationDetailedByWhere("AND relation_id = ? AND member_id = ?", scheduler.RelationId,c.Member.MemberId)
+
+	if err != nil || len(deailed) <= 0{
+		c.JsonResult(404,"The data does not exist")
+	}
+
+	scheduler.Status = "suspend"
+
+	if err := scheduler.Save(); err != nil {
+		c.JsonResult(500,"Cancel failed")
+	}
+	c.JsonResult(0,"ok")
 }
 
 func (c *SchedulerController) Resume () {

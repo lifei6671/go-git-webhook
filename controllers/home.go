@@ -82,7 +82,8 @@ func (c *HomeController) Edit() {
 		webHook := models.NewWebHook()
 
 		if id > 0 {
-			if err := webHook.Find(id); err != nil {
+			webHook.WebHookId = id
+			if err := webHook.Find(); err != nil {
 				c.JsonResult(500, err.Error())
 			}
 			if webHook.CreateAt != c.Member.MemberId {
@@ -142,8 +143,9 @@ func (c *HomeController) Edit() {
 	}
 
 	webHook := models.NewWebHook()
+	webHook.WebHookId = id
 
-	if err := webHook.Find(id);err != nil {
+	if err := webHook.Find();err != nil {
 		c.TplName = "errors/500.html"
 		c.Data["Message"] = err.Error()
 	}else{
@@ -161,7 +163,9 @@ func (c *HomeController) Delete()  {
 	}
 
 	webHook := models.NewWebHook()
-	if err := webHook.Find(id);err != nil {
+	webHook.WebHookId = id
+
+	if err := webHook.Find();err != nil {
 		c.JsonResult(500,"Git WebHook does not exist")
 	}
 	if webHook.CreateAt != c.Member.MemberId {

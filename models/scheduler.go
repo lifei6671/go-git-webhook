@@ -32,7 +32,14 @@ func (m *Scheduler) TableEngine() string {
 func NewScheduler() *Scheduler  {
 	return &Scheduler{}
 }
+func (m *Scheduler) Find() (error) {
+	if m.SchedulerId <= 0 {
+		return ErrInvalidParameter
+	}
+	o := orm.NewOrm()
 
+	return o.Read(m)
+}
 func (m *Scheduler) InsertMulti(schedulers []Scheduler) (int64,error) {
 	if len(schedulers) <= 0 {
 		return 0,ErrInvalidParameter
@@ -42,11 +49,22 @@ func (m *Scheduler) InsertMulti(schedulers []Scheduler) (int64,error) {
 	return o.InsertMulti(len(schedulers),schedulers)
 }
 
-func (m *Scheduler) QuerySchedulerByState(state string) ([]Scheduler,error) {
+func (m *Scheduler) QuerySchedulerByState(state ...string) ([]Scheduler,error) {
 	o := orm.NewOrm()
 
 	var results []Scheduler
 
-	_,err := o.QueryTable(m.TableName()).Filter("status",state).All(&results)
+	_,err := o.QueryTable(m.TableName()).Filter("status__in",state).All(&results)
 	return results,err
+}
+
+func (m *Scheduler) Save() error {
+	o := orm.NewOrm()
+	var err error
+	if m.SchedulerId > 0 {
+		_,err = o.Update(m)
+	}else{
+		_,err = o.Insert(m)
+	}
+	return err
 }
