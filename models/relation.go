@@ -77,6 +77,7 @@ type RelationDetailed struct {
 	WebHookStatus int		`json:"web_hook_status"`
 	Key string			`json:"key"`
 	Secure string			`json:"secure"`
+	HookType string			`json:"hook_type"` //服务类型
 
 	ServerName string		`json:"server_name"`
 	ServerType string		`json:"server_type"`
@@ -132,6 +133,7 @@ func FindRelationDetailed(relationId int) (RelationDetailed,error) {
 	relationDetailed.WebHookStatus	= hook.Status
 	relationDetailed.Key		= hook.Key
 	relationDetailed.Secure		= hook.Secure
+	relationDetailed.HookType	= hook.HookType
 
 	relationDetailed.ServerName	= server.Name
 	relationDetailed.ServerType	= server.Type
@@ -149,7 +151,7 @@ func FindRelationDetailed(relationId int) (RelationDetailed,error) {
 func FindRelationDetailedByWhere(where string,params ...interface{}) ([]RelationDetailed,error) {
 	o := orm.NewOrm()
 
-	sql := "SELECT relation_id,member_id,relation.web_hook_id,server.server_id,name AS server_name,type, ip_address, port, account, private_key,server.tag as server_tag,server.status AS server_status, repo_name AS repository_name,branch_name,hook.tag AS web_hook_tag,shell, hook.status AS web_hook_status,hook.key,secure FROM relations AS relation " +
+	sql := "SELECT relation_id,member_id,relation.web_hook_id,server.server_id,name AS server_name,type as server_type, ip_address, port, account, private_key,server.tag as server_tag,server.status AS server_status, repo_name AS repository_name,branch_name,hook.tag AS web_hook_tag,shell, hook.status AS web_hook_status,hook.key,secure,hook_type FROM relations AS relation  " +
 		"LEFT JOIN servers AS server ON relation.server_id = server.server_id " +
 		"LEFT JOIN webhooks as hook ON relation.web_hook_id = hook.web_hook_id WHERE 1=1 ";
 

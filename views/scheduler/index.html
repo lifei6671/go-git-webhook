@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>执行任务列表 - GitWebHook</title>
-    {{template "widgets/headfile.html"}}    {{if .dev}}
+    {{template "widgets/headfile.html"}}
+    <link rel="stylesheet" href="/static/codemirror/theme/ambiance.css">
+
+    {{if .dev}}
     <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.css">
     <link rel="stylesheet" href="/static/font-awesome/css/font-awesome.css">
     <link rel="stylesheet" href="/static/codemirror/lib/codemirror.css">
@@ -12,11 +15,6 @@
     <script src="/static/js/jquery-1.12.4.min.js" type="text/javascript"></script>
     <script src="/static/js/jquery.form.js" type="text/javascript"></script>
     {{end}}
-    <script type="text/javascript">
-        window.CONFIG = {
-            WebHookId : {{.Model.WebHookId}}
-        }
-    </script>
 </head>
 <body>
 {{template "widgets/head.html" .}}
@@ -74,12 +72,12 @@
                     </td>
                     <td>
                         {{if eq $item.Status "wait"}}
-                        <button id="btnStopScheduler" data-id="{{$item.SchedulerId}}" class="btn btn-default btn-sm btn-cancel-schedule" data-toggle="tooltip" title="取消任务"><i class="fa fa-power-off" aria-hidden="true"></i></button>
+                        <button data-id="{{$item.SchedulerId}}" class="btn btn-default btn-sm btn-cancel-schedule" data-toggle="tooltip" title="取消任务"><i class="fa fa-power-off" aria-hidden="true"></i></button>
                         {{end}}
-                        {{if eq $item.Status "failure"}}
-                        <button id="btnReExecuteScheduler" data-id="{{$item.SchedulerId}}" class="btn btn-default btn-sm btn-cancel-schedule" data-toggle="tooltip" title="重新执行"><i class="fa fa-repeat" aria-hidden="true"></i></button>
-                        {{end}}
-                        <button id="btnSchedulerResult"  data-id="{{$item.SchedulerId}}" class="btn btn-default btn-sm btn-schedule-console" data-toggle="tooltip" title="执行日志"><i class="fa fa-desktop" aria-hidden="true"></i></button>
+                        {{if eq $item.Status "suspend" "failure"}}
+                        <button data-id="{{$item.SchedulerId}}" class="btn btn-default btn-sm btn-resume-schedule" data-toggle="tooltip" title="重新执行"><i class="fa fa-repeat" aria-hidden="true"></i></button>
+                       {{end}}
+                        <button data-id="{{$item.SchedulerId}}" class="btn btn-default btn-sm btn-schedule-console" data-toggle="tooltip" title="执行日志"><i class="fa fa-desktop" aria-hidden="true"></i></button>
                     </td>
                 </tr>
                 {{end}}
@@ -122,6 +120,8 @@
 <script type="text/javascript">
     $(function () {
 
+        var consoleModalCache = $("#consoleModal").find(".modal-body").html();
+
        $(".btn-cancel-schedule").on("click",function () {
             var $this = $(this);
             var id = $this.attr("data-id");
@@ -151,19 +151,62 @@
        });
 
        $(".btn-schedule-console").on("click",function () {
-            $("#consoleModal").modal("show");
+           var id = $(this).attr("data-id");
+
+            $("#consoleModal").attr("data-id",id).modal("show");
        });
+
        $("#consoleModal").on("shown.bs.modal",function () {
            CodeMirror.fromTextArea(document.getElementById("consoleContent"),{
                lineNumbers: true,
                mode: "text/x-sh",
                lineWrapping : true,
                matchBrackets: true,
-               autoCloseBrackets: true
+               autoCloseBrackets: true,
+               theme : "ambiance",
+               readOnly : true
+           });
+       }).on("show.bs.modal",function (e) {
+           $(this).find(".modal-body").html(consoleModalCache);
+
+           var id = $(this).attr("data-id");
+
+           var url = '{{urlfor "SchedulerController.Console" ":scheduler_id" ""}}' + id;
+           $.ajax({
+               url : url,
+               dataType :"json",
+               success : function (res) {
+                   if(res.errcode === 0){
+                       $("#consoleContent").val(res.data);
+                   }else{
+                       alert(res.message);
+                   }
+               },error : function () {
+                   alert("服务器异常");
+               }
            });
        });
-       $("#btnReExecuteScheduler").on("click",function () {
+       $(".btn-resume-schedule").on("click",function () {
+            var $this = $(this);
+            $this.attr("disabled","disabled");
+           var id = $(this).attr("data-id");
 
+           var url = '{{urlfor "SchedulerController.Resume" ":scheduler_id" ""}}' + id;
+
+            $.ajax({
+                url : url,
+                dataType : "json",
+                success : function (res) {
+                    if(res.errcode === 0){
+                        $this.closest("tr").find(".label").removeClass().addClass("label label-default").text("等待执行");
+                        $this.empty().remove();
+                    }
+                },error : function () {
+                    alert("服务器异常");
+                },complete : function () {
+                    $this.removeAttr("disabled");
+                }
+            })
        });
     });
 </script>

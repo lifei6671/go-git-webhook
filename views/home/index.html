@@ -17,7 +17,7 @@
         <div class="body">
             <table class="table table-condensed" id="webHookTable">
                 <thead>
-                <tr><th width="5%">#</th><th width="15%">Repo</th><th>Branch</th><th width="15%">Server Tag</th><th width="15%">Create Time</th><th width="10%">Status</th><th width="17%">Operate</th></tr>
+                <tr><th width="5%">#</th><th width="15%">Repo</th><th>Branch</th><th width="15%">Hook Type</th><th width="15%">Create Time</th><th width="10%">Status</th><th width="17%">Operate</th></tr>
                 </thead>
                 <tbody>
                 {{if .lists}}
@@ -28,9 +28,11 @@
                 {{end}}
                 </tbody>
             </table>
+            {{if gt .totalCount 1}}
             <nav>
                 {{.html}}
             </nav>
+            {{end}}
         </div>
         <div class="body-botton text-center">
             <button class="btn btn-success btn-sm" id="addWebHookBtn">添加新的 Git WebHook</button>
@@ -63,8 +65,14 @@
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group">
-                                    <label>Server Tag <a href="###" data-toggle="tooltip" title="请填写Server对应的Tag，系统会自动匹配Server"><i class="fa fa-question" aria-hidden="true"></i></a></label>
-                                    <input type="text" name="tag" id="serverTag" placeholder="Server Tag" class="form-control">
+                                    <label for="hookType">WebHook Type</label>
+                                    <select name="hook_type" class="form-control" id="hookType">
+                                        <option>None</option>
+                                        <option value="github">GitHub</option>
+                                        <option value="gitlab">GitLab</option>
+                                        <option value="gogs">Gogs</option>
+                                        <option value="gitosc">GitOsc</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>

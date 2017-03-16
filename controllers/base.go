@@ -4,6 +4,7 @@ import (
 	"github.com/astaxie/beego"
 	"go-git-webhook/models"
 	"go-git-webhook/conf"
+	"bytes"
 )
 
 type BaseController struct {
@@ -104,4 +105,20 @@ func (c *BaseController) ServerError (message interface{}) {
 	html,_ := c.RenderString()
 
 	c.Abort(html)
+}
+
+func (c *BaseController) ExecuteViewPathTemplate(tplName string,data interface{}) (string,error){
+	var buf bytes.Buffer
+
+	viewPath := c.ViewPath
+
+	if c.ViewPath == "" {
+		viewPath = beego.BConfig.WebConfig.ViewsPath
+
+	}
+
+	if err := beego.ExecuteViewPathTemplate(&buf,"scheduler/index_item.html",viewPath,data); err != nil {
+		return "",err
+	}
+	return buf.String(),nil
 }

@@ -3,6 +3,8 @@ package queue
 import (
 	"sync"
 	"time"
+	"fmt"
+	"runtime"
 )
 
 type Queue struct {
@@ -25,6 +27,7 @@ type Element struct {
 
 func (self *Element) Push(value interface{}) {
 	self.contents <- value
+	fmt.Printf("%+v",value)
 }
 
 
@@ -36,7 +39,7 @@ func (self *Element) worker(worker func(interface{})) {
 			worker(element)
 		}
 		case <- time.After(time.Second * 1):
-			return
+			runtime.Gosched()
 		}
 	}
 }
@@ -56,7 +59,14 @@ func (q *Queue) Enqueue(name string,value interface{})  {
 		element.Push(value)
 		q.contents[name] = element
 		if q.Handle != nil {
-			go element.worker(q.Handle)
+			go func() {
+				element.worker(q.Handle)
+				defer func() {
+					q.mutex.Lock()
+					delete(q.contents,name)
+					q.mutex.Unlock()
+				}()
+			}()
 		}
 
 	}

@@ -65,6 +65,7 @@ func (c *HomeController) Edit() {
 		tag := strings.TrimSpace(c.GetString("tag", ""))
 		shell := strings.TrimSpace(c.GetString("shell", ""))
 		status, _ := c.GetInt("status", 0)
+		hookType := c.GetString("hook_type","")
 
 		if name == "" {
 			c.JsonResult(500, "Repository Name is require.")
@@ -72,9 +73,7 @@ func (c *HomeController) Edit() {
 		if branch == "" {
 			branch = "master"
 		}
-		if tag == "" {
-			c.JsonResult(500, "Server Tag is require.")
-		}
+
 		if shell == "" {
 			c.JsonResult(500, "Callback Shell Script is require.")
 		}
@@ -97,6 +96,7 @@ func (c *HomeController) Edit() {
 		webHook.Shell = shell
 		webHook.Status = status
 		webHook.CreateAt = c.Member.MemberId
+		webHook.HookType = hookType
 
 		if err := webHook.Save(); err != nil {
 			c.JsonResult(500, err.Error())
@@ -104,22 +104,9 @@ func (c *HomeController) Edit() {
 		data := make(map[string]interface{},5)
 
 		if id <= 0 {
-			c.TplName = "home/index_list.html"
-			c.Data["RepositoryName"] = webHook.RepositoryName
-			c.Data["CreateTime"] = webHook.CreateTime
-			c.Data["WebHookId"] = webHook.WebHookId
-			c.Data["BranchName"] = webHook.BranchName
-			c.Data["Tag"] = webHook.Tag
-			c.Data["Status"] = webHook.Status
-			c.Data["BaseUrl"] = c.BaseUrl()
-			c.Data["Key"] = webHook.Key
-			c.Data["Secure"] = webHook.Secure
 
-			view, err := c.RenderString()
+			view ,_:= c.ExecuteViewPathTemplate("home/index_list.html",webHook)
 
-			if err != nil {
-				fmt.Println(err)
-			}
 			data["view"] = view
 		}
 

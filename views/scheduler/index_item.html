@@ -1,0 +1,84 @@
+<div class="row execute-item">
+
+    {{if eq .Status "wait"}}
+    <div class="execute-item-profile success">
+        <div class="text-success">
+            等待执行
+        </div>
+    </div>
+    {{else if eq .Status "executing"}}
+    <div class="execute-item-profile started">
+        <div class="text-started">
+            正在执行
+        </div>
+    </div>
+    {{else if eq .Status "suspend"}}
+    <div class="execute-item-profile cancelled">
+        <div class="text-cancelled">
+            执行取消
+        </div>
+    </div>
+    {{else if eq .Status "failure"}}
+    <div class="execute-item-profile failure">
+        <div class="text-failure">
+            执行失败
+        </div>
+    </div>
+    {{else if eq .Status "success"}}
+    <div class="execute-item-profile success">
+        <div class="text-success">
+            执行成功
+        </div>
+    </div>
+    {{else}}
+    <div class="execute-item-profile none">
+        <div class="text-inactive">
+            未知状态
+        </div>
+    </div>
+    {{end}}
+
+    <div class="execute-item-main">
+        <div class="sha-msg">
+            <p><i class="fa fa-bookmark-o" aria-hidden="true"></i> {{if .ShaValue}}{{.ShaValue}}{{else}}无{{end}}</p>
+        </div>
+        <div class="meta">
+                    <span class="trigger-icon">
+                        {{if eq .ExecuteType 0}}
+                        <i class="fa fa-life-bouy" aria-hidden="true" data-toggle="tooltip" title="自动触发"></i>
+                        {{else if eq .ExecuteType 1}}
+                        <i class="fa fa-life-bouy" aria-hidden="true" data-toggle="tooltip" title="手动执行"></i>
+                        {{end}}
+                         {{.PushUser}}
+                    </span>
+            <span class="commit-time">
+                        {{.Slogan}}提交
+                    </span>
+            {{if ne .Consuming ""}}
+            <span class="end-time">
+                        耗时 {{.Consuming}}
+                    </span>
+            {{end}}
+        </div>
+        <div class="actions">
+            {{if eq .Status "suspend" "failure"}}
+            <button class="btn btn-default btn-link btn-resume-schedule" data-toggle="tooltip" title="重新执行" data-id="{{.SchedulerId}}">
+                <i class="fa fa-repeat" aria-hidden="true"></i>
+                <span>重新执行</span>
+            </button>
+            {{end}}
+            {{if eq .Status "wait"}}
+            <button class="btn btn-default btn-link btn-cancel-schedule" data-toggle="tooltip" title="取消执行" data-id="{{.SchedulerId}}">
+                <i class="fa fa-power-off" aria-hidden="true"></i>
+                <span>取消执行</span>
+            </button>
+            {{end}}
+
+            <button class="btn btn-default btn-link btn-schedule-console" data-toggle="tooltip" title="执行日志" data-id="{{.SchedulerId}}">
+                <i class="fa fa-eye" aria-hidden="true"></i>
+                <span>执行日志</span>
+            </button>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+</div>

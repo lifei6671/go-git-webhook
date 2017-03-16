@@ -5,6 +5,9 @@ body{
     scrollbar-face-color: #3f3f3f; /*ie立体滚动条的颜色*/
     scrollbar-track-color: #ccc; /*图7,立体滚动条背景颜色*/
 }
+.container{
+    min-width: 980px;
+}
 /*webkit滚动条滚动条整体部分*/
 ::-webkit-scrollbar{
     width: 8px;
@@ -118,4 +121,172 @@ label{
 }
 .login-body .form-group{
     margin: 15px auto;
+}
+/********top-header*********/
+.logo-icon{
+    width: 64px;
+    height: 64px;
+    margin-right: 20px;
+    vertical-align: top;
+}
+.top-header{
+    padding: 10px 20px;
+
+}
+.top-header .title-container{
+    display: inline-block;
+    font-size: 14px;
+    -webkit-box-flex: 1;
+    -moz-box-flex: 1;
+    box-flex: 1;
+    -webkit-flex: 1;
+    -moz-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+    padding: 5px 0;
+}
+.top-header .title-container .title{
+    font-size: 21px;
+    line-height : 1;
+    margin: 0 0 10px;
+    color: #595f69;
+}
+.top-header .title-container .info{
+    color: #595f69;
+    font-size: 13px;
+}
+.top-header .title-container .info .info-item{
+    margin-right: 30px;
+}
+.bottom-container{
+    position: relative;
+    background: #FFF;
+    box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
+    margin: 10px auto 40px auto;
+    padding: 15px 30px;
+    border-radius: .28571429rem;
+    border: 1px solid rgba(34,36,38,.15);
+}
+.execute-item {
+    position: relative;
+}
+.execute-item:after{
+    display: block;
+    width: 1px;
+    content: '';
+    border-right: 1px solid #e9ebef;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 200px
+}
+.execute-item .execute-item-profile{
+    font-size: 16px;
+    line-height: 1.5;
+    position: relative;
+    width: 200px;
+    padding-right: 25px;
+    text-align: right;
+    float: left;
+}
+.execute-item .execute-item-profile:after{
+    display: block;
+    content: '';
+    border: 2px solid;
+    border-radius: 50%;
+    background-color: #fff;
+    height: 11px;
+    width: 11px;
+    position: absolute;
+    top: 5px;
+    right: -6px;
+    z-index: 1000;
+}
+
+.execute-item .text-success,.execute-item-profile.success:after{
+    color: #2ecc71;
+}
+.execute-item .text-failure,.execute-item-profile.failure:after{
+    color: #ed5565
+}
+.execute-item .text-cancelled ,.execute-item-profile.cancelled:after{
+    color: #aab2bd
+}
+.execute-item .text-inactive ,.execute-item-profile.inactive:after{
+    color: #aab2bd
+}
+
+.execute-item .text-active,.execute-item-profile.active:after {
+    color: #2ecc71
+}
+
+.execute-item .text-enqueue,.text-pending {
+    color: #f6bb42
+}
+
+.execute-item .text-started,.execute-item-profile.started:after {
+    color: #4fc1e9
+}
+
+.execute-item .sha-msg{
+    font-size: 16px;
+    margin-bottom: 5px;
+    color: #434a54;
+}
+.execute-item .sha-msg .fa{
+    font-size: 18px;
+}
+.execute-item .execute-item-main{
+    border-bottom: 1px solid #e9ebef;
+    -webkit-box-flex: 1;
+    -moz-box-flex: 1;
+    box-flex: 1;
+    -webkit-flex: 1;
+    -moz-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+    padding: 15px 0 20px 25px;
+    margin-left: 200px;
+    overflow: hidden;
+}
+
+.execute-item .execute-item-main .meta{
+    line-height: 1.7;
+}
+.execute-item .execute-item-main .trigger-icon,
+.execute-item .execute-item-main .start-time,
+.execute-item .execute-item-main .end-time,
+.execute-item .execute-item-main .commit-time{
+    margin-right: 20px;
+}
+.execute-item .actions{
+    margin-right: 20px;
+}
+.execute-item .actions .btn {
+    float: right;
+    margin-left: 10px;
+    padding: 0;
+    color: #b6bcc6;
+    background-color: transparent;
+    height: 60px;
+    width: 60px
+}
+.execute-item .actions .btn:hover{
+    text-decoration: none;
+    border-color: transparent;
+    color: #7d8799
+}
+.execute-item .actions .btn .fa{
+    margin-bottom: 5px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    height: 35px;
+    width: 35px;
+    color: #7d8799;
+}
+.execute-item .actions .btn span {
+    font-size: 13px;
+    display: block;
+    text-align: center
 }

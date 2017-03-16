@@ -19,6 +19,7 @@ type WebHook struct {
 	Secure string			`orm:"size(255);column(secure);unique" json:"secure"`
 	LastExecTime time.Time		`orm:"type(datetime);column(last_exec_time);null" json:"last_exec_time"`
 	CreateTime time.Time		`orm:"type(datetime);column(create_time);auto_now_add" json:"create_time"`
+	HookType string 		`orm:"column(hook_type);size(50)" json:"hook_type"`
 	CreateAt int			`orm:"type(int);column(create_at)"`
 }
 

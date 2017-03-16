@@ -110,10 +110,10 @@ function loadCodeMirrorEditor(id) {
                 isValid = false;
             }
 
-            var serverTagEle = $("#serverTag");
+            var hookTypeEle = $("#hookType");
 
-            if($.trim(serverTagEle.val()) === ""){
-                serverTagEle.closest(".form-group").addClass("has-error");
+            if($.trim(hookTypeEle.val()) === ""){
+                hookTypeEle.closest(".form-group").addClass("has-error");
                 isValid = false;
             }
             var shellScriptEle = $("#shellScript");

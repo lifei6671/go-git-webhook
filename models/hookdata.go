@@ -80,6 +80,28 @@ func (m *HookData) BranchName () (string,error){
 	return branchName,nil
 }
 
+func (m *HookData) HookType() (string,error){
+	//github的data格式
+	if uid := m.Json().Get("pusher").Get("name");uid.IsValid() {
+		return "github",nil
+	}
+
+	//gitlab 格式
+	if uid := m.Json().Get("user_name");uid.IsValid() {
+		return "gitlab",nil;
+	}
+
+	//gogs 格式
+	if uid := m.Json().Get("pusher").Get("username");uid.IsValid() {
+		return "gogs",nil;
+	}
+
+	//gitosc的data格式
+	if uid := m.Json().Get("push_data").Get("user").Get("name");uid.IsValid() {
+		return  "gitosc",nil
+	}
+	return "",ErrPushUserNoExist
+}
 // 获取推送者
 func (m *HookData) PushUser () (string,error){
 
@@ -88,7 +110,7 @@ func (m *HookData) PushUser () (string,error){
 		return uid.Tostring(),nil
 	}
 
-	//gitlib 格式
+	//gitlab 格式
 	if uid := m.Json().Get("user_name");uid.IsValid() {
 		return uid.Tostring(),nil;
 	}
@@ -126,6 +148,12 @@ func (m *HookData) PushEmail() (string,error) {
 	return "",ErrNoData
 }
 
+func (m *HookData) PushSha() (string,error){
+	if value := m.Json().Get("after"); value.IsValid() {
+		return value.Tostring(),nil
+	}
+	return "",ErrNoData
+}
 
 
 

@@ -67,6 +67,11 @@ func (c *PayloadController) Index() {
 	if push,err := hookData.PushUser() ;err == nil {
 		scheduler.PushUser = push
 	}
+	if value,err := hookData.PushSha(); err != nil{
+		scheduler.ShaValue = value
+	}else{
+		scheduler.ShaValue = "无"
+	}
 
 	scheduler.Status = "wait"
 

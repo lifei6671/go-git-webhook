@@ -33,8 +33,14 @@
                     </div>
                     <div class="col-lg-4">
                         <div class="form-group">
-                            <label>Server Tag <a href="###" data-toggle="tooltip" title="请填写Server对应的Tag，系统会自动匹配Server"><i class="fa fa-question" aria-hidden="true"></i></a></label>
-                            <input type="text" name="tag" id="serverTag" placeholder="Server Tag" class="form-control" value="{{.Model.Tag}}">
+                            <label for="hookType">WebHook Type</label>
+                            <select name="hook_type" class="form-control" id="hookType">
+                                <option>None</option>
+                                <option value="github"{{if eq .Model.HookType "github"}} selected{{end}}>GitHub</option>
+                                <option value="gitlab"{{if eq .Model.HookType "gitlab"}} selected{{end}}>GitLab</option>
+                                <option value="gogs"{{if eq .Model.HookType "gogs"}} selected{{end}}>Gogs</option>
+                                <option value="gitosc"{{if eq .Model.HookType "gitosc"}} selected{{end}}>GitOsc</option>
+                            </select>
                         </div>
                     </div>
                 </div>

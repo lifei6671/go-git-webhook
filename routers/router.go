@@ -16,8 +16,8 @@ func init()  {
 	beego.Router("/hook/server_list/delete/:id", &controllers.RelationController{},"*:DeleteServer")
 
 	beego.Router("/hook/scheduler/:id", &controllers.SchedulerController{},"*:Index")
-	beego.Router("/hook/scheduler/:id/console/:scheduler_id", &controllers.SchedulerController{},"*:Console")
-	beego.Router("/hook/scheduler/:id/resume/:scheduler_id", &controllers.SchedulerController{},"*:Resume")
+	beego.Router("/hook/scheduler/console/:scheduler_id", &controllers.SchedulerController{},"*:Console")
+	beego.Router("/hook/scheduler/resume/:scheduler_id", &controllers.SchedulerController{},"*:Resume")
 	beego.Router("/hook/scheduler/cancel/:scheduler_id", &controllers.SchedulerController{},"*:Cancel")
 
 	//用于GitHub Gogs Gitlab 等通知使用

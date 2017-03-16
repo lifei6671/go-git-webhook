@@ -34,9 +34,11 @@
                 {{end}}
                 </tbody>
             </table>
+            {{if gt .totalCount 1}}
             <nav>
                 {{.html}}
             </nav>
+            {{end}}
         </div>
         <div class="body-botton text-center">
             <button class="btn btn-success btn-sm" id="addServerBtn">添加新的 Server</button>

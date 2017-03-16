@@ -6,6 +6,8 @@ import (
 	"go-git-webhook/modules/pager"
 	"strconv"
 	"fmt"
+	"bytes"
+	"github.com/astaxie/beego"
 )
 
 type ServerController struct {
@@ -129,22 +131,23 @@ func (c *ServerController) Edit()  {
 			data := make(map[string]interface{},5)
 
 			if id <= 0 {
-				c.TplName = "server/index_list.html"
-				c.Data["ServerId"] = server.ServerId
-				c.Data["Name"] = server.Name
-				c.Data["IpAddress"] = server.IpAddress
-				c.Data["Port"] = server.Port
-				c.Data["Tag"] = server.Tag
-				c.Data["Status"] = server.Status
-				c.Data["Type"] = server.Type
-				c.Data["CreateTime"] = server.CreateTime
-
-				view, err := c.RenderString()
 
 				if err != nil {
 					fmt.Println(err)
 				}
-				data["view"] = view
+
+				var buf bytes.Buffer
+
+				viewPath := c.ViewPath
+
+				if c.ViewPath == "" {
+					viewPath = beego.BConfig.WebConfig.ViewsPath
+
+				}
+
+				beego.ExecuteViewPathTemplate(&buf, "server/index_list.html",viewPath,server)
+
+				data["view"] = buf.String()
 			}
 
 

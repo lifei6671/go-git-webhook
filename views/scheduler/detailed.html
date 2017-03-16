@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>执行任务列表 - GitWebHook</title>
+    {{template "widgets/headfile.html"}}
+    <link rel="stylesheet" href="/static/codemirror/theme/ambiance.css">
+
+    {{if .dev}}
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/font-awesome/css/font-awesome.css">
+    <link rel="stylesheet" href="/static/codemirror/lib/codemirror.css">
+    <link rel="stylesheet" href="/static/css/global.css">
+    <script src="/static/js/jquery-1.12.4.min.js" type="text/javascript"></script>
+    <script src="/static/js/jquery.form.js" type="text/javascript"></script>
+    {{end}}
+</head>
+<body>
+{{template "widgets/head.html" .}}
+<div class="container">
+    <div class="bs-docs-container" style="margin-bottom: 20px;">
+        <div class="top-header">
+            {{if eq .Model.HookType "github"}}
+            <img class="logo-icon" src="/static/images/github.svg">
+            {{else if eq .Model.HookType "gitlab"}}
+            <img class="logo-icon" src="/static/images/gitlab.png">
+            {{else if eq .Model.HookType "gogs"}}
+            <img class="logo-icon" src="/static/images/gogs.png">
+            {{else if eq .Model.HookType "gitosc"}}
+            <img class="logo-icon" src="/static/images/gitosc.png">
+            {{else}}
+            <img class="logo-icon" src="/static/images/default.png">
+            {{end}}
+            <div class="title-container">
+                <h2 class="title">{{.Model.RepositoryName}}</h2>
+                <div class="info">
+                    <span class="info-item">分支：{{.Model.BranchName}}</span>
+                    <span class="info-item">服务器名称：{{.Model.ServerName}}</span>
+                    <span class="info-item">连接类型：{{.Model.ServerType}}</span>
+                    <span class="info-item">服务器地址：{{.Model.IpAddress}}</span>
+                    <span class="info-item">服务器端口：{{.Model.Port}}</span>
+                </div>
+            </div>
+            <div class="pull-right">
+                <a href="{{urlfor "RelationController.Index" ":id" .Model.WebHookId}}" class="btn btn-default" style="border-radius: 31px;padding:13px 19px;font-size: 24px;color: #7d8799" title="返回" data-toggle="tooltip">
+                    <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="bottom-container">
+        {{if .lists}}
+        {{range $index,$item := .lists}}
+        {{template "scheduler/index_item.html" .}}
+        {{end}}
+        {{else}}
+        <div class="text-center">暂无记录</div>
+        {{end}}
+        {{if gt .totalCount 1}}
+        <hr>
+        <nav>
+
+            {{.html}}
+        </nav>
+        {{end}}
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="consoleModal" tabindex="-1" role="dialog" aria-labelledby="consoleModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="consoleModalLabel">Console Log</h4>
+            </div>
+            <div class="modal-body">
+                <textarea name="shell" id="consoleContent" placeholder="" class="form-control" style="height: 150px;resize: none"></textarea>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{{template "widgets/foot.html" .}}
+<script type="text/javascript">
+    $(function () {
+
+        var consoleModalCache = $("#consoleModal").find(".modal-body").html();
+
+        $(".btn-cancel-schedule").on("click",function () {
+            var $this = $(this);
+            var id = $this.attr("data-id");
+            var url = '{{urlfor "SchedulerController.Cancel" ":scheduler_id" ""}}' + id;
+
+            $.ajax({
+                url : url,
+                type :"POST",
+                dataType : "json",
+                success : function (res) {
+                    if (res.errcode == 0){
+                        $this.closest("tr").find(".label-default").removeClass("label-default").addClass("label-warning").text("执行取消");
+                        $this.empty().remove()
+                    }else{
+                        alert(res.message);
+                    }
+                    $this.removeAttr("disabled");
+                },
+                error : function () {
+                    $this.removeAttr("disabled");
+                }
+
+            });
+
+            $this.attr("disabled","disabled");
+
+        });
+
+        $(".btn-schedule-console").on("click",function () {
+            var id = $(this).attr("data-id");
+
+            $("#consoleModal").attr("data-id",id).modal("show");
+        });
+
+        $("#consoleModal").on("shown.bs.modal",function () {
+            CodeMirror.fromTextArea(document.getElementById("consoleContent"),{
+                lineNumbers: true,
+                mode: "text/x-sh",
+                lineWrapping : true,
+                matchBrackets: true,
+                autoCloseBrackets: true,
+                theme : "ambiance",
+                readOnly : true
+            });
+        }).on("show.bs.modal",function (e) {
+            $(this).find(".modal-body").html(consoleModalCache);
+
+            var id = $(this).attr("data-id");
+
+            var url = '{{urlfor "SchedulerController.Console" ":scheduler_id" ""}}' + id;
+            $.ajax({
+                url : url,
+                dataType :"json",
+                success : function (res) {
+                    if(res.errcode === 0){
+                        $("#consoleContent").val(res.data);
+                    }else{
+                        alert(res.message);
+                    }
+                },error : function () {
+                    alert("服务器异常");
+                }
+            });
+        });
+        $(".btn-resume-schedule").on("click",function () {
+            var $this = $(this);
+            $this.attr("disabled","disabled");
+            var id = $(this).attr("data-id");
+
+            var url = '{{urlfor "SchedulerController.Resume" ":scheduler_id" ""}}' + id;
+
+            $.ajax({
+                url : url,
+                dataType : "json",
+                success : function (res) {
+                    if(res.errcode === 0){
+                        $(".bottom-container").prepend(res.data);
+                    }else{
+                        alert(res.message);
+                    }
+                },error : function () {
+                    alert("服务器异常");
+                },complete : function () {
+                    $this.removeAttr("disabled");
+                }
+            })
+        });
+    });
+</script>
+</body>
+</html>
