@@ -50,6 +50,7 @@ func (c *HomeController) Index() {
 	c.Data["totalItem"] = totalItem
 	c.Data["totalCount"] = totalCount
 	c.Data["BaseUrl"] = c.BaseUrl()
+	c.Data["WebHook"] = true
 }
 
 //编辑
@@ -138,19 +139,20 @@ func (c *HomeController) Edit() {
 	}else{
 		c.Data["Model"] = webHook
 
-		c.Data["HookUrl"] = c.URLFor("HomeController.Payload",":key",webHook.Key)
+		c.Data["HookUrl"] = c.BaseUrl() + c.URLFor("PayloadController.Index",":key",webHook.Key)
 	}
+	c.Data["WebHook"] = true
 }
 
 //删除
 func (c *HomeController) Delete()  {
-	id,_ := c.GetInt("id",0)
-	if id <= 0 {
+	webHookId,_ := c.GetInt("id",0)
+	if webHookId <= 0 {
 		c.JsonResult(500,"Server ID is require.")
 	}
 
 	webHook := models.NewWebHook()
-	webHook.WebHookId = id
+	webHook.WebHookId = webHookId
 
 	if err := webHook.Find();err != nil {
 		c.JsonResult(500,"Git WebHook does not exist")
@@ -162,6 +164,11 @@ func (c *HomeController) Delete()  {
 	if err := webHook.Delete(); err != nil {
 		c.JsonResult(500,"failed to delete")
 	}
+
+	models.NewRelation().DeleteByWhere(" AND web_hook_id = ?",webHookId)
+
+	models.NewScheduler().DeleteByWhere(" AND web_hook_id = ?",webHookId)
+
 	c.JsonResult(0,"ok")
 }
 

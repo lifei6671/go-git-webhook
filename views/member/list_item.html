@@ -1,0 +1,27 @@
+<tr>
+    <td>{{.MemberId}}</td>
+    <td>{{.Account}}</td>
+    <td>{{.Email}}</td>
+    <td>{{.Phone}}</td>
+    <td>
+        {{if eq .Role 0}}
+        管理员
+        {{else}}
+        普通用户
+        {{end}}
+    </td>
+    <td>
+        {{if eq .Status 0}}
+        <span style="color: green">正常</span>
+        {{else}}
+        <span style="color: red">禁用</span>
+        {{end}}
+    </td>
+    <td>
+        <a href='{{urlfor "MemberController.Edit" ":id" .MemberId}}'  title="编辑" class="btn btn-default btn-sm edit-member-btn" data-toggle="tooltip"><i class="fa fa-edit" aria-hidden="true"></i></a>
+        {{if ne .Role 0}}
+        <a href="###" title="删除" class="btn btn-default btn-sm delete-member-btn" data-url="{{urlfor "MemberController.Delete" ":id" .MemberId}}" data-toggle="tooltip"><i class="fa fa-times" aria-hidden="true"></i></a>
+
+        {{end}}
+    </td>
+</tr>

@@ -11,9 +11,11 @@ type Member struct {
 	MemberId int		`orm:"pk;auto;unique;column(member_id)"`
 	Account string 		`orm:"size(255);column(account)"`
 	Password string 	`orm:"size(1000);column(password)"`
-	Email string 		`orm:"size(255);column(email)"`
-	Phone string 		`orm:"size(255);column(phone)"`
+	Email string 		`orm:"size(255);column(email);null;default(null)"`
+	Phone string 		`orm:"size(255);column(phone);null;default(null)"`
 	Avatar string 		`orm:"size(1000);column(avatar)"`
+	Role int		`orm:"column(role);type(int);default(1)"`	//用户角色：0 管理员/1 普通用户
+	Status int 		`orm:"column(status);type(int);default(0)"`	//用户状态：0 正常/1 禁用
 	CreateTime time.Time	`orm:"type(datetime);column(create_time);auto_now_add"`
 	CreateAt int		`orm:"type(int);column(create_at)"`
 	LastLoginTime time.Time	`orm:"type(datetime);column(last_login_time);null"`
@@ -33,9 +35,8 @@ func NewMember() *Member {
 }
 
 //根据用户ID查找用户
-func (m *Member) Find(id int) (error) {
+func (m *Member) Find() (error) {
 	o := orm.NewOrm()
-	m.MemberId = id
 
 	err := o.Read(m)
 
@@ -70,25 +71,6 @@ func (m *Member) Login(account string,password string) (*Member,error) {
 	return member,ErrorMemberPasswordError
 }
 
-//分页获取用户列表
-func (m *Member) GetMemberList(pageIndex int,pageSize int) ([]Member,int64,error) {
-
-	offset  := (pageIndex -1) * pageSize
-
-	o := orm.NewOrm()
-
-	var members []Member
-
-	_,err := o.QueryTable(m.TableName()).Limit(pageSize).Offset(offset).OrderBy("-member_id").All(&members)
-
-	if err != nil {
-		return nil,0,err
-	}
-
-	count,err := o.QueryTable(m.TableName()).Count()
-
-	return members,count,nil
-}
 
 //添加一个用户
 func (member *Member) Add () (error) {
@@ -115,6 +97,15 @@ func (m *Member) Update(cols... string) (error) {
 	o := orm.NewOrm()
 
 	if _,err := o.Update(m,cols...);err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *Member) Delete() error {
+	o := orm.NewOrm()
+
+	if _,err := o.Delete(m);err != nil {
 		return err
 	}
 	return nil

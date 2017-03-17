@@ -5,6 +5,9 @@ body{
     scrollbar-face-color: #3f3f3f; /*ie立体滚动条的颜色*/
     scrollbar-track-color: #ccc; /*图7,立体滚动条背景颜色*/
 }
+a:focus{
+    outline: none;
+}
 .container{
     min-width: 980px;
 }
@@ -58,7 +61,13 @@ label{
     color: #463265;
     background-color: #f9f9f9;
 }
-
+.member-dropdown>a{
+    display: block;
+    padding: 9px;
+}
+.member-dropdown:hover{
+    background-color: #f9f9f9;
+}
 /***中间部分***/
 
 .bs-docs-container,.bs-breadcrumb-container{

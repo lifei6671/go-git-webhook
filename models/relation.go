@@ -194,3 +194,14 @@ func (m *Relation) QueryByWebHookId (webHookId int,memberId int) ( []*ServerRela
 
 	return res,err
 }
+
+
+func (m *Relation) DeleteByWhere(where string,args ...interface{}) error {
+	o := orm.NewOrm()
+
+	sql := "DELETE FROM relations WHERE 1=1 " + where
+
+	_,err := o.Raw(sql,args).Exec()
+
+	return err
+}

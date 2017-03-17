@@ -11,15 +11,23 @@
         </div>
         <nav class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
-                <li><a href="{{urlfor "HomeController.Index"}}">WebHook</a> </li>
-                <li><a href="{{urlfor "ServerController.Index"}}">Server</a> </li>
-                <li><a href="{{urlfor "MemberController.Index"}}">Member</a> </li>
+                <li{{if .WebHook}} class="active"{{end}}><a href="{{urlfor "HomeController.Index"}}" title="WebHook">WebHook</a> </li>
+                <li{{if .Server}} class="active"{{end}}><a href="{{urlfor "ServerController.Index"}}">Server</a> </li>
+                {{if eq .Member.Role 0}}
+                <li{{if .MemberSelected}} class="active"{{end}}><a href="{{urlfor "MemberController.Index"}}">Member</a> </li>
+                {{end}}
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li>
-                    <a href="{{urlfor "MemberController.My"}}" style="padding: 9px;">
+                    <div class="dropdown member-dropdown" id="btnMemberList">
+                    <a href="###" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <img src="/static/images/headimgurl.jpg" class="img-circle" style="width: 32px;height: 32px;">
                     </a>
+                        <ul class="dropdown-menu" aria-labelledby="dLabel" style="margin-top: 0px">
+                            <li><a href="{{urlfor "MemberController.My"}}"><i class="fa fa-user" aria-hidden="true"></i> 个人中心</a> </li>
+                            <li><a href="{{urlfor "MemberController.Logout"}}"><i class="fa fa-sign-out"></i> 退出</a></li>
+                        </ul>
+                    </div>
                 </li>
             </ul>
         </nav>

@@ -4,19 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Edit Server - GitWebHook</title>
-    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.css">
-    <link rel="stylesheet" href="/static/font-awesome/css/font-awesome.css">
-    <link rel="stylesheet" href="/static/css/global.css">
-    <script src="/static/js/jquery-1.12.4.min.js" type="text/javascript"></script>
-    <script src="/static/js/jquery.form.js" type="text/javascript"></script>
-
+    {{template "widgets/headfile.html" .}}
 </head>
 <body>
 {{template "widgets/head.html" .}}
 <div class="container">
     <div class="bs-docs-container">
         <form method="post" action='{{urlfor "ServerController.Edit"}}' id="serverForm">
-        <input type="hidden" name="id" value="{{.Server.ServerId}}">
+        <input type="hidden" name="id" value="{{.Model.ServerId}}">
         <div class="title">
             <h3>Edit Server </h3>
             <hr>
@@ -28,25 +23,25 @@
                 <div class="col-lg-3">
                     <div class="form-group">
                         <label>Server Name</label>
-                        <input type="text" name="name" id="serverName" placeholder="Server Name" class="form-control" value="{{.Server.Name}}">
+                        <input type="text" name="name" id="serverName" placeholder="Server Name" class="form-control" value="{{.Model.Name}}">
                     </div>
                 </div>
                 <div class="col-lg-3">
                     <div class="form-group">
                         <label for="serverIp">Server Ip</label>
-                        <input type="text" name="ip" id="serverIp" placeholder="Server IP" class="form-control" value="{{.Server.IpAddress}}">
+                        <input type="text" name="ip" id="serverIp" placeholder="Server IP" class="form-control" value="{{.Model.IpAddress}}">
                     </div>
                 </div>
                 <div class="col-lg-3">
                     <div class="form-group">
                         <label for="serverPort">Server SSH Port</label>
-                        <input type="text" name="port" id="serverPort" placeholder="Port" class="form-control" value="{{.Server.Port}}">
+                        <input type="text" name="port" id="serverPort" placeholder="Port" class="form-control" value="{{.Model.Port}}">
                     </div>
                 </div>
                 <div class="col-lg-3">
                     <div class="form-group">
                         <label for="serverPort">Server SSH Account</label>
-                        <input type="text" name="account" id="serverAccount" placeholder="Account" class="form-control" value="{{.Server.Account}}">
+                        <input type="text" name="account" id="serverAccount" placeholder="Account" class="form-control" value="{{.Model.Account}}">
                     </div>
                 </div>
             </div>
@@ -54,14 +49,14 @@
                 <div class="col-lg-8">
                     <div class="form-group">
                         <label for="serverTag">Tag <span class="text">(多个标签请用英文的“,”分割)</span></label>
-                        <input type="text" name="tag" id="serverTag" placeholder="Tag" class="form-control" value="{{.Server.Tag}}">
+                        <input type="text" name="tag" id="serverTag" placeholder="Tag" class="form-control" value="{{.Model.Tag}}">
                     </div>
                 </div>
                 <div class="col-lg-2">
                     <div class="form-group">
                         <label for="serverType">Server Type</label>
                         <select name="type" id="serverType" class="form-control">
-                            <option value="ssh" {{if eq .Server.Type "ssh"}}selected{{end}} >SSH</option>
+                            <option value="ssh" {{if eq .Model.Type "ssh"}}selected{{end}} >SSH</option>
                         </select>
                     </div>
                 </div>
@@ -70,10 +65,10 @@
                         <label>Status</label>
                         <div>
                             <label>
-                                <input type="radio" name="status" value="0" {{if eq .Server.Status 0}}checked{{end}}> 启用
+                                <input type="radio" name="status" value="0" {{if eq .Model.Status 0}}checked{{end}}> 启用
                             </label>
                             <label>
-                                <input type="radio" name="status" value="1" {{if eq .Server.Status 1}}checked{{end}}> 禁用
+                                <input type="radio" name="status" value="1" {{if eq .Model.Status 1}}checked{{end}}> 禁用
                             </label>
                         </div>
 
@@ -84,7 +79,7 @@
                 <div class="col-lg-12">
                     <div class="form-group">
                         <label for="serverKey">SSH Private Key / Account Password</label>
-                        <textarea class="form-control" name="key" id="serverKey" placeholder="SSH Private Key / Account Password">{{.Server.PrivateKey}}</textarea>
+                        <textarea class="form-control" name="key" id="serverKey" placeholder="SSH Private Key / Account Password">{{.Model.PrivateKey}}</textarea>
                     </div>
                 </div>
             </div>
@@ -101,7 +96,5 @@
     </div>
 </div>
 {{template "widgets/foot.html" .}}
-<script src="/static/bootstrap/js/bootstrap.js" type="text/javascript"></script>
-<script src="/static/js/global.js" type="text/javascript"></script>
 </body>
 </html>

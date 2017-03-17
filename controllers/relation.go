@@ -34,8 +34,8 @@ func (c *RelationController) Index() {
 
 	res,err := models.NewRelation().QueryByWebHookId(webHookId,c.Member.MemberId)
 
-	fmt.Printf("%+v\n",res)
 	c.Data["lists"] = res
+	c.Data["WebHook"] = true
 }
 
 //检索服务器并添加到数据库
@@ -179,6 +179,8 @@ func (c *RelationController) DeleteServer() {
 	if err := relation.Delete() ; err != nil{
 		c.JsonResult(500,"Delete failed")
 	}
+
+	models.NewScheduler().DeleteByWhere(" AND relation_id  = ?",relation_id)
 
 	c.JsonResult(0,"ok")
 }

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"bytes"
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/logs"
 )
 
 type ServerController struct {
@@ -45,15 +46,14 @@ func (c *ServerController) Index() {
 	_,err := rs.QueryRows(&servers)      //把当前页面的数据序列化进一个切片内
 
 	if err != nil {
-		fmt.Println(err)
+		logs.Error("",err.Error())
 	}
-	fmt.Println(servers)
 
 	c.Data["lists"] = servers
 	c.Data["html"] = pageHtml
 	c.Data["totalItem"] = totalItem
 	c.Data["totalCount"] = totalCount
-
+	c.Data["Server"] = true
 }
 
 
@@ -182,22 +182,22 @@ func (c *ServerController) Edit()  {
 
 		c.JsonResult(0,"ok",*server)
 	}
-	c.Data["Server"] = server
-
+	c.Data["Model"] = server
+	c.Data["Server"] = true
 
 
 }
 
 //删除一个Server
 func (c *ServerController) Delete() {
-	id,_ := c.GetInt("id",0)
+	serverId,_ := c.GetInt("id",0)
 
-	if id <= 0 {
+	if serverId <= 0 {
 		c.JsonResult(500,"Server ID is require.")
 	}
 	server := models.NewServer()
 
-	server.ServerId = id
+	server.ServerId = serverId
 
 	if err := server.Find();err != nil {
 		c.JsonResult(500,err.Error())
@@ -209,9 +209,9 @@ func (c *ServerController) Delete() {
 		c.JsonResult(500,err.Error())
 	}
 
-	webHook := models.NewWebHook()
+	models.NewRelation().DeleteByWhere(" AND server_id = ?",serverId)
 
-	webHook.DeleteForServerId(id)
+	models.NewScheduler().DeleteByWhere(" AND server_id  = ?",serverId)
 
 	c.JsonResult(0,"ok")
 }

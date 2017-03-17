@@ -70,6 +70,7 @@ func (c *SchedulerController) Index()  {
 	c.Data["html"] = pageHtml
 	c.Data["totalItem"] = totalItem
 	c.Data["totalCount"] = totalCount
+	c.Data["WebHook"] = true
 }
 
 func (c *SchedulerController) Console() {

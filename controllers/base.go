@@ -22,7 +22,8 @@ func (c *BaseController) Prepare (){
 		c.Data["Member"] = c.Member
 	}else{
 		member := models.NewMember()
-		member.Find(1)
+		member.MemberId = 1
+		member.Find()
 		c.Member = member
 		c.Data["Member"] = *c.Member
 	}
@@ -117,7 +118,7 @@ func (c *BaseController) ExecuteViewPathTemplate(tplName string,data interface{}
 
 	}
 
-	if err := beego.ExecuteViewPathTemplate(&buf,"scheduler/index_item.html",viewPath,data); err != nil {
+	if err := beego.ExecuteViewPathTemplate(&buf,tplName,viewPath,data); err != nil {
 		return "",err
 	}
 	return buf.String(),nil

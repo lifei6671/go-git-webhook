@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Edit Member - GitWebHook</title>
+    {{template "widgets/headfile.html" .}}
+
+</head>
+<body>
+{{template "widgets/head.html" .}}
+<div class="container">
+    <div class="bs-docs-container">
+        <form method="post" action='{{urlfor "MemberController.Edit" ":id" .Model.MemberId}}' id="formSaveMember">
+            <input type="hidden" name="id" value="{{.Model.MemberId}}">
+            <div class="title">
+                <h3>Edit Member </h3>
+                <hr>
+            </div>
+            <div class="body">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="form-group">
+                            <label for="account">Account</label>
+                            <input type="text" name="account" id="account" class="form-control" placeholder="Account" maxlength="50"{{if ne .Model.Account ""}} readonly{{end}} value="{{.Model.Account}}">
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="text" name="password" id="password" class="form-control" placeholder="Password" maxlength="50" >
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="text" name="email" id="email" class="form-control" placeholder="Email" maxlength="100" value="{{.Model.Email}}">
+                        </div>
+                        <div class="form-group">
+                            <label>Phone</label>
+                            <input type="text" name="phone" id="phone" class="form-control" placeholder="Phone" maxlength="100" value="{{.Model.Phone}}">
+                        </div>
+                    </div>
+                    <div class="col-lg-4 text-center">
+                        {{if .IsSelf}}
+                            <a href="javascript:;" data-toggle="modal" data-target="#upload-logo-panel">
+                                <img src="{{.Model.Avatar}}" onerror="this.src='/static/images/headimgurl.jpg'" class="img-circle" alt="头像" style="max-width: 120px;max-height: 120px;" id="headimgurl">
+                            </a>
+                        {{end}}
+                    </div>
+                </div>
+            </div>
+            <div class="body-botton text-center">
+                <span class="text" style="padding-right: 15px;" id="errorMessage"></span>
+
+                <a href='{{urlfor "MemberController.Index"}}' class="btn btn-success btn-sm">Back Member List</a>
+                <button id="btnSaveMember" type="submit" class="btn btn-info btn-sm" data-load-text="saving">Save Changes</button>
+
+            </div>
+        </form>
+    </div>
+</div>
+{{template "widgets/foot.html" .}}
+<script type="text/javascript">
+    $(function () {
+        $("#formSaveMember").ajaxForm({
+            
+        });
+    });
+</script>
+</body>
+</html>

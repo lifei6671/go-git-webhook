@@ -24,7 +24,9 @@ func (c *AccountController) Login()  {
 
 		if err := gob.Decode(cookie,&remember); err == nil {
 			member := models.NewMember()
-			if err := models.NewMember().Find(remember.MemberId); err == nil {
+			member.MemberId = remember.MemberId
+
+			if err := models.NewMember().Find(); err == nil {
 				c.SetMember(*member)
 
 				c.Redirect(beego.URLFor("HomeController.Index"), 302)

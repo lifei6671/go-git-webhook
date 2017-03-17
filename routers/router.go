@@ -28,6 +28,8 @@ func init()  {
 	beego.Router("/server/delete",&controllers.ServerController{},"post:Delete")
 
 	beego.Router("/member",&controllers.MemberController{},"*:Index")
+	beego.Router("/member/edit/?:id", &controllers.MemberController{},"*:Edit")
+	beego.Router("/member/delete/?:id", &controllers.MemberController{},"*:Delete")
 
 	beego.Router("/my", &controllers.MemberController{},"*:My")
 
