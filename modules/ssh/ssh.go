@@ -2,7 +2,7 @@ package ssh
 
 import (
 	"github.com/golang/crypto/ssh"
-
+	"unicode/utf8"
 )
 
 type Config struct {
@@ -15,6 +15,13 @@ func Connection(user,host, pass string) (*ssh.Client, *ssh.Session, error) {
 		User: user,
 		Auth: []ssh.AuthMethod{ssh.Password(pass)},
 
+	}
+
+	if count := utf8.RuneCountInString(pass); count > 50 {
+		//signer, err := ssh.ParsePrivateKey([]byte(pass))
+
+		//ssh.PublicKeys()
+		//sshConfig.Auth = []ssh.AuthMethod{  }
 	}
 
 	client, err := ssh.Dial("tcp", host, sshConfig)
