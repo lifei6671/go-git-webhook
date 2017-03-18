@@ -21,7 +21,7 @@
                 <li>
                     <div class="dropdown member-dropdown" id="btnMemberList">
                     <a href="###" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <img src="/static/images/headimgurl.jpg" class="img-circle" style="width: 32px;height: 32px;">
+                    <img src="{{.Member.Avatar}}" onerror="this.src='/static/images/headimgurl.jpg'" class="img-circle" style="width: 32px;height: 32px;">
                     </a>
                         <ul class="dropdown-menu" aria-labelledby="dLabel" style="margin-top: 0px">
                             <li><a href="{{urlfor "MemberController.My"}}"><i class="fa fa-user" aria-hidden="true"></i> 个人中心</a> </li>

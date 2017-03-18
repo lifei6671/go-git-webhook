@@ -4,8 +4,76 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Edit Member - GitWebHook</title>
+    <link href="/static/webuploader/webuploader.css" rel="stylesheet">
+    <link href="/static/cropper/cropper.css" rel="stylesheet">
     {{template "widgets/headfile.html" .}}
+    <style type="text/css">
+        #upload-logo-panel .wraper{
+            float: left;
+            background: #f6f6f6;
+            position: relative;
+            width: 360px;
+            height: 360px;
+            overflow: hidden;
+        }
+        #upload-logo-panel .watch-crop-list{
+            width: 170px;
+            padding:10px 20px;
+            margin-left: 10px;
+            background-color: #f6f6f6;
+            text-align: center;
+            float: right;
+            height: 360px;
+        }
+        #image-wraper{
+            text-align: center;
+        }
+        .webuploader-pick{
 
+        }
+        .webuploader-pick-hover{
+
+        }
+        .webuploader-container{
+            padding: 0;
+            border: 0;
+            height: 40px;
+        }
+        .watch-crop-list>ul{
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .webuploader-container div{
+            width: 77px !important;
+            height: 40px !important;
+            left: 0 !important;
+        }
+        .img-preview {
+            margin: 5px auto 10px auto;
+            text-align: center;
+            overflow: hidden;
+        }
+        .img-preview > img {
+            max-width: 100%;
+        }
+        .preview-lg{
+            width: 120px;
+            height: 120px;
+        }
+        .preview-sm{
+            width: 60px;
+            height: 60px;
+        }
+        #error-message{
+            font-size: 13px;
+            color: red;
+            vertical-align: middle;
+            margin-top: -10px;
+            display: inline-block;
+            height: 40px;
+        }
+    </style>
 </head>
 <body>
 {{template "widgets/head.html" .}}
@@ -13,6 +81,7 @@
     <div class="bs-docs-container">
         <form method="post" action='{{urlfor "MemberController.Edit" ":id" .Model.MemberId}}' id="formSaveMember">
             <input type="hidden" name="id" value="{{.Model.MemberId}}">
+            <input type="hidden" name="avatar" id="avatar" value="{{.Model.Avatar}}">
             <div class="title">
                 <h3>Edit Member </h3>
                 <hr>
@@ -36,6 +105,19 @@
                             <label>Phone</label>
                             <input type="text" name="phone" id="phone" class="form-control" placeholder="Phone" maxlength="100" value="{{.Model.Phone}}">
                         </div>
+                        {{if ne .Model.Role 0}}
+                        <div class="form-group">
+                            <label>Status</label>
+                            <p>
+                            <label>
+                                <input type="radio" name="status" value="0"{{if eq .Model.Status 0}} checked{{end}}>启用
+                            </label>
+                                <label>
+                                    <input type="radio" name="status" value="1"{{if eq .Model.Status 1}} checked{{end}}>禁用
+                                </label>
+                            </p>
+                        </div>
+                        {{end}}
                     </div>
                     <div class="col-lg-4 text-center">
                         {{if .IsSelf}}
@@ -56,13 +138,131 @@
         </form>
     </div>
 </div>
+<!-- Modal -->
+<div class="modal fade" id="upload-logo-panel" tabindex="-1" role="dialog" aria-labelledby="修改头像" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title">修改头像</h4>
+            </div>
+            <div class="modal-body">
+                <div class="wraper">
+                    <div id="image-wraper">
+
+                    </div>
+                </div>
+                <div class="watch-crop-list">
+                    <div class="preview-title">预览</div>
+                    <ul>
+                        <li>
+                            <div class="img-preview preview-lg"></div>
+                        </li>
+                        <li>
+                            <div class="img-preview preview-sm"></div>
+                        </li>
+                    </ul>
+                </div>
+                <div style="clear: both"></div>
+            </div>
+            <div class="modal-footer">
+                <span id="error-message"></span>
+                <div id="filePicker" class="btn">选择</div>
+                <button type="button" id="saveImage" class="btn btn-success" style="height: 40px;width: 77px;" data-loading-text="上传中...">上传</button>
+            </div>
+        </div>
+    </div>
+</div>
 {{template "widgets/foot.html" .}}
+<script type="text/javascript" src="/static/cropper/cropper.js"></script>
+<script type="text/javascript" src="/static/webuploader/webuploader.js"></script>
+
 <script type="text/javascript">
     $(function () {
+        var modalHtml = $("#upload-logo-panel").find(".modal-body").html();
+
+        $("#upload-logo-panel").on("hidden.bs.modal",function () {
+            $("#upload-logo-panel").find(".modal-body").html(modalHtml);
+        });
+
         $("#formSaveMember").ajaxForm({
-            
+
         });
     });
+    try {
+        var uploader = WebUploader.create({
+            auto: false,
+            swf: '/static/webuploader/Uploader.swf',
+            server: '{{urlfor "MemberController.Upload"}}',
+            pick: "#filePicker",
+            fileVal : "image-file",
+            fileNumLimit : 1,
+            compress : false,
+            accept: {
+                title: 'Images',
+                extensions: 'jpg,jpeg,png',
+                mimeTypes: 'image/jpg,image/jpeg,image/png'
+            }
+        }).on("beforeFileQueued",function (file) {
+            uploader.reset();
+        }).on( 'fileQueued', function( file ) {
+            uploader.makeThumb( file, function( error, src ) {
+                $img = '<img src="' + src +'" style="max-width: 360px;max-height: 360px;">';
+                if ( error ) {
+                    $img.replaceWith('<span>不能预览</span>');
+                    return;
+                }
+
+                $("#image-wraper").html($img);
+                window.ImageCropper = $('#image-wraper>img').cropper({
+                    aspectRatio: 1 / 1,
+                    dragMode : 'move',
+                    viewMode : 1,
+                    preview : ".img-preview"
+                });
+            }, 1, 1 );
+        }).on("uploadError",function (file,reason) {
+            console.log(reason);
+            $("#error-message").text("上传失败:" + reason);
+
+        }).on("uploadSuccess",function (file, res) {
+
+            if(res.errcode == 0){
+                console.log(res);
+                $("#upload-logo-panel").modal('hide');
+                $("#headimgurl").attr('src',res.data);
+                $("#avatar").val(res.data);
+            }else{
+                $("#error-message").text(res.message);
+            }
+        }).on("beforeFileQueued",function (file) {
+            if(file.size > 1024*1024*2){
+                uploader.removeFile(file);
+                uploader.reset();
+                alert("文件必须小于2MB");
+                return false;
+            }
+        }).on("uploadComplete",function () {
+            $("#saveImage").button('reset');
+        });
+        $("#saveImage").on("click",function () {
+            var files = uploader.getFiles();
+            if(files.length > 0) {
+                $("#saveImage").button('loading');
+                var cropper = window.ImageCropper.cropper("getData");
+
+                console.log(cropper)
+
+                uploader.option("formData", cropper);
+
+                uploader.upload();
+            }else{
+                alert("请选择头像");
+            }
+        });
+    }catch(e){
+        console.log(e);
+    }
 </script>
 </body>
 </html>

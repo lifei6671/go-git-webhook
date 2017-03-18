@@ -53,7 +53,7 @@ func (m *Member) Login(account string,password string) (*Member,error) {
 
 	member := &Member{}
 
-	err := o.QueryTable(m.TableName()).Filter("account",account).One(member);
+	err := o.QueryTable(m.TableName()).Filter("account",account).Filter("status",0).One(member);
 
 	if err != nil {
 		return  member,ErrMemberNoExist
