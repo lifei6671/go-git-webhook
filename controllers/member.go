@@ -274,7 +274,7 @@ func (c *MemberController) Upload() {
 
 	fileName := "avatar_" +  strconv.FormatInt(int64(time.Now().Nanosecond()), 16) + ext
 
-	filePath := "static/upload/" + time.Now().Format("200601") + "/" + fileName
+	filePath := "static/uploads/" + time.Now().Format("200601") + "/" + fileName
 
 	path := filepath.Dir(filePath)
 
