@@ -21,11 +21,11 @@ func (c *BaseController) Prepare (){
 		c.Member = &member
 		c.Data["Member"] = c.Member
 	}else{
-		member := models.NewMember()
-		member.MemberId = 1
-		member.Find()
-		c.Member = member
-		c.Data["Member"] = *c.Member
+		//member := models.NewMember()
+		//member.MemberId = 1
+		//member.Find()
+		//c.Member = member
+		//c.Data["Member"] = *c.Member
 	}
 	scheme := "http"
 

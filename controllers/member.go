@@ -5,7 +5,6 @@ import (
 	"go-git-webhook/modules/passwords"
 	"github.com/astaxie/beego/logs"
 	"go-git-webhook/models"
-	"fmt"
 	"path/filepath"
 	"strings"
 	"time"
@@ -69,6 +68,7 @@ func (c *MemberController) Index() {
 
 
 func (c *MemberController) My(){
+	c.Prepare()
 	c.Layout = ""
 	c.TplName = "member/edit.html"
 	c.Data["MemberSelected"] = true
@@ -77,27 +77,14 @@ func (c *MemberController) My(){
 
 	if c.Ctx.Input.IsPost() {
 		password := c.GetString("password")
-		account := c.GetString("account")
-		status ,_ := c.GetInt("status",0)
+		status, _ := c.GetInt("status", 0)
 
-		if member.MemberId > 0 {
-			if password != "" {
-				pass, _ := passwords.PasswordHash(password)
-				member.Password = pass
-			}
-			if member.Role != 0 {
-				member.Status = status
-			}
-		} else {
-			if account == ""{
-				c.JsonResult(500,"Account is require.")
-			}
-			if password == "" {
-				c.JsonResult(500,"Password is require.")
-			}
-			member.Role = 1
-			member.Account = account
-			member.Password = password
+		if password != "" {
+			pass, _ := passwords.PasswordHash(password)
+			member.Password = pass
+		}
+		if member.Role != 0 {
+			member.Status = status
 		}
 
 		member.Email = c.GetString("email")
@@ -120,7 +107,7 @@ func (c *MemberController) My(){
 		if result != nil {
 			c.JsonResult(500, result.Error())
 		}
-		fmt.Printf("%+v",*member)
+
 		view, err := c.ExecuteViewPathTemplate("member/list_item.html", *member)
 		if err != nil {
 			logs.Error("", err.Error())
@@ -200,7 +187,7 @@ func (c *MemberController) Edit() {
 		if result != nil {
 			c.JsonResult(500, result.Error())
 		}
-		fmt.Printf("%+v",*member)
+
 		view, err := c.ExecuteViewPathTemplate("member/list_item.html", *member)
 		if err != nil {
 			logs.Error("", err.Error())
