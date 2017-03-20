@@ -79,6 +79,11 @@ func (m *Scheduler) ToWebScheduler() WebScheduler {
 		if sub.Seconds() > 1 {
 			item.Consuming += strconv.Itoa(int(sub.Seconds())) + "秒"
 		}
+		millisecond := sub.Nanoseconds()/1000000;
+
+		if item.Consuming == "" && millisecond > 1{
+			item.Consuming =  strconv.Itoa(int(millisecond)) + "毫秒";
+		}
 	}
 	return item
 }

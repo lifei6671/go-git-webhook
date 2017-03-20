@@ -15,7 +15,7 @@ type WebHook struct {
 	Shell string			`orm:"size(1000);column(shell)" json:"shell"`
 	Status int			`orm:"type(int);column(status);default(0)" json:"status"`
 	Key string			`orm:"size(255);column(key);unique" json:"key"`
-	Secure string			`orm:"size(255);column(secure);unique" json:"secure"`
+	Secure string			`orm:"size(255);column(secure)" json:"secure"`
 	LastExecTime time.Time		`orm:"type(datetime);column(last_exec_time);null" json:"last_exec_time"`
 	CreateTime time.Time		`orm:"type(datetime);column(create_time);auto_now_add" json:"create_time"`
 	HookType string 		`orm:"column(hook_type);size(50)" json:"hook_type"`

@@ -43,6 +43,7 @@ func (c *SchedulerController) Index()  {
 		TableName:  models.NewScheduler().TableName(),
 		EnableFirstLastLink : true,
 		CurrentPage : pageIndex,
+		PageSize : 15,
 		ParamName : "page",
 		Conditions : " AND relation_id = " + strconv.Itoa(relationDetailed.RelationId) + " order by scheduler_id desc",
 	}

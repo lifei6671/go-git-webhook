@@ -41,6 +41,7 @@ func (c *MemberController) Index() {
 		TableName:  models.NewMember().TableName(),
 		EnableFirstLastLink : true,
 		CurrentPage : pageIndex,
+		PageSize : 15,
 		ParamName : "page",
 		Conditions : " order by member_id desc",
 	}

@@ -27,6 +27,7 @@ func (c *HomeController) Index() {
 		EnableFirstLastLink : true,
 		CurrentPage : pageIndex,
 		ParamName : "page",
+		PageSize : 15,
 		Conditions : " AND create_at = " + strconv.Itoa(c.Member.MemberId) + " order by web_hook_id desc",
 	}
 

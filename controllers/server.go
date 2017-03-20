@@ -30,6 +30,7 @@ func (c *ServerController) Index() {
 		TableName:  models.NewServer().TableName(),
 		EnableFirstLastLink : true,
 		CurrentPage : pageIndex,
+		PageSize : 15,
 		ParamName : "page",
 		Conditions : " AND create_at = " + strconv.Itoa(c.Member.MemberId) + " order by server_id desc",
 	}

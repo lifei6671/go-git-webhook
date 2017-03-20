@@ -3,7 +3,6 @@ package queue
 import (
 	"sync"
 	"time"
-	"fmt"
 	"runtime"
 )
 
@@ -27,7 +26,6 @@ type Element struct {
 
 func (self *Element) Push(value interface{}) {
 	self.contents <- value
-	fmt.Printf("%+v",value)
 }
 
 

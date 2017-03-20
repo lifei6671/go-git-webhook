@@ -10,19 +10,26 @@ import (
 	"github.com/astaxie/beego/logs"
 	"go-git-webhook/tasks"
 	"fmt"
+	"net/url"
+	"time"
 )
 
 //注册数据库
 func RegisterDataBase()  {
-	host := beego.AppConfig.String("db_host");
-	database := beego.AppConfig.String("db_database");
-	username := beego.AppConfig.String("db_username");
-	password := beego.AppConfig.String("db_password");
-	port := beego.AppConfig.String("db_port");
+	host := beego.AppConfig.String("db_host")
+	database := beego.AppConfig.String("db_database")
+	username := beego.AppConfig.String("db_username")
+	password := beego.AppConfig.String("db_password")
+	timezone := beego.AppConfig.String("timezone")
 
-	dataSource := username + ":" + password + "@tcp(" + host + ":" + port +")/" + database + "?charset=utf8&parseTime=true";
+	port := beego.AppConfig.String("db_port")
+
+	dataSource := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=true&loc=%s",username,password,host,port,database,url.QueryEscape(timezone))
+
 
 	orm.RegisterDataBase("default", "mysql", dataSource)
+
+	orm.DefaultTimeLoc, _ = time.LoadLocation(timezone)
 }
 
 //注册Model

@@ -28,7 +28,6 @@ func Install()  {
 			fmt.Println("Administrator email is required")
 			os.Exit(2)
 		}
-		fmt.Println("|" + password + "|")
 
 		member := models.NewMember()
 		member.Account = *account

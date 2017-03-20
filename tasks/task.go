@@ -88,20 +88,33 @@ func Handle(value interface{})  {
 
 		logs.Info("SSH Server connectioned: " , host)
 
+		//str := strings.TrimSpace(strings.Replace(hook.Shell,"\r","",-1))
+		//
+		//shells := strings.Split(str,"\n")
+		//
+		//logs.Info("%s",shells)
+		//
+		//stdout := bytes.NewBufferString("")
+		//
+		//for _,shell := range shells {
+		//	out,err := session.CombinedOutput(shell);
+		//
+		//	if err != nil{
+		//		logs.Error("%+v",err)
+		//		break
+		//	}
+		//	logs.Info("Command : ",shell)
+		//	logs.Info("Execute Result:",string(out))
+		//	stdout.Write(out)
+		//
+		//	session.Stderr = nil
+		//	session.Stdout = nil
+		//}
 
-		str := strings.TrimSpace(strings.Replace(hook.Shell,"\r","",-1))
-
-		shells := strings.Split(str,"\n")
-
-		shell := strings.Join(shells," && ")
-
-		out,err := session.CombinedOutput(shell);
-
-
+		out,err := session.CombinedOutput(hook.Shell);
 
 		if err != nil{
 			logs.Error("CombinedOutput:",err.Error())
-			logs.Info("%s",shell)
 			scheduler.Status = "failure"
 			scheduler.LogContent = err.Error()
 			scheduler.EndExecTime = time.Now()
