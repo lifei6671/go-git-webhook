@@ -71,12 +71,6 @@ func Handle(value interface{})  {
 		logs.Info("connecting ", host)
 		_,session,err := ssh.Connection(server.Account,host,server.PrivateKey)
 
-		defer func() {
-			if session != nil {
-				session.Close()
-			}
-		}()
-
 		if err != nil {
 			logs.Error("Connection remote server error:", err.Error())
 			scheduler.Status = "failure"
@@ -85,22 +79,36 @@ func Handle(value interface{})  {
 			scheduler.Save()
 			return
 		}
+
+		defer func() {
+			if session != nil {
+				session.Close()
+			}
+		}()
+
 		logs.Info("SSH Server connectioned: " , host)
 
 
-		shells := strings.Split(hook.Shell,"\n")
+		str := strings.TrimSpace(strings.Replace(hook.Shell,"\r","",-1))
+
+		shells := strings.Split(str,"\n")
 
 		shell := strings.Join(shells," && ")
 
 		out,err := session.CombinedOutput(shell);
+
+
+
 		if err != nil{
-			logs.Error("",err.Error())
+			logs.Error("CombinedOutput:",err.Error())
+			logs.Info("%s",shell)
 			scheduler.Status = "failure"
 			scheduler.LogContent = err.Error()
 			scheduler.EndExecTime = time.Now()
 			scheduler.Save()
 			return
 		}
+		logs.Info("%s","The command was executed successfully")
 		scheduler.LogContent = string(out);
 		scheduler.Status = "success"
 		scheduler.EndExecTime = time.Now()
