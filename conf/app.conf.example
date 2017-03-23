@@ -2,6 +2,7 @@ appname = smartwebhook
 httpport = 8080
 runmode = dev
 sessionon = true
+sessionname = smart_webhook_id
 copyrequestbody = true
 
 #时区设置

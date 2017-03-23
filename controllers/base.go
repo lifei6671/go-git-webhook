@@ -41,6 +41,7 @@ func (c *BaseController) SetMember(member models.Member) {
 	if member.MemberId <= 0 {
 		c.DelSession(conf.LoginSessionName)
 		c.DelSession("uid")
+		c.DestroySession()
 	} else {
 		c.SetSession(conf.LoginSessionName, member)
 		c.SetSession("uid", member.MemberId)
