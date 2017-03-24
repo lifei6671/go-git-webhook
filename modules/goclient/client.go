@@ -16,6 +16,7 @@ import (
 type WebHookClient struct {
 	token string
 	conn *websocket.Conn
+
 }
 func Connection(remoteUrl  string,token string) (*WebHookClient ,error){
 	client :=  &WebHookClient{
@@ -29,13 +30,22 @@ func Connection(remoteUrl  string,token string) (*WebHookClient ,error){
 	if err != nil {
 		return client,err
 	}
+
 	client.conn = c
 	return client,nil
+}
+
+func (c *WebHookClient) SetCloseHandler(h func(code int, text string) error) {
+	c.conn.SetCloseHandler(h)
 }
 
 func (c *WebHookClient)Send(msg []byte) error {
 
 	return c.conn.WriteMessage(websocket.TextMessage, msg)
+}
+
+func (c *WebHookClient) SendJSON(v interface{}) error {
+	return c.conn.WriteJSON(v)
 }
 
 func (c *WebHookClient) Read() ([]byte,error) {
@@ -44,6 +54,9 @@ func (c *WebHookClient) Read() ([]byte,error) {
 	return message,err
 }
 
+func (c *WebHookClient) ReadJSON(v interface{}) error {
+	return c.conn.ReadJSON(v)
+}
 func (c *WebHookClient) Close() {
 	c.conn.Close()
 }

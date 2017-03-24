@@ -9,6 +9,14 @@ import (
 	"go-git-webhook/modules/ssh"
 	"strings"
 	"time"
+	"go-git-webhook/modules/goclient"
+	"net/url"
+	"go-git-webhook/modules/hash"
+	"fmt"
+	"bufio"
+	"io"
+	"io/ioutil"
+	"bytes"
 )
 
 var (
@@ -69,65 +77,213 @@ func Handle(value interface{})  {
 		host := server.IpAddress + ":" + strconv.Itoa(server.Port)
 
 		logs.Info("connecting ", host)
-		_,session,err := ssh.Connection(server.Account,host,server.PrivateKey)
 
-		if err != nil {
-			logs.Error("Connection remote server error:", err.Error())
-			scheduler.Status = "failure"
-			scheduler.LogContent = err.Error()
-			scheduler.EndExecTime = time.Now()
-			scheduler.Save()
-			return
+		channel := make(chan []byte,10)
+
+		if server.Type == "ssh" {
+			go sshClient(host, scheduler, server, hook,channel)
+		}else{
+			go clientClient(host,scheduler,server,hook,channel)
 		}
+		buf := bytes.NewBufferString("")
 
-		defer func() {
-			if session != nil {
-				session.Close()
+		isChannelClosed := false
+		for {
+			if isChannelClosed {
+				break
 			}
-		}()
+			select {
+			case out, ok := <-channel:
+				{
+					if !ok {
+						isChannelClosed = true
+						break
+					}
+					if len(out) > 0 {
+						buf.Write(out)
+					}
 
-		logs.Info("SSH Server connectioned: " , host)
-
-		//str := strings.TrimSpace(strings.Replace(hook.Shell,"\r","",-1))
-		//
-		//shells := strings.Split(str,"\n")
-		//
-		//logs.Info("%s",shells)
-		//
-		//stdout := bytes.NewBufferString("")
-		//
-		//for _,shell := range shells {
-		//	out,err := session.CombinedOutput(shell);
-		//
-		//	if err != nil{
-		//		logs.Error("%+v",err)
-		//		break
-		//	}
-		//	logs.Info("Command : ",shell)
-		//	logs.Info("Execute Result:",string(out))
-		//	stdout.Write(out)
-		//
-		//	session.Stderr = nil
-		//	session.Stdout = nil
-		//}
-
-		out,err := session.CombinedOutput(hook.Shell);
-
-		if err != nil{
-			logs.Error("CombinedOutput:",err.Error())
-			scheduler.Status = "failure"
-			scheduler.LogContent = err.Error()
-			scheduler.EndExecTime = time.Now()
-			scheduler.Save()
-			return
+				}
+			}
+			if buf.Len() > 0 {
+				logs.Info("%s", "The command was executed successfully")
+				scheduler.LogContent = buf.String();
+				scheduler.Status = "success"
+				scheduler.EndExecTime = time.Now()
+				scheduler.Save()
+			}
 		}
-		logs.Info("%s","The command was executed successfully")
-		scheduler.LogContent = string(out);
-		scheduler.Status = "success"
+
+	}else{
+		logs.Error("Can not be converted to Task:",value)
+	}
+}
+
+func sshClient(host string,scheduler *models.Scheduler,server *models.Server,hook *models.WebHook,channel chan <-[]byte) {
+
+	defer close(channel)
+
+	logs.Info("connecting ", host)
+	_,session,err := ssh.Connection(server.Account,host,server.PrivateKey)
+
+	if err != nil {
+		logs.Error("Connection remote server error:", err.Error())
+		scheduler.Status = "failure"
+		scheduler.LogContent = err.Error()
 		scheduler.EndExecTime = time.Now()
 		scheduler.Save()
+		return
 	}
 
+	defer func() {
+		if session != nil {
+			session.Close()
+		}
+	}()
+
+	logs.Info("SSH Server connectioned: " , host)
+
+	stdout, err := session.StdoutPipe()
+
+	if err != nil {
+		fmt.Println("StdoutPipe: " + err.Error())
+		channel <- []byte("StdoutPipe: " + err.Error())
+		return
+	}
+	stderr, err := session.StderrPipe()
+	if err != nil {
+		fmt.Println("StderrPipe: ", err.Error())
+		channel <- []byte("StderrPipe: " + err.Error())
+		return
+	}
+
+	if err := session.Start(hook.Shell); err != nil {
+		fmt.Println("Start: ", err.Error())
+		channel <- []byte("Start: " + err.Error())
+		return
+	}
+
+	reader := bufio.NewReader(stdout)
+
+	//实时循环读取输出流中的一行内容
+	for {
+		line ,err2 := reader.ReadBytes('\n')
+
+		if err2 != nil || io.EOF == err2 {
+			break
+		}
+		channel <- line
+	}
+
+	bytesErr, err := ioutil.ReadAll(stderr)
+
+	if err == nil {
+		channel <- bytesErr
+
+	}else{
+		scheduler.Status = "failure"
+		scheduler.LogContent = err.Error()
+		scheduler.EndExecTime = time.Now()
+		scheduler.Save()
+
+		channel <- []byte("Stderr: " + err.Error())
+	}
+
+	if err := session.Wait(); err != nil {
+
+		fmt.Println("Wait: ", err.Error())
+		channel <- []byte("Wait: " +err.Error())
+		return
+	}
+
+}
+
+func clientClient(host string,scheduler *models.Scheduler,server *models.Server,hook *models.WebHook,channel chan<- []byte)  {
+
+	defer close(channel)
+
+	token,err := goclient.GetToken("http://"+ host +"/token",server.Account,server.PrivateKey)
+
+	if err != nil {
+		logs.Error("Connection remote server error:", err.Error())
+		scheduler.Status = "failure"
+		scheduler.LogContent = err.Error()
+		scheduler.EndExecTime = time.Now()
+		scheduler.Save()
+		return
+	}
+	u := url.URL{Scheme: "ws", Host: host , Path: "/socket"}
+
+	client,err := goclient.Connection(u.String(),token)
+
+	if err != nil {
+		logs.Error("Remote server error:", err.Error())
+		scheduler.Status = "failure"
+		scheduler.LogContent = err.Error()
+		scheduler.EndExecTime = time.Now()
+		scheduler.Save()
+		return
+	}
+	defer client.Close()
+
+	client.SetCloseHandler(func(code int, text string) error {
+
+		return nil
+	})
+
+	msg_id :=  hash.Md5(hook.Shell + time.Now().String())
+
+	command := JsonResult{
+		ErrorCode:0,
+		Message:"ok",
+		Command: "shell",
+		MsgId: msg_id,
+		Data:hook.Shell,
+	}
+
+
+	err = client.SendJSON(command)
+
+	if err != nil {
+		logs.Error("Remote server error:", err.Error())
+		scheduler.Status = "failure"
+		scheduler.LogContent = err.Error()
+		scheduler.EndExecTime = time.Now()
+		scheduler.Save()
+		return
+	}
+
+	for {
+		var response JsonResult
+
+		 err := client.ReadJSON(&response)
+
+		if err != nil {
+			logs.Error("Remote server error:", err.Error())
+			scheduler.Status = "failure"
+			scheduler.LogContent = err.Error()
+			scheduler.EndExecTime = time.Now()
+			scheduler.Save()
+			return
+		}
+		if response.ErrorCode == 0 {
+			if response.Command == "end" {
+				return
+			}
+			body := response.Data.(string)
+
+			channel <- []byte(body)
+		}
+	}
+
+}
+
+type JsonResult struct {
+	ErrorCode int                 	`json:"error_code"`
+	Message string                	`json:"message"`
+	Command string			`json:"command,omitempty"`
+	MsgId string			`json:"msg_id,omitempty"`
+	Data interface{}	      	`json:"data,omitempty"`
 }
 
 func init()  {
