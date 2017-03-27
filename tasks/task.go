@@ -85,8 +85,10 @@ func Handle(value interface{})  {
 			logs.Info("connecting ", host)
 			go sshClient(host, scheduler, server, hook,channel)
 		}else{
-			host := server.IpAddress
-			go clientClient(host,scheduler,server,hook,channel)
+			host := server.IpAddress  + ":" + strconv.Itoa(server.Port)
+			u := url.URL{Host: host }
+
+			go clientClient(u.String(),scheduler,server,hook,channel)
 		}
 		buf := bytes.NewBufferString("")
 
