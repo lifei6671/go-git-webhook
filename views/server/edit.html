@@ -57,7 +57,7 @@
                         <label for="serverType">Server Type</label>
                         <select name="type" id="serverType" class="form-control">
                             <option value="ssh" {{if eq .Model.Type "ssh"}}selected{{end}} >SSH</option>
-                            <option value="ssh" {{if eq .Model.Type "client"}}selected{{end}} >Client</option>
+                            <option value="client" {{if eq .Model.Type "client"}}selected{{end}} >Client</option>
                         </select>
                     </div>
                 </div>
