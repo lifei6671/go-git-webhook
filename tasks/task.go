@@ -220,7 +220,14 @@ func clientClient(host string,scheduler *models.Scheduler,server *models.Server,
 		scheduler.Save()
 		return
 	}
-	u := url.URL{Scheme: "ws", Host: host , Path: "/socket"}
+
+	u ,err := url.Parse(host)
+	if err != nil {
+		u = &url.URL{Scheme: "ws", Host: host , Path: "/socket"}
+	}else{
+		u = &url.URL{Scheme: "ws", Host: u.Host , Path: "/socket"}
+	}
+
 
 	client,err := goclient.Connection(u.String(),token)
 
