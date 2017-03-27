@@ -74,15 +74,18 @@ func Handle(value interface{})  {
 		scheduler.Status = "executing"
 		scheduler.Save()
 
-		host := server.IpAddress + ":" + strconv.Itoa(server.Port)
 
-		logs.Info("connecting ", host)
+
+
 
 		channel := make(chan []byte,10)
 
 		if server.Type == "ssh" {
+			host := server.IpAddress + ":" + strconv.Itoa(server.Port)
+			logs.Info("connecting ", host)
 			go sshClient(host, scheduler, server, hook,channel)
 		}else{
+			host := server.IpAddress
 			go clientClient(host,scheduler,server,hook,channel)
 		}
 		buf := bytes.NewBufferString("")
@@ -202,7 +205,7 @@ func clientClient(host string,scheduler *models.Scheduler,server *models.Server,
 
 	defer close(channel)
 
-	token,err := goclient.GetToken("http://"+ host +"/token",server.Account,server.PrivateKey)
+	token,err := goclient.GetToken(host +"/token",server.Account,server.PrivateKey)
 
 	if err != nil {
 		logs.Error("Connection remote server error:", err.Error())

@@ -25,6 +25,7 @@ func Connection(remoteUrl  string,token string) (*WebHookClient ,error){
 
 	header := http.Header{}
 	header.Add("x-smarthook-token",token)
+
 	c, _, err := websocket.DefaultDialer.Dial(remoteUrl,header)
 
 	if err != nil {
