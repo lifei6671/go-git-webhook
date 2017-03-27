@@ -88,7 +88,7 @@ func Handle(value interface{})  {
 			host := server.IpAddress  + ":" + strconv.Itoa(server.Port)
 			u ,err := url.Parse(host)
 			if err != nil {
-				u = url.URL{ Host: host }
+				u = &url.URL{ Host: host }
 			}
 
 			go clientClient(u.String(),scheduler,server,hook,channel)
