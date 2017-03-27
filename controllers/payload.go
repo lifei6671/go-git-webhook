@@ -54,7 +54,7 @@ func (c *PayloadController) Index() {
 		c.StopRun()
 	}
 
-	if webHook.RepositoryName != repo || webHook.BranchName != branch {
+	if webHook.RepositoryName != repo || (webHook.BranchName != branch && "heads/"+ webHook.BranchName != branch){
 		c.Ctx.WriteString( "Not match the Repo and Branch.")
 		//c.StopRun()
 	}
