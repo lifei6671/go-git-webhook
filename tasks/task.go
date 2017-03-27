@@ -86,7 +86,10 @@ func Handle(value interface{})  {
 			go sshClient(host, scheduler, server, hook,channel)
 		}else{
 			host := server.IpAddress  + ":" + strconv.Itoa(server.Port)
-			u := url.URL{Host: host }
+			u ,err := url.Parse(host)
+			if err != nil {
+				u = url.URL{ Host: host }
+			}
 
 			go clientClient(u.String(),scheduler,server,hook,channel)
 		}
