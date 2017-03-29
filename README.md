@@ -16,13 +16,18 @@
 **1、拉取源码**
 
 ```
-git pull github.com/lifei6671/go-git-webhook
+git clone github.com/lifei6671/go-git-webhook.git
+
 ```
 
 **2、编译源码**
 
 ```
-go build main.go
+#更新依赖
+go get -d ./...
+
+#编译项目
+go build -v -tags "pam" -ldflags "-w"
 ```
 
 **3、运行**
@@ -35,7 +40,29 @@ chmod 0777 go-git-webhook
 
 #创建管理员账户
 ./go-git-webhook install -account=admin -password=123456 -email=admin@163.com
+
 ```
+
+# 后台运行
+
+**使用nohup后台运行**
+
+```bash
+nohup ./go-git-webhook &
+```
+
+
+**使用supervisor运行**
+
+```bash
+[program:go-git-webhook]
+command=/var/www/go-git-webhook/go-git-webhook > /dev/null > 2>&1
+autostart=true
+autorestart=true
+startsecs=10
+
+```
+
 
 # 使用技术
 
@@ -55,4 +82,4 @@ go-git-webhook 基于beego框架1.7.2版本开发。编译于golang 1.8版本。
 
 # 问题反馈
 
-如发现 BUG 请在issue中反馈。
+如发现 BUG 请在 [issues](https://github.com/lifei6671/go-git-webhook/issues) 中反馈。
