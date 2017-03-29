@@ -12,8 +12,9 @@ deploy: false
 
 install:
   - go get -v -u ./...
-  - go build -v
 
+build_script:
+  - go build -v -tags "pam" && go install
 notifications:
   - provider: Email
     to:
