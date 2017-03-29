@@ -1,7 +1,7 @@
 package ssh
 
 import (
-	"github.com/golang/crypto/ssh"
+	"golang.org/x/crypto/ssh"
 )
 
 type Config struct {
