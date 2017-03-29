@@ -1,12 +1,12 @@
 package controllers
 
 import (
-	"go-git-webhook/models"
-	"go-git-webhook/modules/pager"
+	"github.com/lifei6671/go-git-webhook/models"
+	"github.com/lifei6671/go-git-webhook/modules/pager"
 	"strconv"
 	"fmt"
 	"github.com/astaxie/beego/logs"
-	"go-git-webhook/tasks"
+	"github.com/lifei6671/go-git-webhook/tasks"
 )
 
 type SchedulerController struct {

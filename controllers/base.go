@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"github.com/astaxie/beego"
-	"go-git-webhook/models"
-	"go-git-webhook/conf"
+	"github.com/lifei6671/go-git-webhook/models"
+	"github.com/lifei6671/go-git-webhook/conf"
 	"bytes"
 )
 

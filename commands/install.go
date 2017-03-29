@@ -3,7 +3,7 @@ package commands
 import (
 	"os"
 	"flag"
-	"go-git-webhook/models"
+	"github.com/lifei6671/go-git-webhook/models"
 	"fmt"
 	"strings"
 )

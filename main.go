@@ -1,7 +1,7 @@
 package main
 
 import (
-	"go-git-webhook/commands"
+	"github.com/lifei6671/go-git-webhook/commands"
 )
 
 func main()  {

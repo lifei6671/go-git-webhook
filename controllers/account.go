@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"time"
 	"github.com/astaxie/beego"
-	"go-git-webhook/modules/gob"
-	"go-git-webhook/conf"
-	"go-git-webhook/models"
+	"github.com/lifei6671/go-git-webhook/modules/gob"
+	"github.com/lifei6671/go-git-webhook/conf"
+	"github.com/lifei6671/go-git-webhook/models"
 )
 
 type AccountController struct {

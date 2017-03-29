@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"go-git-webhook/models"
+	"github.com/lifei6671/go-git-webhook/models"
 	"github.com/astaxie/beego/logs"
-	"go-git-webhook/tasks"
+	"github.com/lifei6671/go-git-webhook/tasks"
 )
 
 

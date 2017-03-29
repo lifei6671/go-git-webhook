@@ -3,7 +3,7 @@ package models
 import (
 	"time"
 	"github.com/astaxie/beego/orm"
-	"go-git-webhook/modules/passwords"
+	"github.com/lifei6671/go-git-webhook/modules/passwords"
 	"fmt"
 )
 

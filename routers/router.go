@@ -2,7 +2,7 @@ package routers
 
 import (
 	"github.com/astaxie/beego"
-	"go-git-webhook/controllers"
+	"github.com/lifei6671/go-git-webhook/controllers"
 )
 
 func init()  {

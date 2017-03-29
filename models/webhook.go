@@ -4,7 +4,7 @@ import (
 	"time"
 	"errors"
 	"github.com/astaxie/beego/orm"
-	"go-git-webhook/modules/hash"
+	"github.com/lifei6671/go-git-webhook/modules/hash"
 )
 
 type WebHook struct {

@@ -1,17 +1,17 @@
 package tasks
 
 import (
-	"go-git-webhook/modules/queue"
-	"go-git-webhook/conf"
+	"github.com/lifei6671/go-git-webhook/modules/queue"
+	"github.com/lifei6671/go-git-webhook/conf"
 	"strconv"
-	"go-git-webhook/models"
+	"github.com/lifei6671/go-git-webhook/models"
 	"github.com/astaxie/beego/logs"
-	"go-git-webhook/modules/ssh"
+	"github.com/lifei6671/go-git-webhook/modules/ssh"
 	"strings"
 	"time"
-	"go-git-webhook/modules/goclient"
+	"github.com/lifei6671/go-git-webhook/modules/goclient"
 	"net/url"
-	"go-git-webhook/modules/hash"
+	"github.com/lifei6671/go-git-webhook/modules/hash"
 	"fmt"
 	"bufio"
 	"io"

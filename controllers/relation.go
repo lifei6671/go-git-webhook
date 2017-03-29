@@ -3,7 +3,7 @@ package controllers
 import (
 	"strconv"
 	"fmt"
-	"go-git-webhook/models"
+	"github.com/lifei6671/go-git-webhook/models"
 )
 
 type RelationController struct {

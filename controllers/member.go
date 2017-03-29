@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"go-git-webhook/modules/pager"
-	"go-git-webhook/modules/passwords"
+	"github.com/lifei6671/go-git-webhook/modules/pager"
+	"github.com/lifei6671/go-git-webhook/modules/passwords"
 	"github.com/astaxie/beego/logs"
-	"go-git-webhook/models"
+	"github.com/lifei6671/go-git-webhook/models"
 	"path/filepath"
 	"strings"
 	"time"

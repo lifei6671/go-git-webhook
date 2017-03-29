@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"strings"
-	"go-git-webhook/models"
-	"go-git-webhook/modules/pager"
+	"github.com/lifei6671/go-git-webhook/models"
+	"github.com/lifei6671/go-git-webhook/modules/pager"
 	"strconv"
 	"fmt"
 	"bytes"
