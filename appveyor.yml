@@ -11,10 +11,15 @@ build: false
 deploy: false
 
 install:
-  - go get -v -u ./...
+  - echo %PATH%
+  - echo %GOPATH%
+  - go version
+  - go env
+  - go get -d ./...
 
 build_script:
   - go build -v -tags "pam" && go install
+
 notifications:
   - provider: Email
     to:
