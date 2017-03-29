@@ -1,6 +1,7 @@
 # go-git-webhook
 
 [![Build Status](https://travis-ci.org/lifei6671/go-git-webhook.svg?branch=master)](https://travis-ci.org/lifei6671/go-git-webhook)
+[![Build status](https://ci.appveyor.com/api/projects/status/tpm2k23umrqri2dd/branch/master?svg=true)](https://ci.appveyor.com/project/lifei6671/go-git-webhook/branch/master)
 
 一个基于 Golang 开发的用于迅速搭建并使用 WebHook 进行自动化部署和运维系统，支持：Github / GitLab / GitOsc。
 
