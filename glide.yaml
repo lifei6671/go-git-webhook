@@ -15,8 +15,5 @@ import:
   version: 1421caf44f6464fd2ee8de694c7508ee13f92964
 - package: github.com/widuu/gojson
   version: 7da9d2cd949b3f1b4e3039dd985773df8cf68a99
-- package: github.com/golang/crypto
-  subpackages:
-  - ssh
 - package: github.com/gorilla/websocket
   version: ^1.1.0
