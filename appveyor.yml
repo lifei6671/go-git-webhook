@@ -8,7 +8,7 @@ environment:
   GOVERSION: 1.8
 
 build: false
-deploy: false
+deploy: true
 
 install:
   - echo %PATH%
@@ -17,8 +17,8 @@ install:
   - go env
   - go get -d ./...
 
-build_script:
-  - go build -v -tags "pam" && go install
+test_script:
+  - go build -v -tags "pam"
 
 notifications:
   - provider: Email
