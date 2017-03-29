@@ -55,13 +55,23 @@ nohup ./go-git-webhook &
 **使用supervisor运行**
 
 ```bash
-[program:go-git-webhook]
-command=/var/www/go-git-webhook/go-git-webhook > /dev/null > 2>&1
+[program:go-git-webhook-client]
+command=/opt/go/src/github.com/lifei6671/go-git-webhook/go-git-webhook
 autostart=true
 autorestart=true
 startsecs=10
+stdout_logfile=/var/log/go-git-webhook/access.log
+stdout_logfile_maxbytes=1MB
+stdout_logfile_backups=10
+stdout_capture_maxbytes=1MB
+stderr_logfile=/var/log/go-git-webhook/error.log
+stderr_logfile_maxbytes=1MB
+stderr_logfile_backups=10
+stderr_capture_maxbytes=1MB
 
 ```
+
+请将配置中的 `command` 配置为你服务器的实际程序地址
 
 
 # 使用技术
