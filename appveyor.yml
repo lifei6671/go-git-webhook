@@ -18,7 +18,7 @@ install:
   - go get -d ./...
 
 test_script:
-  - go build -v -tags "pam"
+  - go build -v -tags "pam" -ldflags "-w"
 
 notifications:
   - provider: Email
