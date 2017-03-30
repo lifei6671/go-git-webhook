@@ -91,7 +91,7 @@ nohup ./go-git-webhook &
 
 ```bash
 [program:go-git-webhook-client]
-#设置为你的程序工作目录，否则会找到配置文件
+#设置为你的程序工作目录，否则会找不到配置文件
 directory=/opt/go/src/github.com/lifei6671/go-git-webhook
 command=/opt/go/src/github.com/lifei6671/go-git-webhook/go-git-webhook
 autostart=true
