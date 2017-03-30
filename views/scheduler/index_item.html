@@ -62,7 +62,7 @@
         </div>
         <div class="actions">
             {{if eq .Status "suspend" "failure"}}
-            <button class="btn btn-default btn-link btn-resume-schedule" data-toggle="tooltip" title="重新执行" data-id="{{.SchedulerId}}">
+            <button class="btn btn-default btn-link " data-toggle="tooltip" title="重新执行" data-id="{{.SchedulerId}}" v-on:click="resumeSchedule">
                 <i class="fa fa-repeat" aria-hidden="true"></i>
                 <span>重新执行</span>
             </button>

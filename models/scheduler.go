@@ -16,7 +16,7 @@ type Scheduler struct {
 	CreateTime time.Time		`orm:"type(datetime);column(create_time);auto_now_add" json:"create_time"` //添加时间
 	StartExecTime time.Time		`orm:"type(datetime);column(start_exec_time);null" json:"start_exec_time"` //开始执行时间
 	EndExecTime time.Time		`orm:"type(datetime);column(end_exec_time);null" json:"end_exec_time"` //执行结束时间
-	Data string			`orm:"type(text);column(data)" json:"data"`	//推送的数据
+	Data string			`orm:"type(text);column(data)" json:"-"`	//推送的数据
 	PushUser string			`orm:"column(push_user);null;size(255)" json:"push_user"` //推送用户
 	ShaValue string 		`orm:"column(sha_value);null;size(255)" json:"sha_value"` //当前请求的sha值
 	LogContent string		`orm:"column(log_content);type(text);" json:"log_content"`
@@ -26,8 +26,8 @@ type Scheduler struct {
 //前端使用的结构体
 type WebScheduler struct {
 	Scheduler
-	Slogan string
-	Consuming string
+	Slogan string                `json:"slogan"`
+	Consuming string             `json:"consuming"`
 }
 
 func (m *Scheduler) ToWebScheduler() WebScheduler {
@@ -146,3 +146,4 @@ func (m *Scheduler) DeleteByWhere(where string,args ...interface{}) error {
 
 	return err
 }
+

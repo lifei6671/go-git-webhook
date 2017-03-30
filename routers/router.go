@@ -19,6 +19,7 @@ func init()  {
 	beego.Router("/hook/scheduler/console/:scheduler_id", &controllers.SchedulerController{},"*:Console")
 	beego.Router("/hook/scheduler/resume/:scheduler_id", &controllers.SchedulerController{},"*:Resume")
 	beego.Router("/hook/scheduler/cancel/:scheduler_id", &controllers.SchedulerController{},"*:Cancel")
+	beego.Router("/hook/scheduler/status/:scheduler_id", &controllers.SchedulerController{},"*:Status")
 
 	//用于GitHub Gogs Gitlab 等通知使用
 	beego.Router("/payload/:key",&controllers.PayloadController{},"*:Index")

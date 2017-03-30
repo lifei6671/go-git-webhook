@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>执行任务列表 - GitWebHook</title>
+    {{template "widgets/headfile.html"}}
+    <link rel="stylesheet" href="/static/codemirror/theme/ambiance.css">
+    <script type="text/javascript" src="/static/vuejs/vue.min.js"></script>
+
+    {{if .dev}}
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/font-awesome/css/font-awesome.css">
+    <link rel="stylesheet" href="/static/codemirror/lib/codemirror.css">
+    <link rel="stylesheet" href="/static/css/global.css">
+    <script src="/static/js/jquery-1.12.4.min.js" type="text/javascript"></script>
+    <script src="/static/js/jquery.form.js" type="text/javascript"></script>
+    {{end}}
+</head>
+<body>
+{{template "widgets/head.html" .}}
+<div class="container">
+    <div class="bs-docs-container" style="margin-bottom: 20px;">
+        <div class="top-header">
+            {{if eq .Model.HookType "github"}}
+            <img class="logo-icon" src="/static/images/github.svg">
+            {{else if eq .Model.HookType "gitlab"}}
+            <img class="logo-icon" src="/static/images/gitlab.png">
+            {{else if eq .Model.HookType "gogs"}}
+            <img class="logo-icon" src="/static/images/gogs.png">
+            {{else if eq .Model.HookType "gitosc"}}
+            <img class="logo-icon" src="/static/images/gitosc.png">
+            {{else}}
+            <img class="logo-icon" src="/static/images/default.png">
+            {{end}}
+            <div class="title-container">
+                <h2 class="title">{{.Model.RepositoryName}}</h2>
+                <div class="info">
+                    <span class="info-item">分支：{{.Model.BranchName}}</span>
+                    <span class="info-item">服务器名称：{{.Model.ServerName}}</span>
+                    <span class="info-item">连接类型：{{.Model.ServerType}}</span>
+                    <span class="info-item">服务器地址：{{.Model.IpAddress}}</span>
+                    <span class="info-item">服务器端口：{{.Model.Port}}</span>
+                </div>
+            </div>
+            <div class="pull-right">
+                <a href="{{urlfor "RelationController.Index" ":id" .Model.WebHookId}}" class="btn btn-default" style="border-radius: 31px;padding:13px 19px;font-size: 24px;color: #7d8799" title="返回" data-toggle="tooltip">
+                <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="bottom-container" id="schedulerList">
+
+        <div class="text-center" v-if="lists.length <= 0">暂无记录</div>
+        <template v-else>
+        <div class="row execute-item" v-for="item in lists">
+
+            <div class="execute-item-profile wait" v-if="item.status == 'wait'">
+                <div class="text-wait">
+                    等待执行
+                </div>
+            </div>
+
+            <div class="execute-item-profile started" v-else-if="item.status == 'executing'">
+                <div class="text-started">
+                    正在执行
+                </div>
+            </div>
+
+            <div class="execute-item-profile cancelled" v-else-if="item.status == 'suspend'">
+                <div class="text-cancelled">
+                    执行取消
+                </div>
+            </div>
+
+            <div class="execute-item-profile failure" v-else-if="item.status == 'failure'">
+                <div class="text-failure">
+                    执行失败
+                </div>
+            </div>
+
+            <div class="execute-item-profile success" v-else-if="item.status == 'success'">
+                <div class="text-success">
+                    执行成功
+                </div>
+            </div>
+
+            <div class="execute-item-profile none" v-else>
+                <div class="text-inactive">
+                    未知状态
+                </div>
+            </div>
+
+
+            <div class="execute-item-main">
+                <div class="sha-msg">
+                    <p><i class="fa fa-bookmark-o" aria-hidden="true"></i><span v-if="item.sha_value == ''">无</span><span v-else>${item.sha_value}</span> </p>
+                </div>
+                <div class="meta">
+                    <span class="trigger-icon">
+
+                        <i class="fa fa-life-bouy" aria-hidden="true" data-toggle="tooltip" title="自动触发" v-if="item.execute_type == 0"></i>
+                        <i class="fa fa-life-bouy" aria-hidden="true" data-toggle="tooltip" title="手动执行" v-if="item.execute_type == 1"></i>
+                        ${item.push_user}
+                    </span>
+                    <span class="commit-time">
+                        ${item.slogan} 提交
+                    </span>
+
+                    <span class="end-time" v-if="item.consuming != ''">
+                        耗时 ${item.consuming}
+                    </span>
+
+                </div>
+                <div class="actions">
+
+                    <button class="btn btn-default btn-link " data-toggle="tooltip" v-bind:data-id="item.scheduler_id" title="重新执行"  v-on:click="resumeSchedule" v-if="item.status == 'suspend' || item.status == 'failure'">
+                        <i class="fa fa-repeat" aria-hidden="true"></i>
+                        <span>重新执行</span>
+                    </button>
+
+                    <button class="btn btn-default btn-link" data-toggle="tooltip" title="取消执行" v-bind:data-id="item.scheduler_id" v-on:click="cancelSchedule" v-if="item.status == 'wait'">
+                        <i class="fa fa-power-off" aria-hidden="true"></i>
+                        <span>取消执行</span>
+                    </button>
+
+
+                    <button class="btn btn-default btn-link" data-toggle="tooltip" title="执行日志" v-bind:data-id="item.scheduler_id" v-on:click="scheduleConsole">
+                        <i class="fa fa-eye" aria-hidden="true"></i>
+                        <span>执行日志</span>
+                    </button>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        </template>
+        {{if gt .totalCount 1}}
+        <hr>
+        <nav>
+            {{.html}}
+        </nav>
+        {{end}}
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="consoleModal" tabindex="-1" role="dialog" aria-labelledby="consoleModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="consoleModalLabel">Console Log</h4>
+            </div>
+            <div class="modal-body">
+                <textarea name="shell" id="consoleContent" placeholder="" class="form-control" style="height: 150px;resize: none"></textarea>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{{template "widgets/foot.html" .}}
+
+<script type="text/javascript">
+    $(function () {
+
+        var consoleModalCache = $("#consoleModal").find(".modal-body").html();
+
+        $("#consoleModal").on("shown.bs.modal",function () {
+            window.codeMirror = CodeMirror.fromTextArea(document.getElementById("consoleContent"),{
+                lineNumbers: true,
+                mode: "text/x-sh",
+                lineWrapping : true,
+                matchBrackets: true,
+                autoCloseBrackets: true,
+                theme : "ambiance",
+                readOnly : true ,
+                scrollPastEnd : true
+            });
+        }).on("show.bs.modal",function (e) {
+            $(this).find(".modal-body").html(consoleModalCache);
+
+            var id = $(this).attr("data-id");
+            readSchedulerConsole(id);
+
+
+        }).on("hidden.bs.modal",function () {
+            window.codeMirror = null;
+        });
+
+        var app = new Vue({
+            el : "#schedulerList",
+            delimiters : ['${','}'],
+            data : {
+                lists: []
+            },
+            methods : {
+                resumeSchedule : function (event) {
+                    var $this = $(event.currentTarget);
+                    var $then = this;
+
+                    var id = $this.attr("data-id");
+                    var url = '{{urlfor "SchedulerController.Resume" ":scheduler_id" ""}}' + id;
+                    $.ajax({
+                        url : url,
+                        dataType : "json",
+                        success : function (res) {
+                            if(res.errcode === 0){
+                                $then.lists.unshift(res.data.data);
+                                readSchedulerStatus($then,res.data.data.scheduler_id);
+
+                            }else{
+                                alert(res.message);
+                            }
+                        },error : function () {
+                            alert("服务器异常");
+                        },complete : function () {
+                            $this.removeAttr("disabled");
+                        }
+                    });
+                },
+                scheduleConsole : function (event) {
+                    var id = $(event.currentTarget).attr("data-id");
+
+                    $("#consoleModal").attr("data-id",id).modal("show");
+                },
+                cancelSchedule : function (event) {
+                    var $this = $(event.currentTarget);
+                    var id = $this.attr("data-id");
+                    var url = '{{urlfor "SchedulerController.Cancel" ":scheduler_id" ""}}' + id;
+
+                    $.ajax({
+                        url : url,
+                        type :"POST",
+                        dataType : "json",
+                        success : function (res) {
+                            if (res.errcode === 0){
+                                $this.closest("tr").find(".label-default").removeClass("label-default").addClass("label-warning").text("执行取消");
+                                $this.empty().remove()
+                            }else{
+                                alert(res.message);
+                            }
+                            $this.removeAttr("disabled");
+                        },
+                        error : function () {
+                            $this.removeAttr("disabled");
+                        }
+
+                    });
+
+                    $this.attr("disabled","disabled");
+                }
+            },
+            mounted : function () {
+                var $this = this;
+
+                $.ajax({
+                    dataType: "json",
+                    success: function (res) {
+                        if (res.errcode === 0) {
+
+                            $this.lists.push.apply($this.lists, res.data);
+                            for(var index in $this.lists){
+                                var item = $this.lists[index];
+                                if(item.status === "wait" || item.status === "executing"){
+                                    readSchedulerStatus($this,item.scheduler_id);
+                                }
+                            }
+                        } else {
+                            alert("数据加载失败");
+                        }
+                    },
+                    error: function () {
+
+                    }
+                });
+            },
+            updated :function () {
+                $('[data-toggle="tooltip"]').tooltip();
+            }
+        });
+    });
+
+    /**
+     * 读取指定任务的信息
+     * @param $vue
+     * @param $id
+     */
+    function readSchedulerStatus($vue,$id) {
+        var socketUrl = 'ws://localhost:8080/{{urlfor "SchedulerController.Status" ":scheduler_id" ""}}' + $id;
+
+        console.log(socketUrl);
+
+        var websocket = null;
+        //判断当前浏览器是否支持WebSocket
+        if ('WebSocket' in window) {
+            websocket = new WebSocket(socketUrl);
+            websocket.onerror = function () {
+                alert("WebSocket连接发生错误")
+            };
+            websocket.onopen = function () {
+                console.log("WebSocket连接成功");
+                websocket.send("a");
+            };
+            websocket.onclose = function () {
+                console.log("WebSocket已关闭")
+            };
+            websocket.onmessage = function (event) {
+                var data = eval("(" + event.data + ")");
+
+                if(data.status !== "wait" && data.status !== "executing"){
+                    websocket.close();
+                }
+                for(var index in $vue.lists){
+                    var item = $vue.lists[index];
+
+                    if (item.scheduler_id === $id){
+                        $vue.lists.splice(index,1,data);
+                        break;
+                    }
+                }
+            };
+            window.onbeforeunload = function () {
+                websocket.close();
+            };
+
+        }
+        else {
+            alert('The browser does not support WebSocket')
+        }
+    }
+
+    function readSchedulerConsole($id) {
+        var status = "";
+
+        var url = '{{urlfor "SchedulerController.Console" ":scheduler_id" ""}}' + $id;
+        $.ajax({
+            url : url,
+            dataType :"json",
+            success : function (res) {
+                if(res.errcode === 0){
+                    if( window.codeMirror){
+                        window.codeMirror.setValue(res.data.log);
+                    }else {
+                        $("#consoleContent").val(res.data.log);
+                    }
+
+                    status = res.data.status;
+                }else{
+                    alert(res.message);
+                }
+            },error : function () {
+                alert("服务器异常");
+            }
+        });
+
+        window.interval = setInterval(function () {
+            if(status !== "wait" && status !== "executing"){
+                clearInterval(window.interval);
+                return;
+            }
+            $.ajax({
+                url : url,
+                dataType :"json",
+                success : function (res) {
+                    if(res.errcode === 0){
+                        if( window.codeMirror){
+                            window.codeMirror.setValue(res.data.log);
+                            console.log(res)
+                        }else {
+                            $("#consoleContent").val(res.data.log);
+                            console.log(res.data)
+                        }
+                        if(res.data.status !== "wait" && res.data.status !== "executing"){
+                            clearInterval(window.interval);
+                        }
+                    }else{
+                        clearInterval(window.interval);
+                        alert(res.message);
+                    }
+                },error : function () {
+                    clearInterval(window.interval);
+                    alert("服务器异常");
+                }
+            });
+        },2000);
+    }
+
+</script>
+</body>
+</html>

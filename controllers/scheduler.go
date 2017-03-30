@@ -1,13 +1,19 @@
 package controllers
 
 import (
+	"github.com/gorilla/websocket"
 	"github.com/lifei6671/go-git-webhook/models"
 	"github.com/lifei6671/go-git-webhook/modules/pager"
 	"strconv"
 	"fmt"
 	"github.com/astaxie/beego/logs"
 	"github.com/lifei6671/go-git-webhook/tasks"
+	"net/http"
+	"bytes"
+	"time"
 )
+
+var upgrader = websocket.Upgrader{CheckOrigin : verification} // use default options
 
 type SchedulerController struct {
 	BaseController
@@ -15,7 +21,7 @@ type SchedulerController struct {
 
 func (c *SchedulerController) Index()  {
 	c.Prepare()
-	c.TplName = "scheduler/detailed.html"
+	c.TplName = "scheduler/index_vue.html"
 
 
 	pageIndex, _ := c.GetInt("page", 1)
@@ -58,12 +64,16 @@ func (c *SchedulerController) Index()  {
 
 	var webList []models.WebScheduler
 
-	if len(schedulers) > 0 {
-		webList = make([]models.WebScheduler,len(schedulers))
-		for i, item := range schedulers {
-			webList[i] = (&item).ToWebScheduler()
+	if c.IsAjax() {
+		if len(schedulers) > 0 {
+			webList = make([]models.WebScheduler,len(schedulers))
+			for i, item := range schedulers {
+				webList[i] = (&item).ToWebScheduler()
+			}
 		}
+		c.JsonResult(0,"ok",webList)
 	}
+
 
 	c.Data["Model"] = relationDetailed
 
@@ -72,6 +82,7 @@ func (c *SchedulerController) Index()  {
 	c.Data["totalItem"] = totalItem
 	c.Data["totalCount"] = totalCount
 	c.Data["WebHook"] = true
+
 }
 
 func (c *SchedulerController) Console() {
@@ -93,7 +104,9 @@ func (c *SchedulerController) Console() {
 		c.JsonResult(404,"The data does not exist")
 	}
 
-	c.JsonResult(0,"ok",scheduler.LogContent)
+	data := map[string]interface{}{"log": scheduler.LogContent,"status": scheduler.Status}
+
+	c.JsonResult(0,"ok",data)
 }
 
 func (c *SchedulerController) Cancel() {
@@ -164,5 +177,61 @@ func (c *SchedulerController) Resume () {
 
 	view ,_:= c.ExecuteViewPathTemplate("scheduler/index_item.html",webModel)
 
-	c.JsonResult(0,"ok",view)
+	data := map[string]interface{}{"view" : view,"data": webModel}
+	c.JsonResult(0,"ok",data)
+}
+
+func (c *SchedulerController) Status() {
+
+	ws, err := upgrader.Upgrade(c.Ctx.ResponseWriter.ResponseWriter, c.Ctx.Request, nil)
+
+	if err != nil {
+
+		c.StopRun()
+	}
+	defer ws.Close()
+
+	buf := bytes.NewBufferString("")
+
+	scheduler_id,err := strconv.Atoi(c.Ctx.Input.Param(":scheduler_id"));
+
+	if err != nil {
+		buf.WriteString("Parameter error.")
+		ws.WriteMessage(websocket.TextMessage,buf.Bytes())
+		c.StopRun()
+	}
+	scheduler := models.NewScheduler()
+
+	scheduler.SchedulerId = scheduler_id
+
+	if err := scheduler.Find();err != nil {
+		ws.WriteMessage(websocket.TextMessage,[]byte("Error 50001: Query data error"))
+		c.StopRun()
+	}
+	deailed,err := models.FindRelationDetailedByWhere("AND relation_id = ? AND member_id = ?", scheduler.RelationId,c.Member.MemberId)
+
+	if err != nil || len(deailed) <= 0{
+		ws.WriteMessage(websocket.TextMessage,[]byte("The data does not exist"))
+		c.StopRun()
+	}
+	for{
+		m := scheduler.ToWebScheduler()
+
+		err := ws.WriteJSON(m)
+		if err != nil {
+			return
+		}
+		time.Sleep(time.Second*2)
+
+		scheduler = models.NewScheduler()
+
+		scheduler.SchedulerId = scheduler_id
+		scheduler.Find();
+	}
+	c.StopRun()
+}
+
+func verification(r *http.Request) bool {
+
+	return true
 }

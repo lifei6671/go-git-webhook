@@ -12,7 +12,6 @@ import (
 	"github.com/lifei6671/go-git-webhook/modules/goclient"
 	"net/url"
 	"github.com/lifei6671/go-git-webhook/modules/hash"
-	"fmt"
 	"bufio"
 	"io"
 	"io/ioutil"
@@ -44,7 +43,7 @@ func Handle(value interface{})  {
 		scheduler.SchedulerId = task.SchedulerId
 
 		if err := scheduler.Find(); err != nil {
-			logs.Error("%s",err.Error())
+			logs.Error("",err.Error())
 			return
 		}
 		if scheduler.Status != "wait" {
@@ -55,7 +54,7 @@ func Handle(value interface{})  {
 		server.ServerId = task.ServerId
 
 		if err := server.Find();err != nil {
-			logs.Error("%s",err.Error())
+			logs.Error("",err.Error())
 			return
 		}
 
@@ -63,7 +62,7 @@ func Handle(value interface{})  {
 		hook.WebHookId = task.WebHookId
 
 		if err := hook.Find();err != nil {
-			logs.Error("%s",err.Error())
+			logs.Error("",err.Error())
 			return
 		}
 		if strings.TrimSpace(hook.Shell) == "" {
@@ -83,7 +82,7 @@ func Handle(value interface{})  {
 		if server.Type == "ssh" {
 			host := server.IpAddress + ":" + strconv.Itoa(server.Port)
 			logs.Info("connecting ", host)
-			go sshClient(host, scheduler, server, hook,channel)
+			go sshClient(host, server, hook,channel)
 		}else{
 			host := server.IpAddress  + ":" + strconv.Itoa(server.Port)
 			u ,err := url.Parse(host)
@@ -91,11 +90,13 @@ func Handle(value interface{})  {
 				u = &url.URL{ Host: host }
 			}
 
-			go clientClient(u.String(),scheduler,server,hook,channel)
+			go clientClient(u.String(),server,hook,channel)
 		}
 		buf := bytes.NewBufferString("")
 
 		isChannelClosed := false
+		var lastInfo string
+
 		for {
 			if isChannelClosed {
 				break
@@ -109,6 +110,7 @@ func Handle(value interface{})  {
 					}
 					if len(out) > 0 {
 						buf.Write(out)
+						lastInfo = string(out)
 					}
 
 				}
@@ -116,18 +118,25 @@ func Handle(value interface{})  {
 			if buf.Len() > 0 {
 				logs.Info("%s", "The command was executed successfully")
 				scheduler.LogContent = buf.String();
-				scheduler.Status = "success"
+				scheduler.Status = "executing"
 				scheduler.EndExecTime = time.Now()
 				scheduler.Save()
 			}
 		}
+
+		if strings.HasPrefix(lastInfo,"Error") {
+			scheduler.Status = "failure"
+		}else{
+			scheduler.Status = "success"
+		}
+		scheduler.Save()
 
 	}else{
 		logs.Error("Can not be converted to Task:",value)
 	}
 }
 
-func sshClient(host string,scheduler *models.Scheduler,server *models.Server,hook *models.WebHook,channel chan <-[]byte) {
+func sshClient(host string,server *models.Server,hook *models.WebHook,channel chan <-[]byte) {
 
 	defer close(channel)
 
@@ -136,10 +145,8 @@ func sshClient(host string,scheduler *models.Scheduler,server *models.Server,hoo
 
 	if err != nil {
 		logs.Error("Connection remote server error:", err.Error())
-		scheduler.Status = "failure"
-		scheduler.LogContent = err.Error()
-		scheduler.EndExecTime = time.Now()
-		scheduler.Save()
+
+		channel <- []byte("Error: Connection remote server error => " + err.Error())
 		return
 	}
 
@@ -154,20 +161,20 @@ func sshClient(host string,scheduler *models.Scheduler,server *models.Server,hoo
 	stdout, err := session.StdoutPipe()
 
 	if err != nil {
-		fmt.Println("StdoutPipe: " + err.Error())
-		channel <- []byte("StdoutPipe: " + err.Error())
+		logs.Error("StdoutPipe: " + err.Error())
+		channel <- []byte("Error: StdoutPipe error => " + err.Error())
 		return
 	}
 	stderr, err := session.StderrPipe()
 	if err != nil {
-		fmt.Println("StderrPipe: ", err.Error())
-		channel <- []byte("StderrPipe: " + err.Error())
+		logs.Error("StderrPipe: ", err.Error())
+		channel <- []byte("Error: StderrPipe error => " + err.Error())
 		return
 	}
 
 	if err := session.Start(hook.Shell); err != nil {
-		fmt.Println("Start: ", err.Error())
-		channel <- []byte("Start: " + err.Error())
+		logs.Error("Error: Start error => ", err.Error())
+		channel <- []byte("Error: Start error => " + err.Error())
 		return
 	}
 
@@ -189,24 +196,21 @@ func sshClient(host string,scheduler *models.Scheduler,server *models.Server,hoo
 		channel <- bytesErr
 
 	}else{
-		scheduler.Status = "failure"
-		scheduler.LogContent = err.Error()
-		scheduler.EndExecTime = time.Now()
-		scheduler.Save()
 
-		channel <- []byte("Stderr: " + err.Error())
+		channel <- []byte("Error: Stderr error => " + err.Error())
 	}
 
 	if err := session.Wait(); err != nil {
 
-		fmt.Println("Wait: ", err.Error())
-		channel <- []byte("Wait: " +err.Error())
+		logs.Error("Wait error: ", err.Error())
+
+		channel <- []byte("Error: " + err.Error())
 		return
 	}
 
 }
 
-func clientClient(host string,scheduler *models.Scheduler,server *models.Server,hook *models.WebHook,channel chan<- []byte)  {
+func clientClient(host string,server *models.Server,hook *models.WebHook,channel chan<- []byte)  {
 
 	defer close(channel)
 
@@ -214,10 +218,8 @@ func clientClient(host string,scheduler *models.Scheduler,server *models.Server,
 
 	if err != nil {
 		logs.Error("Connection remote server error:", err.Error())
-		scheduler.Status = "failure"
-		scheduler.LogContent = err.Error()
-		scheduler.EndExecTime = time.Now()
-		scheduler.Save()
+
+		channel <- []byte("Error: Connection remote server error => " + err.Error())
 		return
 	}
 
@@ -233,10 +235,8 @@ func clientClient(host string,scheduler *models.Scheduler,server *models.Server,
 
 	if err != nil {
 		logs.Error("Remote server error:", err.Error())
-		scheduler.Status = "failure"
-		scheduler.LogContent = err.Error()
-		scheduler.EndExecTime = time.Now()
-		scheduler.Save()
+
+		channel <- []byte("Error:Remote server error => " + err.Error())
 		return
 	}
 	defer client.Close()
@@ -261,10 +261,8 @@ func clientClient(host string,scheduler *models.Scheduler,server *models.Server,
 
 	if err != nil {
 		logs.Error("Remote server error:", err.Error())
-		scheduler.Status = "failure"
-		scheduler.LogContent = err.Error()
-		scheduler.EndExecTime = time.Now()
-		scheduler.Save()
+
+		channel <- []byte("Error:Remote server error => " + err.Error())
 		return
 	}
 
@@ -275,10 +273,8 @@ func clientClient(host string,scheduler *models.Scheduler,server *models.Server,
 
 		if err != nil {
 			logs.Error("Remote server error:", err.Error())
-			scheduler.Status = "failure"
-			scheduler.LogContent = err.Error()
-			scheduler.EndExecTime = time.Now()
-			scheduler.Save()
+
+			channel <- []byte("Error:Remote server error => " + err.Error())
 			return
 		}
 		if response.ErrorCode == 0 {

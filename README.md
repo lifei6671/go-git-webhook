@@ -30,7 +30,36 @@ go get -d ./...
 go build -v -tags "pam" -ldflags "-w"
 ```
 
-**3、运行**
+**3、配置**
+
+系统的配置文件位于 conf/app.conf 中：
+
+```ini
+appname = smartwebhook
+#监听的端口号
+httpport = 8080
+runmode = dev
+sessionon = true
+#保存到客户端的 session 名称
+sessionname = smart_webhook_id
+copyrequestbody = true
+
+#时区设置
+timezone = Asia/Shanghai
+
+#数据库配置
+db_host=127.0.0.1
+db_port=3306
+db_database=webhook_db
+db_username=root
+db_password=123456
+
+queue_size=50
+```
+
+请将 conf/的app.conf.example 重命名为 app.conf ，并修改 数据和端口号配置。
+
+**4、运行**
 
 ```
 chmod 0777 go-git-webhook

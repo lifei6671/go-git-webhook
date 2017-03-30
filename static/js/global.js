@@ -17,6 +17,7 @@ function loadCodeMirrorEditor(id) {
 
     $('[data-toggle="tooltip"]').tooltip();
 
+
     $.fn.open = function (title, values) {
       this.find(".modal-title").text(title);
       if(typeof values === "object"){
