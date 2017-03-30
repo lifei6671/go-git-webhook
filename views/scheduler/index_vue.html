@@ -95,20 +95,23 @@
 
             <div class="execute-item-main">
                 <div class="sha-msg">
-                    <p><i class="fa fa-bookmark-o" aria-hidden="true"></i><span v-if="item.sha_value == ''">无</span><span v-else>${item.sha_value}</span> </p>
+                    <span data-toggle="tooltip" title="Commit SHA 值"><i class="fa fa-bookmark-o" aria-hidden="true"></i><span v-if="item.sha_value == ''">无</span><span v-else>${item.sha_value}</span> </span>
                 </div>
                 <div class="meta">
-                    <span class="trigger-icon">
 
-                        <i class="fa fa-life-bouy" aria-hidden="true" data-toggle="tooltip" title="自动触发" v-if="item.execute_type == 0"></i>
-                        <i class="fa fa-life-bouy" aria-hidden="true" data-toggle="tooltip" title="手动执行" v-if="item.execute_type == 1"></i>
+                    <span class="trigger-icon" data-toggle="tooltip" title="自动触发" v-if="item.execute_type == 0">
+                        <i class="fa fa-life-bouy" aria-hidden="true"></i>
                         ${item.push_user}
                     </span>
-                    <span class="commit-time">
+                    <span class="trigger-icon" data-toggle="tooltip" title="手动执行" v-if="item.execute_type == 1">
+                          <i class="fa fa-life-bouy" aria-hidden="true"></i>
+                        ${item.push_user}
+                    </span>
+                    <span class="commit-time" data-toggle="tooltip" title="任务提交时间">
                         ${item.slogan} 提交
                     </span>
 
-                    <span class="end-time" v-if="item.consuming != ''">
+                    <span class="end-time" v-if="item.consuming != ''" data-toggle="tooltip" title="任务执行耗时">
                         耗时 ${item.consuming}
                     </span>
 
