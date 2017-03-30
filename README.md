@@ -11,6 +11,12 @@
 
 因与服务器通信使用的是SSH方式，请注意保管服务器账号和密码。
 
+同时支持 C/S 模式，配合[客户端](https://github.com/lifei6671/go-git-webhook-client/)可以实现不用SSH也可以远程执行命令。
+
+当使用 C/S 模式时，server 的账号和密码是服务器端跟 Client 第一次通信时的认证信息，服务器端将通过 http://remote url/token 地址换取连接 WebSocket 的密钥，该密钥会作为 `x-smarthook-token` 请求头发送到客户端进行认证连接。
+
+
+
 # 如何使用？
 
 **1、拉取源码**
