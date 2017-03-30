@@ -15,6 +15,7 @@ install:
   - echo %GOPATH%
   - go version
   - go env
+  - rm -rf vendor/golang.org
   - go get -d ./...
 
 test_script:
