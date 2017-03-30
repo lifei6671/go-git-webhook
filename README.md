@@ -103,6 +103,55 @@ stderr_capture_maxbytes=1MB
 请将配置中的 `command` 配置为你服务器的实际程序地址
 
 
+# 使用 nginx 作为前端代理
+
+如果使用nginx 作为前端代理，需要配置 WebSocket 支持，具体配置如下：
+
+```smartyconfig
+server {
+    listen       80;
+    server_name  webhook.iminho.me;
+
+    charset utf-8;
+    access_log  /var/log/nginx/webhook.iminho.me/access.log;
+
+    root "/var/go/src/go-git-webhook";
+
+    location ~ .*\.(ttf|woff2|eot|otf|map|swf|svg|gif|jpg|jpeg|bmp|png|ico|txt|js|css)$ {
+        root "/var/go/src/go-git-webhook";
+        expires 30m;
+    }
+    
+    # 这是为了配合任务执行时自动刷新任务状态，需要开启 WebSocket 支持，请将 proxy_pass 参数配置为你的服务地址
+    location /hook/scheduler/status {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_redirect off;
+
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-NginX-Proxy true;
+
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+    location / {
+        try_files /_not_exists_ @backend;
+    }
+    
+    # 这里为具体的服务代理配置
+    location @backend {
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header Host            $http_host;
+
+        proxy_pass http://127.0.0.1:8080;
+    }
+}
+
+```
+
+
 # 使用技术
 
 go-git-webhook 基于beego框架1.7.2版本开发。编译于golang 1.8版本。使用glide作为包管理工具。
