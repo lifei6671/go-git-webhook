@@ -82,6 +82,7 @@ func (c *SchedulerController) Index()  {
 	c.Data["totalItem"] = totalItem
 	c.Data["totalCount"] = totalCount
 	c.Data["WebHook"] = true
+	c.Data["WebSocketUrl"] = "ws://" + c.Ctx.Request.Host + c.URLFor("SchedulerController.Status",":scheduler_id","")
 
 }
 

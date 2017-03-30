@@ -289,9 +289,8 @@
      * @param $id
      */
     function readSchedulerStatus($vue,$id) {
-        var socketUrl = 'ws://localhost:8080/{{urlfor "SchedulerController.Status" ":scheduler_id" ""}}' + $id;
+        var socketUrl = '{{.WebSocketUrl}}' + $id;
 
-        console.log(socketUrl);
 
         var websocket = null;
         //判断当前浏览器是否支持WebSocket
