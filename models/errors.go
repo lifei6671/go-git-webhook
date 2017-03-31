@@ -1,3 +1,4 @@
+// Package models 为项目所需的模型对象定义.
 package models
 
 import "errors"

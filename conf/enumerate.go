@@ -1,3 +1,4 @@
+// package conf 为配置相关.
 package conf
 
 import "github.com/astaxie/beego"

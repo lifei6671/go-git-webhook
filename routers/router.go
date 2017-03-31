@@ -1,3 +1,4 @@
+// Package routers 路由定义.
 package routers
 
 import (

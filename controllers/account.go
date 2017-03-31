@@ -1,3 +1,4 @@
+// Package controllers 控制器相关.
 package controllers
 
 import (
@@ -11,12 +12,12 @@ import (
 	"github.com/astaxie/beego"
 )
 
-// AccountController 用户登录与注册
+// AccountController 用户登录与注册.
 type AccountController struct {
 	BaseController
 }
 
-// Login 用户登录
+// Login 用户登录.
 func (c *AccountController) Login()  {
 	c.Prepare()
 
@@ -62,7 +63,7 @@ func (c *AccountController) Login()  {
 	}
 }
 
-// Logout 退出登录
+// Logout 退出登录.
 func (c *AccountController) Logout(){
 	c.SetMember(models.Member{});
 

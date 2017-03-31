@@ -1,3 +1,4 @@
+// package commands 为命令行定义.
 package commands
 
 import (
