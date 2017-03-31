@@ -219,9 +219,9 @@ func (c *SchedulerController) Status() {
 		ws.WriteMessage(websocket.TextMessage,[]byte("Error 50001: Query data error"))
 		c.StopRun()
 	}
-	deailed,err := models.FindRelationDetailedByWhere("AND relation_id = ? AND member_id = ?", scheduler.RelationId,c.Member.MemberId)
+	detailed,err := models.FindRelationDetailedByWhere("AND relation_id = ? AND member_id = ?", scheduler.RelationId,c.Member.MemberId)
 
-	if err != nil || len(deailed) <= 0{
+	if err != nil || len(detailed) <= 0{
 		ws.WriteMessage(websocket.TextMessage,[]byte("The data does not exist"))
 		c.StopRun()
 	}
