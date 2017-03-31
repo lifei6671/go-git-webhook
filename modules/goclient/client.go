@@ -1,16 +1,22 @@
 package goclient
 
 import (
-	"github.com/gorilla/websocket"
+
 	"net/http"
 	"errors"
 	"strings"
 	"io/ioutil"
-	"github.com/widuu/gojson"
 	"strconv"
 	"crypto/sha256"
 	"encoding/hex"
 	"time"
+	"net/url"
+
+	"github.com/lifei6671/go-git-webhook/modules/hash"
+
+	"github.com/astaxie/beego/logs"
+	"github.com/widuu/gojson"
+	"github.com/gorilla/websocket"
 )
 
 type WebHookClient struct {
@@ -18,7 +24,8 @@ type WebHookClient struct {
 	conn *websocket.Conn
 
 }
-func Connection(remoteUrl  string,token string) (*WebHookClient ,error){
+
+func (p *WebHookClient)Connection(remoteUrl  string,token string) (*WebHookClient ,error){
 	client :=  &WebHookClient{
 
 	}
@@ -61,13 +68,14 @@ func (c *WebHookClient) ReadJSON(v interface{}) error {
 func (c *WebHookClient) Close() {
 	c.conn.Close()
 }
+
+// GetToken 获取与服务器端连接的认证密钥.
 func GetToken(remoteUrl,account string,password string) (string,error) {
 
-
 	t := strconv.Itoa(time.Now().Nanosecond())
-	hash := sha256.New()
-	hash.Write([]byte(account + password + t))
-	md := hash.Sum(nil)
+	h := sha256.New()
+	h.Write([]byte(account + password + t))
+	md := h.Sum(nil)
 	mdStr := hex.EncodeToString(md)
 
 	response, err := http.Post(remoteUrl,
@@ -100,4 +108,80 @@ func GetToken(remoteUrl,account string,password string) (string,error) {
 	}
 	return "",errors.New("Data error")
 
+}
+
+// Command 执行命令.
+func (p *WebHookClient) Command (host url.URL,account,password ,shell string,channel chan <-[]byte) {
+
+	defer close(channel)
+
+
+	token,err := GetToken(host.String() +"/token",account,password)
+
+	if err != nil {
+		logs.Error("Connection remote server error:", err.Error())
+
+		channel <- []byte("Error: Connection remote server error => " + err.Error())
+		return
+	}
+
+
+	u := &url.URL{Scheme: "ws", Host: host.Host , Path: "/socket"}
+
+	client,err := (&WebHookClient{}).Connection(u.String(),token)
+
+	if err != nil {
+		logs.Error("Remote server error:", err.Error())
+
+		channel <- []byte("Error:Remote server error => " + err.Error())
+		return
+	}
+
+	defer client.Close()
+
+	client.SetCloseHandler(func(code int, text string) error {
+
+		return nil
+	})
+
+	msg_id :=  hash.Md5(shell + time.Now().String())
+
+	command := JsonResult{
+		ErrorCode	: 0,
+		Message		: "ok",
+		Command		: "shell",
+		MsgId		: msg_id,
+		Data		: shell,
+	}
+
+
+	err = client.SendJSON(command)
+
+	if err != nil {
+		logs.Error("Remote server error:", err.Error())
+
+		channel <- []byte("Error:Remote server error => " + err.Error())
+		return
+	}
+
+	for {
+		var response JsonResult
+
+		err := client.ReadJSON(&response)
+
+		if err != nil {
+			logs.Error("Remote server error:", err.Error())
+
+			channel <- []byte("Error:Remote server error => " + err.Error())
+			return
+		}
+		if response.ErrorCode == 0 {
+			if response.Command == "end" {
+				return
+			}
+			body := response.Data.(string)
+
+			channel <- []byte(body)
+		}
+	}
 }

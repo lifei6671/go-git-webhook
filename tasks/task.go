@@ -1,21 +1,18 @@
 package tasks
 
 import (
-	"github.com/lifei6671/go-git-webhook/modules/queue"
-	"github.com/lifei6671/go-git-webhook/conf"
 	"strconv"
-	"github.com/lifei6671/go-git-webhook/models"
-	"github.com/astaxie/beego/logs"
-	"github.com/lifei6671/go-git-webhook/modules/ssh"
 	"strings"
 	"time"
-	"github.com/lifei6671/go-git-webhook/modules/goclient"
 	"net/url"
-	"github.com/lifei6671/go-git-webhook/modules/hash"
-	"bufio"
-	"io"
-	"io/ioutil"
 	"bytes"
+
+	"github.com/astaxie/beego/logs"
+	"github.com/lifei6671/go-git-webhook/modules/queue"
+	"github.com/lifei6671/go-git-webhook/conf"
+	"github.com/lifei6671/go-git-webhook/models"
+	"github.com/lifei6671/go-git-webhook/modules/goclient"
+	"errors"
 )
 
 var (
@@ -73,25 +70,39 @@ func Handle(value interface{})  {
 		scheduler.Status = "executing"
 		scheduler.Save()
 
-
-
-
-
 		channel := make(chan []byte,10)
 
-		if server.Type == "ssh" {
-			host := server.IpAddress + ":" + strconv.Itoa(server.Port)
-			logs.Info("connecting ", host)
-			go sshClient(host, server, hook,channel)
-		}else{
-			host := server.IpAddress  + ":" + strconv.Itoa(server.Port)
-			u ,err := url.Parse(host)
-			if err != nil {
-				u = &url.URL{ Host: host }
-			}
+		client,err := CreateClient(server.Type)
 
-			go clientClient(u.String(),server,hook,channel)
+		if err != nil {
+			logs.Error("",err.Error())
+			return
 		}
+
+
+		host := server.IpAddress + ":" + strconv.Itoa(server.Port)
+
+		u,err := url.Parse(host)
+
+		scheme := "http"
+
+		if strings.HasPrefix(server.IpAddress,"http://") {
+			scheme = "http"
+		}else if strings.HasPrefix(server.IpAddress,"https://") {
+			scheme = "https"
+		}else{
+			scheme = "ssh"
+		}
+
+		if err != nil {
+			u = &url.URL{ Scheme : scheme, Host: host}
+		}
+
+		logs.Info("connecting ", u)
+
+		go client.Command(*u, server.Account,server.PrivateKey, hook.Shell,channel)
+
+
 		buf := bytes.NewBufferString("")
 
 		isChannelClosed := false
@@ -136,165 +147,14 @@ func Handle(value interface{})  {
 	}
 }
 
-func sshClient(host string,server *models.Server,hook *models.WebHook,channel chan <-[]byte) {
-
-	defer close(channel)
-
-	logs.Info("connecting ", host)
-	_,session,err := ssh.Connection(server.Account,host,server.PrivateKey)
-
-	if err != nil {
-		logs.Error("Connection remote server error:", err.Error())
-
-		channel <- []byte("Error: Connection remote server error => " + err.Error())
-		return
-	}
-
-	defer func() {
-		if session != nil {
-			session.Close()
-		}
-	}()
-
-	logs.Info("SSH Server connectioned: " , host)
-
-	stdout, err := session.StdoutPipe()
-
-	if err != nil {
-		logs.Error("StdoutPipe: " + err.Error())
-		channel <- []byte("Error: StdoutPipe error => " + err.Error())
-		return
-	}
-	stderr, err := session.StderrPipe()
-	if err != nil {
-		logs.Error("StderrPipe: ", err.Error())
-		channel <- []byte("Error: StderrPipe error => " + err.Error())
-		return
-	}
-
-	if err := session.Start(hook.Shell); err != nil {
-		logs.Error("Error: Start error => ", err.Error())
-		channel <- []byte("Error: Start error => " + err.Error())
-		return
-	}
-
-	reader := bufio.NewReader(stdout)
-
-	//实时循环读取输出流中的一行内容
-	for {
-		line ,err2 := reader.ReadBytes('\n')
-
-		if err2 != nil || io.EOF == err2 {
-			break
-		}
-		channel <- line
-	}
-
-	bytesErr, err := ioutil.ReadAll(stderr)
-
-	if err == nil {
-		channel <- bytesErr
-
+func CreateClient(t string) (goclient.ClientInterface,error) {
+	if t == "ssh" {
+		return &goclient.SSHClient{},nil
+	}else if t == "client" {
+		return &goclient.WebHookClient{},nil
 	}else{
-
-		channel <- []byte("Error: Stderr error => " + err.Error())
+		return nil,errors.New("未知的客户端类型")
 	}
-
-	if err := session.Wait(); err != nil {
-
-		logs.Error("Wait error: ", err.Error())
-
-		channel <- []byte("Error: " + err.Error())
-		return
-	}
-
-}
-
-func clientClient(host string,server *models.Server,hook *models.WebHook,channel chan<- []byte)  {
-
-	defer close(channel)
-
-	token,err := goclient.GetToken(host +"/token",server.Account,server.PrivateKey)
-
-	if err != nil {
-		logs.Error("Connection remote server error:", err.Error())
-
-		channel <- []byte("Error: Connection remote server error => " + err.Error())
-		return
-	}
-
-	u ,err := url.Parse(host)
-	if err != nil {
-		u = &url.URL{Scheme: "ws", Host: host , Path: "/socket"}
-	}else{
-		u = &url.URL{Scheme: "ws", Host: u.Host , Path: "/socket"}
-	}
-
-
-	client,err := goclient.Connection(u.String(),token)
-
-	if err != nil {
-		logs.Error("Remote server error:", err.Error())
-
-		channel <- []byte("Error:Remote server error => " + err.Error())
-		return
-	}
-	defer client.Close()
-
-	client.SetCloseHandler(func(code int, text string) error {
-
-		return nil
-	})
-
-	msg_id :=  hash.Md5(hook.Shell + time.Now().String())
-
-	command := JsonResult{
-		ErrorCode:0,
-		Message:"ok",
-		Command: "shell",
-		MsgId: msg_id,
-		Data:hook.Shell,
-	}
-
-
-	err = client.SendJSON(command)
-
-	if err != nil {
-		logs.Error("Remote server error:", err.Error())
-
-		channel <- []byte("Error:Remote server error => " + err.Error())
-		return
-	}
-
-	for {
-		var response JsonResult
-
-		 err := client.ReadJSON(&response)
-
-		if err != nil {
-			logs.Error("Remote server error:", err.Error())
-
-			channel <- []byte("Error:Remote server error => " + err.Error())
-			return
-		}
-		if response.ErrorCode == 0 {
-			if response.Command == "end" {
-				return
-			}
-			body := response.Data.(string)
-
-			channel <- []byte(body)
-		}
-	}
-
-}
-
-type JsonResult struct {
-	ErrorCode int                 	`json:"error_code"`
-	Message string                	`json:"message"`
-	Command string			`json:"command,omitempty"`
-	MsgId string			`json:"msg_id,omitempty"`
-	Data interface{}	      	`json:"data,omitempty"`
 }
 
 func init()  {
