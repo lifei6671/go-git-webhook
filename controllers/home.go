@@ -8,10 +8,12 @@ import (
 	"fmt"
 )
 
+//首页WebHook控制器
 type HomeController struct {
 	BaseController
 }
 
+//首页
 func (c *HomeController) Index() {
 	c.Prepare()
 

@@ -297,7 +297,7 @@ func (c *MemberController) Upload() {
 	defer f.Close()
 
 	if strings.EqualFold(ext,".jpg") || strings.EqualFold(ext,".jpeg"){
-		err = jpeg.Encode(f,subImg,&jpeg.Options{ 100 })
+		err = jpeg.Encode(f,subImg,&jpeg.Options{ Quality : 100 })
 	}else if strings.EqualFold(ext,".png") {
 		err = png.Encode(f,subImg)
 	}else if strings.EqualFold(ext,".gif") {

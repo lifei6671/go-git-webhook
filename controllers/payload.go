@@ -6,11 +6,11 @@ import (
 	"github.com/lifei6671/go-git-webhook/tasks"
 )
 
-
+//Git回调页面控制器
 type PayloadController struct {
 	BaseController
 }
-
+//回调首页
 func (c *PayloadController) Index() {
 	c.Prepare()
 	c.TplName = ""
@@ -70,7 +70,7 @@ func (c *PayloadController) Index() {
 	if value,err := hookData.PushSha(); err == nil{
 		scheduler.ShaValue = value
 	}else{
-		logs.Error("%s",err)
+		logs.Error("",err.Error())
 		scheduler.ShaValue = "无"
 	}
 

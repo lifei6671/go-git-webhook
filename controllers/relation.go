@@ -5,11 +5,11 @@ import (
 	"github.com/lifei6671/go-git-webhook/models"
 	"github.com/astaxie/beego/logs"
 )
-
+//关系控制器
 type RelationController struct {
 	BaseController
 }
-
+//首页
 func (c *RelationController) Index() {
 	c.Prepare()
 	c.TplName = "relation/server_list.html"

@@ -232,7 +232,7 @@ func (c *SchedulerController) Status() {
 	c.StopRun()
 }
 
-func verification(r *http.Request) bool {
+func verification( *http.Request) bool {
 
 	return true
 }

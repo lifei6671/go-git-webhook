@@ -7,6 +7,7 @@ import (
 	"bytes"
 )
 
+//基础控制器
 type BaseController struct {
 	beego.Controller
 	Member *models.Member

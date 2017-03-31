@@ -1,33 +1,33 @@
 package models
 
 import (
-	"time"
 	"github.com/astaxie/beego/orm"
 	"strconv"
+	"time"
 )
 
 //任务调度器储存表
 type Scheduler struct {
-	SchedulerId int 		`orm:"pk;auto;unique;column(scheduler_id)" json:"scheduler_id"`
-	WebHookId int			`orm:"type(int);column(web_hook_id)" json:"web_hook_id"`
-	ServerId int			`orm:"type(int);column(server_id)" json:"server_id"`
-	RelationId int			`orm:"type(int);column(relation_id)" json:"relation_id"`
-	Status string			`orm:"column(status);default(wait)" json:"status"` //状态：wait 等待执行/executing 执行中/suspend 中断执行/ failure 执行失败/ success 执行成功
-	CreateTime time.Time		`orm:"type(datetime);column(create_time);auto_now_add" json:"create_time"` //添加时间
-	StartExecTime time.Time		`orm:"type(datetime);column(start_exec_time);null" json:"start_exec_time"` //开始执行时间
-	EndExecTime time.Time		`orm:"type(datetime);column(end_exec_time);null" json:"end_exec_time"` //执行结束时间
-	Data string			`orm:"type(text);column(data)" json:"-"`	//推送的数据
-	PushUser string			`orm:"column(push_user);null;size(255)" json:"push_user"` //推送用户
-	ShaValue string 		`orm:"column(sha_value);null;size(255)" json:"sha_value"` //当前请求的sha值
-	LogContent string		`orm:"column(log_content);type(text);" json:"log_content"`
-	ExecuteType int			`orm:"column(execute_type);type(int);default(0)" json:"execute_type"` //执行方式：0 自动触发 / 1 手动执行
+	SchedulerId   int       `orm:"pk;auto;unique;column(scheduler_id)" json:"scheduler_id"`
+	WebHookId     int       `orm:"type(int);column(web_hook_id)" json:"web_hook_id"`
+	ServerId      int       `orm:"type(int);column(server_id)" json:"server_id"`
+	RelationId    int       `orm:"type(int);column(relation_id)" json:"relation_id"`
+	Status        string    `orm:"column(status);default(wait)" json:"status"`                         //状态：wait 等待执行/executing 执行中/suspend 中断执行/ failure 执行失败/ success 执行成功
+	CreateTime    time.Time `orm:"type(datetime);column(create_time);auto_now_add" json:"create_time"` //添加时间
+	StartExecTime time.Time `orm:"type(datetime);column(start_exec_time);null" json:"start_exec_time"` //开始执行时间
+	EndExecTime   time.Time `orm:"type(datetime);column(end_exec_time);null" json:"end_exec_time"`     //执行结束时间
+	Data          string    `orm:"type(text);column(data)" json:"-"`                                   //推送的数据
+	PushUser      string    `orm:"column(push_user);null;size(255)" json:"push_user"`                  //推送用户
+	ShaValue      string    `orm:"column(sha_value);null;size(255)" json:"sha_value"`                  //当前请求的sha值
+	LogContent    string    `orm:"column(log_content);type(text);" json:"log_content"`
+	ExecuteType   int       `orm:"column(execute_type);type(int);default(0)" json:"execute_type"` //执行方式：0 自动触发 / 1 手动执行
 }
 
 //前端使用的结构体
 type WebScheduler struct {
 	Scheduler
-	Slogan string                `json:"slogan"`
-	Consuming string             `json:"consuming"`
+	Slogan    string `json:"slogan"`
+	Consuming string `json:"consuming"`
 }
 
 //转换为前端可用的优化信息对象
@@ -35,36 +35,35 @@ func (m *Scheduler) ToWebScheduler() WebScheduler {
 	item := WebScheduler{}
 
 	item.SchedulerId = m.SchedulerId
-	item.WebHookId	= m.WebHookId
-	item.ServerId	= m.ServerId
-	item.RelationId	= m.RelationId
-	item.Status	= m.Status
-	item.CreateTime	= m.CreateTime
+	item.WebHookId = m.WebHookId
+	item.ServerId = m.ServerId
+	item.RelationId = m.RelationId
+	item.Status = m.Status
+	item.CreateTime = m.CreateTime
 	item.StartExecTime = m.StartExecTime
-	item.EndExecTime	= m.EndExecTime
-	item.Data		= m.Data
-	item.PushUser		= m.PushUser
-	item.ShaValue		= m.ShaValue
-	item.LogContent		= m.LogContent
-	item.ExecuteType	= m.ExecuteType
-	item.Consuming		= ""
+	item.EndExecTime = m.EndExecTime
+	item.Data = m.Data
+	item.PushUser = m.PushUser
+	item.ShaValue = m.ShaValue
+	item.LogContent = m.LogContent
+	item.ExecuteType = m.ExecuteType
+	item.Consuming = ""
 
 	duration := m.CreateTime.Sub(time.Now())
 
-	over :=  time.Now().Add(duration)
+	over := time.Now().Add(duration)
 
-
-	if time.Now().Year() - over.Year() > 1 {
-		item.Slogan = strconv.Itoa(time.Now().Year() - over.Year()) + "年前"
-	}else if int(time.Now().Month() - over.Month()) > 1 {
-		item.Slogan = strconv.Itoa(int(time.Now().Month() - over.Month())) + "月前"
-	}else if time.Now().Day() - over.Day() > 1 {
-		item.Slogan = strconv.Itoa( time.Now().Day() -over.Day()) + "天前"
-	}else if time.Now().Hour() - over.Hour() > 1 {
-		item.Slogan = strconv.Itoa(time.Now().Hour() -over.Hour()) + "小时前"
-	}else if time.Now().Minute() - over.Minute() > 1 {
-		item.Slogan = strconv.Itoa(time.Now().Minute() - over.Minute()) + "分钟前"
-	}else{
+	if time.Now().Year()-over.Year() > 1 {
+		item.Slogan = strconv.Itoa(time.Now().Year()-over.Year()) + "年前"
+	} else if int(time.Now().Month()-over.Month()) > 1 {
+		item.Slogan = strconv.Itoa(int(time.Now().Month()-over.Month())) + "月前"
+	} else if time.Now().Day()-over.Day() > 1 {
+		item.Slogan = strconv.Itoa(time.Now().Day()-over.Day()) + "天前"
+	} else if time.Now().Hour()-over.Hour() > 1 {
+		item.Slogan = strconv.Itoa(time.Now().Hour()-over.Hour()) + "小时前"
+	} else if time.Now().Minute()-over.Minute() > 1 {
+		item.Slogan = strconv.Itoa(time.Now().Minute()-over.Minute()) + "分钟前"
+	} else {
 		item.Slogan = "刚刚"
 	}
 
@@ -80,28 +79,32 @@ func (m *Scheduler) ToWebScheduler() WebScheduler {
 		if sub.Seconds() > 1 {
 			item.Consuming += strconv.Itoa(int(sub.Seconds())) + "秒"
 		}
-		millisecond := sub.Nanoseconds()/1000000;
+		millisecond := sub.Nanoseconds() / 1000000
 
-		if item.Consuming == "" && millisecond > 1{
-			item.Consuming =  strconv.Itoa(int(millisecond)) + "毫秒";
+		if item.Consuming == "" && millisecond > 1 {
+			item.Consuming = strconv.Itoa(int(millisecond)) + "毫秒"
 		}
 	}
 	return item
 }
+
 //获取对应数据库表名
 func (m *Scheduler) TableName() string {
 	return "scheduler"
 }
+
 //获取数据使用的引擎
 func (m *Scheduler) TableEngine() string {
 	return "INNODB"
 }
+
 //新建对象
-func NewScheduler() *Scheduler  {
+func NewScheduler() *Scheduler {
 	return &Scheduler{}
 }
+
 //根据ID查找对象
-func (m *Scheduler) Find() (error) {
+func (m *Scheduler) Find() error {
 	if m.SchedulerId <= 0 {
 		return ErrInvalidParameter
 	}
@@ -109,44 +112,46 @@ func (m *Scheduler) Find() (error) {
 
 	return o.Read(m)
 }
+
 //批量插入对象
-func (m *Scheduler) InsertMulti(schedulers []Scheduler) (int64,error) {
+func (m *Scheduler) InsertMulti(schedulers []Scheduler) (int64, error) {
 	if len(schedulers) <= 0 {
-		return 0,ErrInvalidParameter
+		return 0, ErrInvalidParameter
 	}
 	o := orm.NewOrm()
 
-	return o.InsertMulti(len(schedulers),schedulers)
+	return o.InsertMulti(len(schedulers), schedulers)
 }
+
 //根据状态查询
-func (m *Scheduler) QuerySchedulerByState(state ...string) ([]Scheduler,error) {
+func (m *Scheduler) QuerySchedulerByState(state ...string) ([]Scheduler, error) {
 	o := orm.NewOrm()
 
 	var results []Scheduler
 
-	_,err := o.QueryTable(m.TableName()).Filter("status__in",state).All(&results)
-	return results,err
+	_, err := o.QueryTable(m.TableName()).Filter("status__in", state).All(&results)
+	return results, err
 }
+
 //更新或插入
 func (m *Scheduler) Save() error {
 	o := orm.NewOrm()
 	var err error
 	if m.SchedulerId > 0 {
-		_,err = o.Update(m)
-	}else{
-		_,err = o.Insert(m)
+		_, err = o.Update(m)
+	} else {
+		_, err = o.Insert(m)
 	}
 	return err
 }
 
 //根据条件删除
-func (m *Scheduler) DeleteByWhere(where string,args ...interface{}) error {
+func (m *Scheduler) DeleteByWhere(where string, args ...interface{}) error {
 	o := orm.NewOrm()
 
 	sql := "DELETE FROM scheduler WHERE 1=1 " + where
 
-	_,err := o.Raw(sql,args).Exec()
+	_, err := o.Raw(sql, args).Exec()
 
 	return err
 }
-

@@ -9,6 +9,7 @@ import (
 	"github.com/lifei6671/go-git-webhook/models"
 )
 
+//用户登录与注册
 type AccountController struct {
 	BaseController
 }
