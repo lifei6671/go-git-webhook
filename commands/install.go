@@ -8,7 +8,7 @@ import (
 
 	"github.com/lifei6671/go-git-webhook/models"
 )
-// 安装
+// Install 安装
 // 使用方式：go-git-webhook install -account=admin -password=123456 -email=admin@163.com
 func Install()  {
 

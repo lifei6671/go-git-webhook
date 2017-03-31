@@ -13,7 +13,7 @@ import (
 	"github.com/astaxie/beego/logs"
 )
 
-// 注册数据库
+// RegisterDataBase 注册数据库
 func RegisterDataBase()  {
 	host := beego.AppConfig.String("db_host")
 	database := beego.AppConfig.String("db_database")
@@ -31,7 +31,7 @@ func RegisterDataBase()  {
 	orm.DefaultTimeLoc, _ = time.LoadLocation(timezone)
 }
 
-// 注册Model
+// RegisterModel 注册Model
 func RegisterModel()  {
 	orm.RegisterModel(new(models.Member))
 	orm.RegisterModel(new(models.Server))
@@ -39,7 +39,7 @@ func RegisterModel()  {
 	orm.RegisterModel(new(models.Scheduler))
 	orm.RegisterModel(new(models.Relation))
 }
-// 注册日志
+// RegisterLogger 注册日志
 func RegisterLogger()  {
 
 	logs.SetLogger("console")
@@ -47,7 +47,7 @@ func RegisterLogger()  {
 	logs.EnableFuncCallDepth(true)
 	logs.Async()
 }
-// 注册队列
+// RegisterTaskQueue 注册队列
 func RegisterTaskQueue()  {
 
 	schedulerList,err := models.NewScheduler().QuerySchedulerByState("wait");
@@ -60,13 +60,13 @@ func RegisterTaskQueue()  {
 	}
 
 }
-// 注册orm命令行工具
+// RunCommand 注册orm命令行工具
 func RunCommand()  {
 	orm.RunCommand()
 	Install()
 }
 
-// 启动Web监听
+// Run 启动Web监听
 func Run()  {
 	beego.Run()
 }
