@@ -2,11 +2,12 @@ package models
 
 import (
 	"time"
-	"github.com/astaxie/beego/orm"
 	"errors"
+
+	"github.com/astaxie/beego/orm"
 )
 
-//WebHook和Server之间关系
+// WebHook和Server之间关系
 type Relation struct {
 	RelationId int		`orm:"pk;auto;unique;column(relation_id)" json:"relation_id"`
 	WebHookId int		`orm:"type(int);column(web_hook_id)" json:"web_hook_id"`
@@ -15,22 +16,22 @@ type Relation struct {
 	CreateTime time.Time	`orm:"type(datetime);column(create_time);auto_now_add" json:"create_time"` //添加时间
 }
 
-//获取对应数据库表名
+// 获取对应数据库表名
 func (m *Relation) TableName() string {
 	return "relations"
 }
 
-//获取数据使用的引擎
+// 获取数据使用的引擎
 func (m *Relation) TableEngine() string {
 	return "INNODB"
 }
 
-//获取新的关系对象
+// 获取新的关系对象
 func NewRelation() *Relation {
 	return &Relation{}
 }
 
-//更新或添加映射关系
+// 更新或添加映射关系
 func (m *Relation) Save () error {
 
 	o := orm.NewOrm()
@@ -50,14 +51,14 @@ func (m *Relation) Save () error {
 	return err
 }
 
-//删除关系
+// 删除关系
 func (m *Relation) Delete()error {
 	o := orm.NewOrm()
 	_,err := o.Delete(m)
 
 	return err
 }
-//查找关系
+// 查找关系
 func (m *Relation) Find(id int) error {
 	o := orm.NewOrm()
 
@@ -173,7 +174,7 @@ func FindRelationDetailedByWhere(where string,params ...interface{}) ([]Relation
 	return results,err
 }
 
-//服务与WebHook简单关系
+// 服务与WebHook简单关系
 type ServerRelation struct {
 	ServerId int
 	RelationId int
@@ -188,7 +189,7 @@ type ServerRelation struct {
 	CreateAt int
 }
 
-//查找指定用户的服务和WebHook简单关系
+// 查找指定用户的服务和WebHook简单关系
 func (m *Relation) QueryByWebHookId (webHookId int,memberId int) ( []*ServerRelation ,error){
 	o := orm.NewOrm()
 
@@ -202,7 +203,7 @@ func (m *Relation) QueryByWebHookId (webHookId int,memberId int) ( []*ServerRela
 	return res,err
 }
 
-//删除指定用户的服务和WebHook的关系
+// 删除指定用户的服务和WebHook的关系
 func (m *Relation) DeleteByWhere(where string,args ...interface{}) error {
 	o := orm.NewOrm()
 

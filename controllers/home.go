@@ -9,12 +9,12 @@ import (
 	"github.com/astaxie/beego/logs"
 )
 
-//首页WebHook控制器
+// 首页WebHook控制器
 type HomeController struct {
 	BaseController
 }
 
-//首页
+// 首页
 func (c *HomeController) Index() {
 	c.Prepare()
 
@@ -57,7 +57,7 @@ func (c *HomeController) Index() {
 	c.Data["WebHook"] = true
 }
 
-//编辑
+// 编辑
 func (c *HomeController) Edit() {
 	c.Prepare()
 	c.Layout = ""
@@ -148,7 +148,7 @@ func (c *HomeController) Edit() {
 	c.Data["WebHook"] = true
 }
 
-//删除
+// 删除
 func (c *HomeController) Delete()  {
 	webHookId,_ := c.GetInt("id",0)
 	if webHookId <= 0 {

@@ -8,7 +8,7 @@ import (
 	"github.com/astaxie/beego/logs"
 )
 
-//服务器对象
+// 服务器对象
 type Server struct {
 	ServerId int			`orm:"pk;auto;unique;column(server_id)" json:"server_id"`
 	Name string			`orm:"size(255);column(name)" json:"name"`
@@ -23,20 +23,20 @@ type Server struct {
 	CreateAt int			`orm:"type(int);column(create_at)" json:"-"`
 }
 
-//获取对应数据库表名
+// 获取对应数据库表名
 func (m *Server) TableName() string {
 	return "servers"
 }
-//获取数据使用的引擎
+// 获取数据使用的引擎
 func (m *Server) TableEngine() string {
 	return "INNODB"
 }
-//新建服务器对象
+// 新建服务器对象
 func NewServer() *Server {
 	return &Server{}
 }
 
-//根据ID查找对象
+// 根据ID查找对象
 func (m *Server) Find() (error) {
 
 	if m.ServerId <= 0 {
@@ -50,7 +50,7 @@ func (m *Server) Find() (error) {
 	return nil;
 }
 
-//创建或更新
+// 创建或更新
 func (m *Server) Save() error {
 	o := orm.NewOrm()
 	var err error;
@@ -64,7 +64,7 @@ func (m *Server) Save() error {
 	return err
 }
 
-//删除
+// 删除
 func (m *Server) Delete() error {
 	o := orm.NewOrm()
 	_,err := o.Delete(m)
@@ -72,7 +72,7 @@ func (m *Server) Delete() error {
 	return err
 }
 
-//搜索指定用户的服务器
+// 搜索指定用户的服务器
 func (m *Server) Search(keyword string, memberId int,excludeServerId ...int) ([]Server,error) {
 	o := orm.NewOrm()
 
@@ -100,7 +100,7 @@ func (m *Server) Search(keyword string, memberId int,excludeServerId ...int) ([]
 	return servers,nil
 }
 
-//根据server_id和用户id查询服务器信息列表
+// 根据server_id和用户id查询服务器信息列表
 func (m *Server) QueryServerByServerId(serverIds []int,memberId ...int) ([]*Server,error) {
 	o := orm.NewOrm()
 

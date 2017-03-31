@@ -11,11 +11,11 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 )
-//服务器控制器
+// 服务器控制器
 type ServerController struct {
 	BaseController
 }
-//服务器列表
+// 服务器列表
 func (c *ServerController) Index() {
 	c.Prepare()
 
@@ -58,7 +58,7 @@ func (c *ServerController) Index() {
 	c.Data["Server"] = true
 }
 
-//编辑
+// 编辑
 func (c *ServerController) Edit()  {
 	c.Prepare()
 	c.Layout = ""
@@ -186,7 +186,7 @@ func (c *ServerController) Edit()  {
 
 }
 
-//删除一个Server
+// 删除一个Server
 func (c *ServerController) Delete() {
 	serverId,_ := c.GetInt("id",0)
 

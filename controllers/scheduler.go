@@ -14,12 +14,15 @@ import (
 	"github.com/astaxie/beego/logs"
 )
 
+// 默认的 WebSocket 选项
 var upgrader = websocket.Upgrader{CheckOrigin : verification} // use default options
 
+// 任务调度控制器
 type SchedulerController struct {
 	BaseController
 }
 
+// 首页
 func (c *SchedulerController) Index()  {
 	c.Prepare()
 	c.TplName = "scheduler/index_vue.html"
@@ -87,6 +90,7 @@ func (c *SchedulerController) Index()  {
 
 }
 
+// 控制台
 func (c *SchedulerController) Console() {
 	schedulerId,err := strconv.Atoi(c.Ctx.Input.Param(":scheduler_id"))
 
@@ -111,6 +115,7 @@ func (c *SchedulerController) Console() {
 	c.JsonResult(0,"ok",data)
 }
 
+// 取消任务
 func (c *SchedulerController) Cancel() {
 	schedulerId,err := strconv.Atoi(c.Ctx.Input.Param(":scheduler_id"))
 
@@ -138,6 +143,7 @@ func (c *SchedulerController) Cancel() {
 	c.JsonResult(0,"ok")
 }
 
+// 重新执行
 func (c *SchedulerController) Resume () {
 	schedulerId,err := strconv.Atoi(c.Ctx.Input.Param(":scheduler_id"))
 
@@ -183,6 +189,7 @@ func (c *SchedulerController) Resume () {
 	c.JsonResult(0,"ok",data)
 }
 
+// 任务状态
 func (c *SchedulerController) Status() {
 
 	ws, err := upgrader.Upgrade(c.Ctx.ResponseWriter.ResponseWriter, c.Ctx.Request, nil)
@@ -233,6 +240,7 @@ func (c *SchedulerController) Status() {
 	c.StopRun()
 }
 
+// 校验是否可以连接 WebSocket
 func verification( *http.Request) bool {
 
 	return true

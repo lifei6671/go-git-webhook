@@ -11,12 +11,12 @@ import (
 	"github.com/astaxie/beego"
 )
 
-//用户登录与注册
+// 用户登录与注册
 type AccountController struct {
 	BaseController
 }
 
-//用户登录
+// 用户登录
 func (c *AccountController) Login()  {
 	c.Prepare()
 
@@ -62,15 +62,9 @@ func (c *AccountController) Login()  {
 	}
 }
 
-//退出登录
+// 退出登录
 func (c *AccountController) Logout(){
 	c.SetMember(models.Member{});
 
 	c.Redirect(beego.URLFor("AccountController.Login"),302)
-}
-
-func (c *AccountController) Lists (){
-	c.Prepare()
-
-
 }

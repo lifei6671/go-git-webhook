@@ -7,11 +7,12 @@ import (
 
 	"github.com/astaxie/beego/logs"
 )
-//关系控制器
+
+// 关系控制器
 type RelationController struct {
 	BaseController
 }
-//首页
+// 首页
 func (c *RelationController) Index() {
 	c.Prepare()
 	c.TplName = "relation/server_list.html"
@@ -40,7 +41,7 @@ func (c *RelationController) Index() {
 	c.Data["WebHook"] = true
 }
 
-//检索服务器并添加到数据库
+// 检索服务器并添加到数据库
 func (c *RelationController) AddServer() {
 	c.Prepare()
 
@@ -149,6 +150,7 @@ func (c *RelationController) AddServer() {
 	c.StopRun()
 }
 
+// 删除一个服务器
 func (c *RelationController) DeleteServer() {
 	c.Prepare()
 	relation_id ,err := strconv.Atoi(c.Ctx.Input.Param(":id"))

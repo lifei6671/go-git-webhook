@@ -9,7 +9,7 @@ import (
 	"github.com/astaxie/beego"
 )
 
-//基础控制器
+// 基础控制器
 type BaseController struct {
 	beego.Controller
 	Member *models.Member
@@ -38,7 +38,7 @@ func (c *BaseController) Prepare (){
 	c.Scheme = scheme
 }
 
-//获取或设置当前登录用户信息,如果 MemberId 小于 0 则标识删除 Session
+// 获取或设置当前登录用户信息,如果 MemberId 小于 0 则标识删除 Session
 func (c *BaseController) SetMember(member models.Member) {
 
 	if member.MemberId <= 0 {
@@ -51,7 +51,7 @@ func (c *BaseController) SetMember(member models.Member) {
 	}
 }
 
-//响应 json 结果
+// 响应 json 结果
 func (c *BaseController) JsonResult(errCode int,errMsg string,data ...interface{}){
 	json := make(map[string]interface{},3)
 

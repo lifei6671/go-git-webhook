@@ -2,8 +2,9 @@ package models
 
 import (
 	"errors"
-	"github.com/widuu/gojson"
 	"strings"
+
+	"github.com/widuu/gojson"
 )
 
 var(
@@ -15,17 +16,17 @@ var(
 	ErrInvalidParameter = errors.New("Invalid parameter")
 )
 
-//Git请求时发送的信息
+// Git请求时发送的信息
 type HookData struct {
 	data string
 }
 
-//获取Json结构
+// 获取Json结构
 func (m *HookData) Json () *gojson.Js {
 	return gojson.Json(m.data);
 }
 
-//解析GitWebHook请求时发送的内容
+// 解析GitWebHook请求时发送的内容
 func ResolveHookRequest (data string) (HookData,error) {
 
 	hookData := HookData{}
@@ -41,7 +42,7 @@ func ResolveHookRequest (data string) (HookData,error) {
 	return hookData,nil
 }
 
-//解析仓库名称
+// 解析仓库名称
 func (m *HookData) RepositoryName() (string,error){
 
 	result := m.Json().Get("repository").Get("name")
@@ -82,7 +83,7 @@ func (m *HookData) BranchName () (string,error){
 	}
 	return branchName,nil
 }
-//获取Git类型
+// 获取Git类型
 func (m *HookData) HookType() (string,error){
 	//github的data格式
 	if uid := m.Json().Get("pusher").Get("name");uid.IsValid() {
@@ -150,7 +151,7 @@ func (m *HookData) PushEmail() (string,error) {
 
 	return "",ErrNoData
 }
-//获取当前推送的SHA值
+// 获取当前推送的SHA值
 func (m *HookData) PushSha() (string,error){
 	if value := m.Json().Get("after"); value.IsValid() {
 		return value.Tostring(),nil

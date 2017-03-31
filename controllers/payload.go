@@ -6,11 +6,11 @@ import (
 	"github.com/lifei6671/go-git-webhook/tasks"
 )
 
-//Git回调页面控制器
+// Git回调页面控制器
 type PayloadController struct {
 	BaseController
 }
-//回调首页
+// 回调首页
 func (c *PayloadController) Index() {
 	c.Prepare()
 	c.TplName = ""

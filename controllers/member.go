@@ -20,10 +20,12 @@ import (
 	"github.com/astaxie/beego/logs"
 )
 
+// 会员控制器
 type MemberController struct {
 	BaseController
 }
 
+// 首页
 func (c *MemberController) Index() {
 	c.Prepare()
 
@@ -69,7 +71,7 @@ func (c *MemberController) Index() {
 	c.Data["totalCount"] = totalCount
 }
 
-
+// 个人中心
 func (c *MemberController) My(){
 	c.Prepare()
 	c.Layout = ""
@@ -128,6 +130,7 @@ func (c *MemberController) My(){
 	c.Data["IsSelf"] = true
 }
 
+// 编辑信息
 func (c *MemberController) Edit() {
 	c.TplName = "member/edit.html"
 
@@ -211,6 +214,7 @@ func (c *MemberController) Edit() {
 	}
 }
 
+// 删除会员
 func (c *MemberController) Delete() {
 	c.Prepare()
 
@@ -243,6 +247,7 @@ func (c *MemberController) Delete() {
 	c.JsonResult(0,"ok")
 }
 
+// 上传图片
 func (c *MemberController) Upload() {
 	file,moreFile,err := c.GetFile("image-file")
 	defer file.Close()

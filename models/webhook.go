@@ -3,10 +3,12 @@ package models
 import (
 	"time"
 	"errors"
+
 	"github.com/astaxie/beego/orm"
 	"github.com/lifei6671/go-git-webhook/modules/hash"
 )
-//WebHook对象
+
+// WebHook对象
 type WebHook struct {
 	WebHookId int			`orm:"pk;auto;unique;column(web_hook_id)" json:"web_hook_id"`
 	RepositoryName string		`orm:"size(255);column(repo_name)" json:"repository_name"`
@@ -22,19 +24,22 @@ type WebHook struct {
 	CreateAt int			`orm:"type(int);column(create_at)"`
 }
 
-//获取对应数据库表名
+// 获取对应数据库表名
 func (m *WebHook) TableName() string {
 	return "webhooks"
 }
-//获取数据使用的引擎
+
+// 获取数据使用的引擎
 func (m *WebHook) TableEngine() string {
 	return "INNODB"
 }
-//新建 WebHook 对象
+
+// 新建 WebHook 对象
 func NewWebHook() *WebHook {
 	return &WebHook{}
 }
-//查找
+
+// 查找
 func (m *WebHook) Find() error {
 
 	if m.WebHookId <= 0 {
@@ -49,7 +54,7 @@ func (m *WebHook) Find() error {
 	}
 	return nil;
 }
-//批量删除
+// 批量删除
 func (m *WebHook) DeleteMulti (id ...int) error {
 	if len(id) > 0 {
 		o := orm.NewOrm()
@@ -76,7 +81,7 @@ func (m *WebHook) Delete() error {
 	return err
 }
 
-//根据Key查找
+// 根据Key查找
 func (m *WebHook) FindByKey(key string) error {
 	o := orm.NewOrm()
 
@@ -86,7 +91,7 @@ func (m *WebHook) FindByKey(key string) error {
 	return nil
 }
 
-//添加或更新
+// 添加或更新
 func (m *WebHook) Save() error {
 	o := orm.NewOrm()
 	var err error;
