@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"strconv"
-	"fmt"
 	"github.com/lifei6671/go-git-webhook/models"
+	"github.com/astaxie/beego/logs"
 )
 
 type RelationController struct {
@@ -158,7 +158,7 @@ func (c *RelationController) DeleteServer() {
 	relation := models.NewRelation()
 
 	if err := relation.Find(relation_id);err != nil {
-		fmt.Println("DeleteServer:",err)
+		logs.Info("DeleteServer:",err)
 
 		c.JsonResult(404,"Server does not exist.")
 	}

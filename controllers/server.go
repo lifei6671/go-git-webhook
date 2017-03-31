@@ -5,16 +5,15 @@ import (
 	"github.com/lifei6671/go-git-webhook/models"
 	"github.com/lifei6671/go-git-webhook/modules/pager"
 	"strconv"
-	"fmt"
 	"bytes"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 )
-
+//服务器控制器
 type ServerController struct {
 	BaseController
 }
-
+//服务器列表
 func (c *ServerController) Index() {
 	c.Prepare()
 
@@ -57,7 +56,7 @@ func (c *ServerController) Index() {
 	c.Data["Server"] = true
 }
 
-
+//编辑
 func (c *ServerController) Edit()  {
 	c.Prepare()
 	c.Layout = ""
@@ -132,10 +131,6 @@ func (c *ServerController) Edit()  {
 			data := make(map[string]interface{},5)
 
 			if id <= 0 {
-
-				if err != nil {
-					fmt.Println(err)
-				}
 
 				var buf bytes.Buffer
 

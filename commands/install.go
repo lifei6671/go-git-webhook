@@ -7,7 +7,8 @@ import (
 	"fmt"
 	"strings"
 )
-// go-git-webhook install -account=admin -password=123456 -email=admin@163.com
+// 安装
+// 使用方式：go-git-webhook install -account=admin -password=123456 -email=admin@163.com
 func Install()  {
 
 	if len(os.Args) > 2 && os.Args[1] == "install" {

@@ -7,6 +7,7 @@ import (
 	"strconv"
 )
 
+//服务器对象
 type Server struct {
 	ServerId int			`orm:"pk;auto;unique;column(server_id)" json:"server_id"`
 	Name string			`orm:"size(255);column(name)" json:"name"`
@@ -21,15 +22,15 @@ type Server struct {
 	CreateAt int			`orm:"type(int);column(create_at)" json:"-"`
 }
 
-
+//获取对应数据库表名
 func (m *Server) TableName() string {
 	return "servers"
 }
-
+//获取数据使用的引擎
 func (m *Server) TableEngine() string {
 	return "INNODB"
 }
-
+//新建服务器对象
 func NewServer() *Server {
 	return &Server{}
 }
@@ -70,7 +71,7 @@ func (m *Server) Delete() error {
 	return err
 }
 
-
+//搜索指定用户的服务器
 func (m *Server) Search(keyword string, memberId int,excludeServerId ...int) ([]Server,error) {
 	o := orm.NewOrm()
 

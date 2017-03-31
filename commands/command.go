@@ -4,14 +4,11 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	"github.com/lifei6671/go-git-webhook/models"
-	_ "github.com/go-sql-driver/mysql"
-	_ "github.com/lifei6671/go-git-webhook/routers"
-	_ "github.com/lifei6671/go-git-webhook/modules/filters"
 	"github.com/astaxie/beego/logs"
 	"github.com/lifei6671/go-git-webhook/tasks"
-	"fmt"
 	"net/url"
 	"time"
+	"fmt"
 )
 
 //注册数据库
@@ -40,7 +37,7 @@ func RegisterModel()  {
 	orm.RegisterModel(new(models.Scheduler))
 	orm.RegisterModel(new(models.Relation))
 }
-
+//注册日志
 func RegisterLogger()  {
 
 	logs.SetLogger("console")
@@ -48,7 +45,7 @@ func RegisterLogger()  {
 	logs.EnableFuncCallDepth(true)
 	logs.Async()
 }
-
+//注册队列
 func RegisterTaskQueue()  {
 
 	schedulerList,err := models.NewScheduler().QuerySchedulerByState("wait");

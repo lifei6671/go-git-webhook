@@ -5,6 +5,7 @@ import (
 	"encoding/gob"
 )
 
+//解码
 func Decode(value string,r interface{}) (error) {
 
 	network := bytes.NewBuffer([]byte(value));
@@ -14,7 +15,7 @@ func Decode(value string,r interface{}) (error) {
 	return dec.Decode(r);
 }
 
-//
+//编码
 func Encode(value interface{}) (string,error) {
 	network:= bytes.NewBuffer(nil);
 

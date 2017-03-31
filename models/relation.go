@@ -6,6 +6,7 @@ import (
 	"errors"
 )
 
+//WebHook和Server之间关系
 type Relation struct {
 	RelationId int		`orm:"pk;auto;unique;column(relation_id)" json:"relation_id"`
 	WebHookId int		`orm:"type(int);column(web_hook_id)" json:"web_hook_id"`
@@ -14,19 +15,22 @@ type Relation struct {
 	CreateTime time.Time	`orm:"type(datetime);column(create_time);auto_now_add" json:"create_time"` //添加时间
 }
 
-
+//获取对应数据库表名
 func (m *Relation) TableName() string {
 	return "relations"
 }
 
+//获取数据使用的引擎
 func (m *Relation) TableEngine() string {
 	return "INNODB"
 }
 
+//获取新的关系对象
 func NewRelation() *Relation {
 	return &Relation{}
 }
 
+//更新或添加映射关系
 func (m *Relation) Save () error {
 
 	o := orm.NewOrm()
@@ -46,13 +50,14 @@ func (m *Relation) Save () error {
 	return err
 }
 
+//删除关系
 func (m *Relation) Delete()error {
 	o := orm.NewOrm()
 	_,err := o.Delete(m)
 
 	return err
 }
-
+//查找关系
 func (m *Relation) Find(id int) error {
 	o := orm.NewOrm()
 
@@ -90,62 +95,62 @@ type RelationDetailed struct {
 
 }
 
-func NewRelationDetailed() *RelationDetailed {
-	return &RelationDetailed{}
-}
-
-func FindRelationDetailed(relationId int) (RelationDetailed,error) {
-	var relationDetailed RelationDetailed
-	if relationId <= 0 {
-		return  relationDetailed,ErrInvalidParameter
-	}
-
-	relation := &Relation{ RelationId: relationId}
-
-	o := orm.NewOrm()
-	if err := o.Read(relation);err != nil {
-		return relationDetailed,err
-	}
-
-
-	server := &Server{ ServerId: relation.ServerId}
-
-	if err := o.Read(server);err != nil {
-		return relationDetailed,err
-	}
-
-	hook := &WebHook{WebHookId: relation.WebHookId}
-
-	if err := o.Read(hook);err != nil {
-		return relationDetailed,err
-	}
-
-
-	relationDetailed.RelationId 	= relationId
-	relationDetailed.MemberId	= relation.MemberId
-	relationDetailed.WebHookId 	= relation.WebHookId
-	relationDetailed.ServerId 	= relation.ServerId
-
-	relationDetailed.RepositoryName	= hook.RepositoryName
-	relationDetailed.BranchName	= hook.BranchName
-	relationDetailed.WebHookTag	= hook.Tag
-	relationDetailed.Shell		= hook.Shell
-	relationDetailed.WebHookStatus	= hook.Status
-	relationDetailed.Key		= hook.Key
-	relationDetailed.Secure		= hook.Secure
-	relationDetailed.HookType	= hook.HookType
-
-	relationDetailed.ServerName	= server.Name
-	relationDetailed.ServerType	= server.Type
-	relationDetailed.IpAddress	= server.IpAddress
-	relationDetailed.Port		= server.Port
-	relationDetailed.Account	= server.Account
-	relationDetailed.PrivateKey	= server.PrivateKey
-	relationDetailed.ServerTag	= server.Tag
-	relationDetailed.ServerStatus	= server.Status
-
-	return relationDetailed,nil
-}
+//func NewRelationDetailed() *RelationDetailed {
+//	return &RelationDetailed{}
+//}
+//
+//func FindRelationDetailed(relationId int) (RelationDetailed,error) {
+//	var relationDetailed RelationDetailed
+//	if relationId <= 0 {
+//		return  relationDetailed,ErrInvalidParameter
+//	}
+//
+//	relation := &Relation{ RelationId: relationId}
+//
+//	o := orm.NewOrm()
+//	if err := o.Read(relation);err != nil {
+//		return relationDetailed,err
+//	}
+//
+//
+//	server := &Server{ ServerId: relation.ServerId}
+//
+//	if err := o.Read(server);err != nil {
+//		return relationDetailed,err
+//	}
+//
+//	hook := &WebHook{WebHookId: relation.WebHookId}
+//
+//	if err := o.Read(hook);err != nil {
+//		return relationDetailed,err
+//	}
+//
+//
+//	relationDetailed.RelationId 	= relationId
+//	relationDetailed.MemberId	= relation.MemberId
+//	relationDetailed.WebHookId 	= relation.WebHookId
+//	relationDetailed.ServerId 	= relation.ServerId
+//
+//	relationDetailed.RepositoryName	= hook.RepositoryName
+//	relationDetailed.BranchName	= hook.BranchName
+//	relationDetailed.WebHookTag	= hook.Tag
+//	relationDetailed.Shell		= hook.Shell
+//	relationDetailed.WebHookStatus	= hook.Status
+//	relationDetailed.Key		= hook.Key
+//	relationDetailed.Secure		= hook.Secure
+//	relationDetailed.HookType	= hook.HookType
+//
+//	relationDetailed.ServerName	= server.Name
+//	relationDetailed.ServerType	= server.Type
+//	relationDetailed.IpAddress	= server.IpAddress
+//	relationDetailed.Port		= server.Port
+//	relationDetailed.Account	= server.Account
+//	relationDetailed.PrivateKey	= server.PrivateKey
+//	relationDetailed.ServerTag	= server.Tag
+//	relationDetailed.ServerStatus	= server.Status
+//
+//	return relationDetailed,nil
+//}
 
 // 指定条件查询完整的关系对象
 func FindRelationDetailedByWhere(where string,params ...interface{}) ([]RelationDetailed,error) {
@@ -168,6 +173,7 @@ func FindRelationDetailedByWhere(where string,params ...interface{}) ([]Relation
 	return results,err
 }
 
+//服务与WebHook简单关系
 type ServerRelation struct {
 	ServerId int
 	RelationId int
@@ -182,6 +188,7 @@ type ServerRelation struct {
 	CreateAt int
 }
 
+//查找指定用户的服务和WebHook简单关系
 func (m *Relation) QueryByWebHookId (webHookId int,memberId int) ( []*ServerRelation ,error){
 	o := orm.NewOrm()
 
@@ -195,7 +202,7 @@ func (m *Relation) QueryByWebHookId (webHookId int,memberId int) ( []*ServerRela
 	return res,err
 }
 
-
+//删除指定用户的服务和WebHook的关系
 func (m *Relation) DeleteByWhere(where string,args ...interface{}) error {
 	o := orm.NewOrm()
 

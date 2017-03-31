@@ -7,6 +7,7 @@ import (
 	"fmt"
 )
 
+//会员信息
 type Member struct {
 	MemberId int		`orm:"pk;auto;unique;column(member_id)"`
 	Account string 		`orm:"size(255);column(account)"`
@@ -20,16 +21,16 @@ type Member struct {
 	CreateAt int		`orm:"type(int);column(create_at)"`
 	LastLoginTime time.Time	`orm:"type(datetime);column(last_login_time);null"`
 }
-
+//获取对应数据库表名
 func (m *Member) TableName() string {
 	return "members"
 }
-
+//获取数据使用的引擎
 func (m *Member) TableEngine() string {
 	return "INNODB"
 }
 
-
+//获取新的用户信息对象
 func NewMember() *Member {
 	return new(Member)
 }
@@ -102,6 +103,7 @@ func (m *Member) Update(cols... string) (error) {
 	return nil
 }
 
+//删除一个用户
 func (m *Member) Delete() error {
 	o := orm.NewOrm()
 
