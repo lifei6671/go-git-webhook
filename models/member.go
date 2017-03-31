@@ -7,7 +7,7 @@ import (
 	"github.com/lifei6671/go-git-webhook/modules/passwords"
 )
 
-// 会员信息
+// Member 会员信息
 type Member struct {
 	MemberId int		`orm:"pk;auto;unique;column(member_id)"`
 	Account string 		`orm:"size(255);column(account)"`
@@ -21,21 +21,21 @@ type Member struct {
 	CreateAt int		`orm:"type(int);column(create_at)"`
 	LastLoginTime time.Time	`orm:"type(datetime);column(last_login_time);null"`
 }
-// 获取对应数据库表名
+// TableName 获取对应数据库表名
 func (m *Member) TableName() string {
 	return "members"
 }
-// 获取数据使用的引擎
+// TableEngine 获取数据使用的引擎
 func (m *Member) TableEngine() string {
 	return "INNODB"
 }
 
-// 获取新的用户信息对象
+// NewMember 获取新的用户信息对象
 func NewMember() *Member {
 	return new(Member)
 }
 
-// 根据用户ID查找用户
+// Find 根据用户ID查找用户
 func (m *Member) Find() (error) {
 	o := orm.NewOrm()
 
@@ -48,7 +48,7 @@ func (m *Member) Find() (error) {
 	return nil
 }
 
-// 用户登录
+// Login 用户登录
 func (m *Member) Login(account string,password string) (*Member,error) {
 	o := orm.NewOrm()
 
@@ -70,7 +70,7 @@ func (m *Member) Login(account string,password string) (*Member,error) {
 }
 
 
-// 添加一个用户
+// Add 添加一个用户
 func (member *Member) Add () (error) {
 	o := orm.NewOrm()
 
@@ -90,7 +90,7 @@ func (member *Member) Add () (error) {
 	return  nil
 }
 
-// 更新用户信息
+// Update 更新用户信息
 func (m *Member) Update(cols... string) (error) {
 	o := orm.NewOrm()
 
@@ -100,7 +100,7 @@ func (m *Member) Update(cols... string) (error) {
 	return nil
 }
 
-// 删除一个用户
+// Delete 删除一个用户
 func (m *Member) Delete() error {
 	o := orm.NewOrm()
 
