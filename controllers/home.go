@@ -2,10 +2,11 @@ package controllers
 
 import (
 	"strings"
+	"strconv"
+
 	"github.com/lifei6671/go-git-webhook/models"
 	"github.com/lifei6671/go-git-webhook/modules/pager"
-	"strconv"
-	"fmt"
+	"github.com/astaxie/beego/logs"
 )
 
 //首页WebHook控制器
@@ -45,7 +46,7 @@ func (c *HomeController) Index() {
 	_,err := rs.QueryRows(&hooks)      //把当前页面的数据序列化进一个切片内
 
 	if err != nil {
-		fmt.Println(err)
+		logs.Error("",err.Error())
 	}
 
 	c.Data["lists"] = hooks

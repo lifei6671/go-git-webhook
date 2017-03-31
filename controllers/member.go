@@ -1,10 +1,6 @@
 package controllers
 
 import (
-	"github.com/lifei6671/go-git-webhook/modules/pager"
-	"github.com/lifei6671/go-git-webhook/modules/passwords"
-	"github.com/astaxie/beego/logs"
-	"github.com/lifei6671/go-git-webhook/models"
 	"path/filepath"
 	"strings"
 	"time"
@@ -16,6 +12,12 @@ import (
 	"io/ioutil"
 	"image/png"
 	"image/gif"
+
+	"github.com/lifei6671/go-git-webhook/modules/pager"
+	"github.com/lifei6671/go-git-webhook/modules/passwords"
+	"github.com/lifei6671/go-git-webhook/models"
+
+	"github.com/astaxie/beego/logs"
 )
 
 type MemberController struct {

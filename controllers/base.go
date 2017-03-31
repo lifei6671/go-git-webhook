@@ -1,10 +1,12 @@
 package controllers
 
 import (
-	"github.com/astaxie/beego"
+	"bytes"
+
 	"github.com/lifei6671/go-git-webhook/models"
 	"github.com/lifei6671/go-git-webhook/conf"
-	"bytes"
+
+	"github.com/astaxie/beego"
 )
 
 //基础控制器

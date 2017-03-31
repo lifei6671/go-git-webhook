@@ -2,9 +2,10 @@ package models
 
 import (
 	"time"
-	"github.com/astaxie/beego/orm"
-	"fmt"
 	"strconv"
+
+	"github.com/astaxie/beego/orm"
+	"github.com/astaxie/beego/logs"
 )
 
 //服务器对象
@@ -92,7 +93,7 @@ func (m *Server) Search(keyword string, memberId int,excludeServerId ...int) ([]
 	_,err := o.Raw(sql,memberId,keyword,keyword).QueryRows(&servers)
 
 	if err != nil {
-		fmt.Println(err)
+		logs.Error("",err.Error())
 		return servers,err
 	}
 

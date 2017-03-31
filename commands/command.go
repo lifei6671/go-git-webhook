@@ -1,14 +1,16 @@
 package commands
 
 import (
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/orm"
-	"github.com/lifei6671/go-git-webhook/models"
-	"github.com/astaxie/beego/logs"
-	"github.com/lifei6671/go-git-webhook/tasks"
 	"net/url"
 	"time"
 	"fmt"
+
+	"github.com/lifei6671/go-git-webhook/tasks"
+	"github.com/lifei6671/go-git-webhook/models"
+
+	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/orm"
+	"github.com/astaxie/beego/logs"
 )
 
 //注册数据库

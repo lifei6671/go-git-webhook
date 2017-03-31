@@ -3,9 +3,10 @@ package commands
 import (
 	"os"
 	"flag"
-	"github.com/lifei6671/go-git-webhook/models"
 	"fmt"
 	"strings"
+
+	"github.com/lifei6671/go-git-webhook/models"
 )
 // 安装
 // 使用方式：go-git-webhook install -account=admin -password=123456 -email=admin@163.com

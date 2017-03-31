@@ -3,10 +3,12 @@ package controllers
 import (
 	"fmt"
 	"time"
-	"github.com/astaxie/beego"
+
 	"github.com/lifei6671/go-git-webhook/modules/gob"
 	"github.com/lifei6671/go-git-webhook/conf"
 	"github.com/lifei6671/go-git-webhook/models"
+
+	"github.com/astaxie/beego"
 )
 
 //用户登录与注册

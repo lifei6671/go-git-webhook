@@ -2,10 +2,12 @@ package controllers
 
 import (
 	"strings"
-	"github.com/lifei6671/go-git-webhook/models"
-	"github.com/lifei6671/go-git-webhook/modules/pager"
 	"strconv"
 	"bytes"
+
+	"github.com/lifei6671/go-git-webhook/models"
+	"github.com/lifei6671/go-git-webhook/modules/pager"
+
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 )

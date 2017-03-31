@@ -2,7 +2,9 @@ package controllers
 
 import (
 	"strconv"
+
 	"github.com/lifei6671/go-git-webhook/models"
+
 	"github.com/astaxie/beego/logs"
 )
 //关系控制器

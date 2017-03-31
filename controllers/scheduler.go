@@ -1,16 +1,17 @@
 package controllers
 
 import (
-	"github.com/gorilla/websocket"
-	"github.com/lifei6671/go-git-webhook/models"
-	"github.com/lifei6671/go-git-webhook/modules/pager"
 	"strconv"
-	"fmt"
-	"github.com/astaxie/beego/logs"
-	"github.com/lifei6671/go-git-webhook/tasks"
 	"net/http"
 	"bytes"
 	"time"
+
+	"github.com/lifei6671/go-git-webhook/models"
+	"github.com/lifei6671/go-git-webhook/modules/pager"
+	"github.com/lifei6671/go-git-webhook/tasks"
+
+	"github.com/gorilla/websocket"
+	"github.com/astaxie/beego/logs"
 )
 
 var upgrader = websocket.Upgrader{CheckOrigin : verification} // use default options
@@ -34,7 +35,7 @@ func (c *SchedulerController) Index()  {
 	relationDetailedResult ,err := models.FindRelationDetailedByWhere("AND relation_id = ?",relation_id)
 
 	if err != nil {
-		fmt.Printf("FindRelationDetailed Error : %s", err.Error())
+		logs.Info("FindRelationDetailed Error : ", err.Error())
 		c.Abort("500")
 	}
 	var relationDetailed models.RelationDetailed
