@@ -192,6 +192,8 @@ func (c *SchedulerController) Resume () {
 // Status 任务状态
 func (c *SchedulerController) Status() {
 
+	c.TplName = "scheduler/status.html"
+
 	ws, err := upgrader.Upgrade(c.Ctx.ResponseWriter.ResponseWriter, c.Ctx.Request, nil)
 
 	if err != nil {
