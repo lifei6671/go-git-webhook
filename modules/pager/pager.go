@@ -72,7 +72,7 @@ func GetPagesInfo(tableName string, currentpage int, pagesize int, conditions st
     }
 */
 func GetPagerLinks(po *PageOptions, ctx *context.Context) (int, int, orm.RawSeter, html.HTML) {
-	var str string = ""
+	str := ""
 	totalItem, totalpages, rs := GetPagesInfo(po.TableName, po.CurrentPage, po.PageSize, po.Conditions)
 	po = setDefault(po, totalpages)
 	DealUri(po, ctx)
@@ -117,7 +117,7 @@ func DealUri(po *PageOptions, ctx *context.Context) {
  * 1...197 198 199 200
  */
 func fun4(po *PageOptions, totalPages int) string {
-	var rs string = ""
+	rs := ""
 	rs += getHeader(po, totalPages)
 	rs += "<li><a href='" + po.Href + "&" + po.ParamName + "=" + con.Itoa(1) + "'>" + con.Itoa(1) + "</a><li>"
 	rs += "<li><a href=''>...</a></li>"
