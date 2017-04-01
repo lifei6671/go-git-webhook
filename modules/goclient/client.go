@@ -13,9 +13,9 @@ import (
 	"net/url"
 
 	"github.com/lifei6671/go-git-webhook/modules/hash"
+	"github.com/lifei6671/go-git-webhook/modules/gojson"
 
 	"github.com/astaxie/beego/logs"
-	"github.com/widuu/gojson"
 	"github.com/gorilla/websocket"
 )
 
@@ -90,23 +90,23 @@ func GetToken(remoteUrl,account string,password string) (string,error) {
 		return "",err
 	}
 
-	if js := gojson.Json(string(body)).Get("error_code");js.IsValid() {
-		error_code,err := strconv.Atoi(js.Tostring())
+	if js := gojson.DeserializeObject(string(body)).GetJsonObject("error_code");js.IsValid() {
+		error_code,err := strconv.Atoi(js.ToString())
 
 		if err != nil {
 			return "",err
 		}
 		if error_code != 0 {
-			message := gojson.Json(string(body)).Get("message");
+			message := gojson.DeserializeObject(string(body)).GetJsonObject("message");
 
-			return "",errors.New(message.Tostring())
+			return "",errors.New(message.ToString())
 		}
-		token := gojson.Json(string(body)).Get("data")
+		token := gojson.DeserializeObject(string(body)).GetJsonObject("data")
 
-		return token.Tostring(),nil
+		return token.ToString(),nil
 
 	}
-	return "",errors.New("Data error")
+	return "",errors.New("Data error:" + string(body))
 
 }
 

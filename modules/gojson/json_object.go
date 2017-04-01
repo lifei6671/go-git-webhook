@@ -27,13 +27,10 @@ func (p *JsonObject) IsValid() bool {
 
 func (p *JsonObject) GetJsonObject(key string) *JsonObject {
 	jsonObject := &JsonObject{}
-	var dataMap map[string]interface{}
 
 	if v,ok := p.dataMap.(map[string]interface{}) ; ok {
 		if v, ok := v[key]; ok {
-			if dataMap, ok = v.(map[string]interface{}); ok {
-				jsonObject.dataMap = dataMap
-			}
+			jsonObject.dataMap = v
 		}
 	}
 	return jsonObject
@@ -50,4 +47,26 @@ func (p *JsonObject) ToString() string {
 		return strconv.FormatBool(m)
 	}
 	return ""
+}
+
+func (p *JsonObject) ToArray()([]interface{}) {
+	if m, ok := (p.dataMap).([]interface{}); ok {
+		return m
+	}
+	return nil
+}
+
+func (p *JsonObject) ToObject(v interface{}) (error){
+	b,err := json.Marshal(p.dataMap);
+	if err != nil {
+		return err
+	}
+	if err := json.Unmarshal(b,v) ; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *JsonObject) GetObject() interface{} {
+	return p.dataMap
 }
