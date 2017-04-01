@@ -50,20 +50,18 @@ func (m *Scheduler) ToWebScheduler() WebScheduler {
 	item.ExecuteType = m.ExecuteType
 	item.Consuming = ""
 
-	duration := m.CreateTime.Sub(time.Now())
+	duration := time.Now().Sub(m.CreateTime)
 
-	over := time.Now().Add(duration)
-
-	if time.Now().Year()-over.Year() > 1 {
-		item.Slogan = strconv.Itoa(time.Now().Year()-over.Year()) + "年前"
-	} else if int(time.Now().Month()-over.Month()) > 1 {
-		item.Slogan = strconv.Itoa(int(time.Now().Month()-over.Month())) + "月前"
-	} else if time.Now().Day()-over.Day() > 1 {
-		item.Slogan = strconv.Itoa(time.Now().Day()-over.Day()) + "天前"
-	} else if time.Now().Hour()-over.Hour() > 1 {
-		item.Slogan = strconv.Itoa(time.Now().Hour()-over.Hour()) + "小时前"
-	} else if time.Now().Minute()-over.Minute() > 1 {
-		item.Slogan = strconv.Itoa(time.Now().Minute()-over.Minute()) + "分钟前"
+	if year := int(duration.Seconds()/(365*24*3600)); year >= 1 {
+		item.Slogan = strconv.Itoa(year) + "年前"
+	} else if month := int(duration.Seconds()/(30*24*3600)); month >= 1 {
+		item.Slogan = strconv.Itoa(month) + "月前"
+	} else if day := int(duration.Seconds()/(24*3600)); day >= 1 {
+		item.Slogan = strconv.Itoa(day) + "天前"
+	} else if hour := int(duration.Hours()); hour >= 1 {
+		item.Slogan = strconv.Itoa(hour) + "小时前"
+	} else if minute := int(duration.Minutes());minute >= 1 {
+		item.Slogan = strconv.Itoa(minute) + "分钟前"
 	} else {
 		item.Slogan = "刚刚"
 	}
