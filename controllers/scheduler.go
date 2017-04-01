@@ -230,8 +230,9 @@ func (c *SchedulerController) Status() {
 
 		err := ws.WriteJSON(m)
 		if err != nil {
-			return
+			c.StopRun()
 		}
+
 		time.Sleep(time.Second*2)
 
 		scheduler = models.NewScheduler()

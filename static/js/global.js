@@ -97,6 +97,7 @@ function loadCodeMirrorEditor(id) {
     });
 
     $("#webHookForm").ajaxForm({
+        dataType :"json",
         beforeSubmit :function () {
             var isValid = true;
             var repositoryNameEle = $("#repositoryName");
@@ -141,6 +142,9 @@ function loadCodeMirrorEditor(id) {
             }
         },complete : function () {
             $("#saveWebHookBtn").button("reset");
+        },
+        error :function () {
+            $("#errorMessage").css("color","red").text("服务器错误，请刷新后再试。");
         }
     });
     

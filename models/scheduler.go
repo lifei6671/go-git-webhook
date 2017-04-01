@@ -7,7 +7,7 @@ import (
 	"github.com/astaxie/beego/orm"
 )
 
-// 任务调度器储存表
+// Scheduler 任务调度器储存表
 type Scheduler struct {
 	SchedulerId   int       `orm:"pk;auto;unique;column(scheduler_id)" json:"scheduler_id"`
 	WebHookId     int       `orm:"type(int);column(web_hook_id)" json:"web_hook_id"`
@@ -24,14 +24,14 @@ type Scheduler struct {
 	ExecuteType   int       `orm:"column(execute_type);type(int);default(0)" json:"execute_type"` //执行方式：0 自动触发 / 1 手动执行
 }
 
-// 前端使用的结构体
+// WebScheduler 前端使用的结构体
 type WebScheduler struct {
 	Scheduler
 	Slogan    string `json:"slogan"`
 	Consuming string `json:"consuming"`
 }
 
-// 转换为前端可用的优化信息对象
+// ToWebScheduler 转换为前端可用的优化信息对象
 func (m *Scheduler) ToWebScheduler() WebScheduler {
 	item := WebScheduler{}
 
@@ -89,22 +89,22 @@ func (m *Scheduler) ToWebScheduler() WebScheduler {
 	return item
 }
 
-// 获取对应数据库表名
+// TableName 获取对应数据库表名
 func (m *Scheduler) TableName() string {
 	return "scheduler"
 }
 
-// 获取数据使用的引擎
+// TableEngine 获取数据使用的引擎
 func (m *Scheduler) TableEngine() string {
 	return "INNODB"
 }
 
-// 新建对象
+// NewScheduler 新建对象
 func NewScheduler() *Scheduler {
 	return &Scheduler{}
 }
 
-// 根据ID查找对象
+// Find 根据ID查找对象
 func (m *Scheduler) Find() error {
 	if m.SchedulerId <= 0 {
 		return ErrInvalidParameter
@@ -114,7 +114,7 @@ func (m *Scheduler) Find() error {
 	return o.Read(m)
 }
 
-// 批量插入对象
+// InsertMulti 批量插入对象
 func (m *Scheduler) InsertMulti(schedulers []Scheduler) (int64, error) {
 	if len(schedulers) <= 0 {
 		return 0, ErrInvalidParameter
@@ -124,7 +124,7 @@ func (m *Scheduler) InsertMulti(schedulers []Scheduler) (int64, error) {
 	return o.InsertMulti(len(schedulers), schedulers)
 }
 
-// 根据状态查询
+// QuerySchedulerByState 根据状态查询
 func (m *Scheduler) QuerySchedulerByState(state ...string) ([]Scheduler, error) {
 	o := orm.NewOrm()
 
@@ -134,7 +134,7 @@ func (m *Scheduler) QuerySchedulerByState(state ...string) ([]Scheduler, error) 
 	return results, err
 }
 
-// 更新或插入
+// Save 更新或插入
 func (m *Scheduler) Save() error {
 	o := orm.NewOrm()
 	var err error
@@ -146,7 +146,7 @@ func (m *Scheduler) Save() error {
 	return err
 }
 
-// 根据条件删除
+// DeleteByWhere 根据条件删除
 func (m *Scheduler) DeleteByWhere(where string, args ...interface{}) error {
 	o := orm.NewOrm()
 

@@ -16,6 +16,7 @@ type BaseController struct {
 	Scheme string
 }
 
+// Prepare 预处理.
 func (c *BaseController) Prepare (){
 	c.Data["SiteName"] = "Git WebHook"
 	c.Data["Member"] = models.Member{}
@@ -23,13 +24,8 @@ func (c *BaseController) Prepare (){
 	if member,ok := c.GetSession(conf.LoginSessionName).(models.Member); ok && member.MemberId > 0{
 		c.Member = &member
 		c.Data["Member"] = c.Member
-	}else{
-		member := models.NewMember()
-		member.MemberId = 1
-		member.Find()
-		c.Member = member
-		c.Data["Member"] = *c.Member
 	}
+
 	scheme := "http"
 
 	if c.Ctx.Request.TLS != nil {
@@ -117,7 +113,7 @@ func (c *BaseController) ServerError (message interface{}) {
 	c.Abort(html)
 }
 
-// ExecuteViewPathTemplate 执行指定的模板并返回执行结果
+// ExecuteViewPathTemplate 执行指定的模板并返回执行结果.
 func (c *BaseController) ExecuteViewPathTemplate(tplName string,data interface{}) (string,error){
 	var buf bytes.Buffer
 
