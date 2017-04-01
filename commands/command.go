@@ -65,6 +65,7 @@ func RegisterTaskQueue()  {
 func RunCommand()  {
 	orm.RunCommand()
 	Install()
+	Version()
 }
 
 // Run 启动Web监听
