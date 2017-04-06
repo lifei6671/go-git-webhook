@@ -77,6 +77,19 @@ chmod 0777 go-git-webhook
 ./go-git-webhook install -account=admin -password=123456 -email=admin@163.com
 
 ```
+# 添加Server
+
+## 添加 SSH Server
+
+- 当添加的是一台 SSH 方式的服务器时，Server IP 为SSH外网IP地址，端口号为SSH端口号，账号为登录账号，SSH Private Key 可以是密码也可以是登录密钥，系统会自动识别密码类型。
+
+- 如果添加的是一台 Client 模式的服务器时，Server IP 则为带有访问协议的网址，例如 `http://client.iminho.me`,端口号为HTTP端口号，如果为HTTP可是80，如果是HTTPS则是443. 账号和密码需要跟 Client 配置一致。
+
+## 添加 WebHook
+
+- WebHook 的回调脚本**暂**不支持换行，建议用服务器 shell 脚本代替命令。
+
+- 添加完 WebHook 后，会自动生成对应的url回调地址，将改地址填写到对应git服务的webhooks中即可。其中 `Secure` 字段暂时不支持。
 
 # 后台运行
 
