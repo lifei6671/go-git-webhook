@@ -77,7 +77,8 @@ chmod 0777 go-git-webhook
 ./go-git-webhook install -account=admin -password=123456 -email=admin@163.com
 
 ```
-# 添加Server
+
+# 注意
 
 ## 添加 SSH Server
 
