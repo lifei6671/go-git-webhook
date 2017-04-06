@@ -1,4 +1,4 @@
-# go-git-webhook
+# SmartWebHook
 
 [![Build Status](https://travis-ci.org/lifei6671/go-git-webhook.svg?branch=master)](https://travis-ci.org/lifei6671/go-git-webhook)
 [![Build status](https://ci.appveyor.com/api/projects/status/tpm2k23umrqri2dd/branch/master?svg=true)](https://ci.appveyor.com/project/lifei6671/go-git-webhook/branch/master)
