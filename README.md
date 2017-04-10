@@ -42,6 +42,8 @@ go build -v -tags "pam" -ldflags "-w"
 
 ```ini
 appname = smartwebhook
+#监听的地址，如果要使用 nginx 作为前端代理
+#httpaddr = 127.0.0.1
 #监听的端口号
 httpport = 8080
 runmode = dev
