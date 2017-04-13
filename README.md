@@ -52,6 +52,9 @@ sessionon = true
 sessionname = smart_webhook_id
 copyrequestbody = true
 
+#生成回调地址时完整的域名
+base_url = https://hook.iminho.me
+
 #时区设置
 timezone = Asia/Shanghai
 
@@ -168,6 +171,7 @@ server {
     location @backend {
         proxy_set_header X-Forwarded-For $remote_addr;
         proxy_set_header Host            $http_host;
+        proxy_set_header   X-Forwarded-Proto $scheme;
 
         proxy_pass http://127.0.0.1:8080;
     }
