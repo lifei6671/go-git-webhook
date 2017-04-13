@@ -22,4 +22,5 @@ func init()  {
 	beego.InsertFilter("/server/*",beego.BeforeRouter,Authorize)
 	beego.InsertFilter("/hook",beego.BeforeRouter,Authorize)
 	beego.InsertFilter("/hook/*",beego.BeforeRouter,Authorize)
+	beego.InsertFilter("/my",beego.BeforeRouter,Authorize)
 }
