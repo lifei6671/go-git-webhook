@@ -75,12 +75,8 @@ func (c *BaseController) BaseUrl() string {
 	if baseUrl := beego.AppConfig.String("base_url"); baseUrl != "" {
 		return baseUrl
 	}
-	scheme := "http://"
 
-	if c.Ctx.Request.TLS != nil {
-		scheme = "https://"
-	}
-	return scheme + c.Ctx.Request.Host
+	return c.Ctx.Input.Scheme() + "://" + c.Ctx.Request.Host
 }
 
 // NotFound .
