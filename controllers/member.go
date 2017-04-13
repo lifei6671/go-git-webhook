@@ -202,6 +202,9 @@ func (c *MemberController) Edit() {
 		data := map[string]interface{}{
 			"view" : view,
 		}
+		if member.MemberId == c.Member.MemberId {
+			c.SetMember(*member)
+		}
 		c.JsonResult(0, "ok", data)
 
 	}

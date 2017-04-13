@@ -186,7 +186,21 @@
         });
 
         $("#formSaveMember").ajaxForm({
-
+            beforeSubmit : function () {
+                var btn = $("#btnSaveMember");
+                btn.button("load");
+            },
+            success : function (res) {
+                if(res.errcode !== 0){
+                    $("#errorMessage").css("color","red").text(res.message);
+                }else{
+                    $("#errorMessage").css("color","green").text("保存成功");
+                }
+                $("#btnSaveMember").button("reset");
+            },
+            error : function () {
+                $("#btnSaveMember").button("reset");
+            }
         });
     });
     try {
