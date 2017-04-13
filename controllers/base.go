@@ -71,6 +71,10 @@ func (c *BaseController) UrlFor (endpoint string, values ...interface{}) string 
 
 // BaseUrl .
 func (c *BaseController) BaseUrl() string {
+
+	if baseUrl := beego.AppConfig.String("base_url"); baseUrl != "" {
+		return baseUrl
+	}
 	scheme := "http://"
 
 	if c.Ctx.Request.TLS != nil {

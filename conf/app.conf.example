@@ -6,6 +6,9 @@ sessionon = true
 sessionname = smart_webhook_id
 copyrequestbody = true
 
+#生成回调地址时完整的域名
+base_url = https://hook.iminho.me
+
 #时区设置
 timezone = Asia/Shanghai
 
