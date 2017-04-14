@@ -6,6 +6,7 @@ cd /usr/src/github.com/lifei6671/go-git-webhook/
 goFile="go-git-webhook"
 
 if [ ! -f go-git-webhook] ; then
+    - go get -v -u ./...
     go build -ldflags "-w"
 fi
 
