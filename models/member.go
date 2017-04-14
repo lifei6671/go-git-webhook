@@ -10,7 +10,7 @@ import (
 // Member 会员信息.
 type Member struct {
 	MemberId int		`orm:"pk;auto;unique;column(member_id)"`
-	Account string 		`orm:"size(255);column(account)"`
+	Account string 		`orm:"size(100);unique;column(account)"`
 	Password string 	`orm:"size(1000);column(password)"`
 	Email string 		`orm:"size(255);column(email);null;default(null)"`
 	Phone string 		`orm:"size(255);column(phone);null;default(null)"`

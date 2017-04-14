@@ -24,11 +24,11 @@ func Install()  {
 
 		if(password == ""){
 			fmt.Println("Administrator password  is required.")
-			os.Exit(2)
+			os.Exit(0)
 		}
 		if(*email == ""){
 			fmt.Println("Administrator email is required")
-			os.Exit(2)
+			os.Exit(0)
 		}
 
 		member := models.NewMember()
@@ -38,9 +38,9 @@ func Install()  {
 
 		if err := member.Add();err != nil {
 			fmt.Println(err.Error())
-			os.Exit(2)
+			os.Exit(0)
 		}
 		fmt.Println("ok")
-		os.Exit(2)
+		os.Exit(0)
 	}
 }

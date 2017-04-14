@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-cd /usr/src/github.com/lifei6671/go-git-webhook/
+cd /go/src/github.com/lifei6671/go-git-webhook/
 
 goFile="go-git-webhook"
 
@@ -37,9 +37,17 @@ if [ ! -z $httpport ] ; then
 fi
 
 #初始化数据
-if [ ! -z $install ] ; then
+if [ ! -f "install.lock" ] ; then
+    if [ -z $account ]; then
+        echo "Then parameter $account is required"
+        exit 1
+    fi
     ./$goFile orm syncdb
+     echo "Initialized successfully."
+
     ./$goFile install -account=$account -password=$password -email=$email
+
+    touch install.lock
 fi
 
-exec ./$goFile
+./$goFile

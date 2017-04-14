@@ -8,17 +8,21 @@ import (
 	"strconv"
 	"bytes"
 	"image"
-	"image/jpeg"
 	"io/ioutil"
-	"image/png"
-	"image/gif"
+	_ "image/jpeg"
+	_ "image/gif"
+	"fmt"
 
 	"github.com/lifei6671/go-git-webhook/modules/pager"
 	"github.com/lifei6671/go-git-webhook/modules/passwords"
 	"github.com/lifei6671/go-git-webhook/models"
-
 	"github.com/astaxie/beego/logs"
+
+	"image/jpeg"
+	"image/png"
+	"image/gif"
 )
+
 
 // MemberController 会员控制器
 type MemberController struct {
@@ -260,19 +264,28 @@ func (c *MemberController) Upload() {
 		c.JsonResult(500,"读取文件异常")
 	}
 
-	ext := filepath.Ext(moreFile.Filename);
+	ext := filepath.Ext(moreFile.Filename)
+
 	if !strings.EqualFold(ext,".png") && !strings.EqualFold(ext,".jpg") && !strings.EqualFold(ext,".gif") && !strings.EqualFold(ext,".jpeg")  {
 		c.JsonResult(500,"不支持的图片格式")
 	}
 
-	x ,_ := c.GetInt("x")
-	y ,_ := c.GetInt("y")
-	width ,_ := c.GetInt("width")
-	height ,_ := c.GetInt("height")
 
-	fileName := "avatar_" +  strconv.FormatInt(int64(time.Now().Nanosecond()), 16) + ext
+	x1 ,_ := strconv.ParseFloat(c.GetString("x"),10)
+	y1 ,_ := strconv.ParseFloat(c.GetString("y"),10)
+	w1 ,_ := strconv.ParseFloat(c.GetString("width"),10)
+	h1 ,_ := strconv.ParseFloat(c.GetString("height"),10)
 
-	filePath := "static/uploads/" + time.Now().Format("200601") + "/" + fileName
+	x := int(x1)
+	y := int(y1)
+	width := int(w1)
+	height := int(h1)
+
+	fmt.Println(x,x1,y,y1)
+
+	fileName := "avatar_" +  strconv.FormatInt(int64(time.Now().Nanosecond()), 16)
+
+	filePath := "static/uploads/" + time.Now().Format("200601") + "/" + fileName + ext
 
 	path := filepath.Dir(filePath)
 
@@ -291,15 +304,31 @@ func (c *MemberController) Upload() {
 		logs.Error("",err)
 		c.JsonResult(500,"图片保存失败")
 	}
+
 	buf := bytes.NewBuffer(fileBytes)
 
-	m,_,_ := image.Decode(buf)
+	m,_,err := image.Decode(buf)
 
-	rgbImg := m.(*image.YCbCr)
+	if err != nil{
+		logs.Error("image.Decode => ",err)
+		c.JsonResult(500,"图片解码失败")
+	}
 
-	subImg := rgbImg.SubImage(image.Rect(x, y, x + width, y + height)).(*image.YCbCr) //图片裁剪x0 y0 x1 y1
 
-	f, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	var subImg image.Image
+
+	if rgbImg,ok := m.(*image.YCbCr); ok {
+		subImg = rgbImg.SubImage(image.Rect(x, y, x+width, y+height)).(*image.YCbCr) //图片裁剪x0 y0 x1 y1
+	}else if rgbImg,ok := m.(*image.RGBA); ok {
+		subImg = rgbImg.SubImage(image.Rect(x, y, x+width, y+height)).(*image.YCbCr) //图片裁剪x0 y0 x1 y1
+	}else if rgbImg,ok := m.(*image.NRGBA); ok {
+		subImg = rgbImg.SubImage(image.Rect(x, y, x+width, y+height)).(*image.YCbCr) //图片裁剪x0 y0 x1 y1
+	} else {
+		fmt.Println(m)
+		c.JsonResult(500,"图片解码失败")
+	}
+
+	f, err := os.OpenFile("./" + filePath, os.O_SYNC | os.O_RDWR, 0666)
 
 	if err != nil{
 		c.JsonResult(500,"保存图片失败")
@@ -307,6 +336,7 @@ func (c *MemberController) Upload() {
 	defer f.Close()
 
 	if strings.EqualFold(ext,".jpg") || strings.EqualFold(ext,".jpeg"){
+
 		err = jpeg.Encode(f,subImg,&jpeg.Options{ Quality : 100 })
 	}else if strings.EqualFold(ext,".png") {
 		err = png.Encode(f,subImg)
@@ -314,11 +344,13 @@ func (c *MemberController) Upload() {
 		err = gif.Encode(f,subImg,&gif.Options{ NumColors : 256})
 	}
 	if err != nil {
+		logs.Error("图片剪切失败 => ",err.Error())
 		c.JsonResult(500,"图片剪切失败")
 	}
 
+
 	if err != nil {
-		logs.Error("",err.Error())
+		logs.Error("保存文件失败 => ",err.Error())
 		c.JsonResult(500,"保存文件失败")
 	}
 	url := "/" + filePath
