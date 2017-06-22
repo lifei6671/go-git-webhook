@@ -22,16 +22,14 @@ install:
          7z x -oC:\ glide-v0.12.3-windows-amd64.zip | out-null;
          copy C:\windows-amd64\glide.exe c:\go\bin\ ;
   - set PATH=%GOBIN%;%PATH%
-
-build: false
-deploy: true
-
-install:
   - echo %PATH%
   - echo %GOPATH%
   - go version
   - go env
   - glide update
+
+build: false
+deploy: true
 
 test_script:
   - go build -v -tags "pam" -ldflags "-w"
