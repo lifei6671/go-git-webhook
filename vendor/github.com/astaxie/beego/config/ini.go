@@ -98,7 +98,7 @@ func (ini *IniConfig) parseData(dir string, data []byte) (*IniConfigContainer, e
 			bComment = bSemComment
 		}
 		if bComment != nil {
-			line = bytes.TrimLeft(line, string(bComment))
+			line = bytes.TrimPrefix(line, string(bComment))
 			// Need append to a new line if multi-line comments.
 			if comment.Len() > 0 {
 				comment.WriteByte('\n')

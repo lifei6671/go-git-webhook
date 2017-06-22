@@ -46,14 +46,14 @@ func startAgent(t *testing.T) (client Agent, socket string, cleanup func()) {
 	*/
 	fields := bytes.Split(out, []byte(";"))
 	line := bytes.SplitN(fields[0], []byte("="), 2)
-	line[0] = bytes.TrimLeft(line[0], "\n")
+	line[0] = bytes.TrimPrefix(line[0], "\n")
 	if string(line[0]) != "SSH_AUTH_SOCK" {
 		t.Fatalf("could not find key SSH_AUTH_SOCK in %q", fields[0])
 	}
 	socket = string(line[1])
 
 	line = bytes.SplitN(fields[2], []byte("="), 2)
-	line[0] = bytes.TrimLeft(line[0], "\n")
+	line[0] = bytes.TrimPrefix(line[0], "\n")
 	if string(line[0]) != "SSH_AGENT_PID" {
 		t.Fatalf("could not find key SSH_AGENT_PID in %q", fields[2])
 	}

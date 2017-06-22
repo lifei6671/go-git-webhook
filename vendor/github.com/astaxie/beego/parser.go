@@ -96,9 +96,9 @@ func parserPkg(pkgRealpath, pkgpath string) error {
 func parserComments(comments *ast.CommentGroup, funcName, controllerName, pkgpath string) error {
 	if comments != nil && comments.List != nil {
 		for _, c := range comments.List {
-			t := strings.TrimSpace(strings.TrimLeft(c.Text, "//"))
+			t := strings.TrimSpace(strings.TrimPrefix(c.Text, "//"))
 			if strings.HasPrefix(t, "@router") {
-				elements := strings.TrimLeft(t, "@router ")
+				elements := strings.TrimPrefix(t, "@router ")
 				e1 := strings.SplitN(elements, " ", 2)
 				if len(e1) < 1 {
 					return errors.New("you should has router information")

@@ -133,7 +133,7 @@ func (tf *templateFile) visit(paths string, f os.FileInfo, err error) error {
 	}
 
 	replace := strings.NewReplacer("\\", "/")
-	file := strings.TrimLeft(replace.Replace(paths[len(tf.root):]), "/")
+	file := strings.TrimPrefix(replace.Replace(paths[len(tf.root):]), "/")
 	subDir := filepath.Dir(file)
 
 	tf.files[subDir] = append(tf.files[subDir], file)
