@@ -6,6 +6,22 @@ clone_depth: 1
 environment:
   GOPATH: c:\gopath
   GOVERSION: 1.8
+  matrix:
+    - tbs_arch: "x86"
+      tbs_tools: "mingw"
+      tbs_static_runtime: 1
+      GOARCH: 386
+
+    - tbs_arch: "x64"
+      tbs_tools: "mingw"
+      tbs_static_runtime: 1
+      GOARCH: amd64
+
+install:
+  - ps:  Start-FileDownload  https://github.com/Masterminds/glide/releases/download/v0.12.3/glide-v0.12.3-windows-amd64.zip;
+         7z x -oC:\ glide-v0.12.3-windows-amd64.zip | out-null;
+         copy C:\windows-amd64\glide.exe c:\go\bin\ ;
+  - set PATH=%GOBIN%;%PATH%
 
 build: false
 deploy: true
@@ -15,7 +31,7 @@ install:
   - echo %GOPATH%
   - go version
   - go env
-  - go get -d ./...
+  - glide update
 
 test_script:
   - go build -v -tags "pam" -ldflags "-w"
