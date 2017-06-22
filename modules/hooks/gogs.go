@@ -56,7 +56,7 @@ func (p *GogsWebHook) BranchName()(string,error) {
 		return "",err
 	}
 
-	return strings.TrimLeft(value,"refs/heads/"),nil
+	return strings.TrimPrefix(value,"refs/heads/"),nil
 }
 
 // UserName 获取用户名称.
