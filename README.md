@@ -19,6 +19,12 @@
 
 # 如何使用？
 
+## Docker & docker-compose
+
+[文档](./docs/docker.md)
+
+## 源码安装使用
+
 **1、拉取源码**
 
 ```
