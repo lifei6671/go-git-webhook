@@ -4,6 +4,7 @@ jobs:
   test:
     docker:
       - image: golang:1.9
+    working_directory: /go/src/github.com/lifei6671/go-git-webhook
     steps:
       - checkout
       - run:
