@@ -52,15 +52,15 @@ func (m *Scheduler) ToWebScheduler() WebScheduler {
 
 	duration := time.Now().Sub(m.CreateTime)
 
-	if year := int(duration.Seconds()/(365*24*3600)); year >= 1 {
+	if year := int(duration.Seconds() / (365 * 24 * 3600)); year >= 1 {
 		item.Slogan = strconv.Itoa(year) + "年前"
-	} else if month := int(duration.Seconds()/(30*24*3600)); month >= 1 {
+	} else if month := int(duration.Seconds() / (30 * 24 * 3600)); month >= 1 {
 		item.Slogan = strconv.Itoa(month) + "月前"
-	} else if day := int(duration.Seconds()/(24*3600)); day >= 1 {
+	} else if day := int(duration.Seconds() / (24 * 3600)); day >= 1 {
 		item.Slogan = strconv.Itoa(day) + "天前"
 	} else if hour := int(duration.Hours()); hour >= 1 {
 		item.Slogan = strconv.Itoa(hour) + "小时前"
-	} else if minute := int(duration.Minutes());minute >= 1 {
+	} else if minute := int(duration.Minutes()); minute >= 1 {
 		item.Slogan = strconv.Itoa(minute) + "分钟前"
 	} else {
 		item.Slogan = "刚刚"
@@ -153,4 +153,21 @@ func (m *Scheduler) DeleteByWhere(where string, args ...interface{}) error {
 	_, err := o.Raw(sql, args).Exec()
 
 	return err
+}
+
+//获取当前最大SchedulerId
+func (m *Scheduler) GetMaxSchedulerId() int {
+	o := orm.NewOrm()
+	sql := "select * FROM scheduler order by scheduler_id desc limit 1"
+
+	var results []Scheduler
+	_, err := o.Raw(sql).QueryRows(&results)
+	if err != nil {
+		return 0
+	}
+	for _, result := range results {
+		return result.SchedulerId
+
+	}
+	return 0
 }
