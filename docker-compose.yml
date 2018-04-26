@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  go-git-webhook:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    links:
+      - mysql
+    volumes:
+      - ./conf/app.conf:/go-git-webhook/conf/app.conf
+      - go-git-webhook-logger:/go-git-webhook/logs
+    command: go-git-webhook
+  mysql:
+    image: mysql:latest
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+    volumes:
+      - ./create-db.sql:/docker-entrypoint-initdb.d/create-db.sql
+      - go-git-webhook-mysql:/var/lib/mysql
+volumes:
+  go-git-webhook-logger:
+    driver: "local"
+  go-git-webhook-mysql:
+    driver: "local"

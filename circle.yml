@@ -1,0 +1,64 @@
+version: 2.0
+
+jobs:
+  test:
+    docker:
+      - image: golang:1.9
+    working_directory: /go/src/github.com/lifei6671/go-git-webhook
+    steps:
+      - checkout
+      - run:
+          name: test
+          command: |
+            curl https://glide.sh/get | sh
+            glide install
+            go build -tags "pam"
+
+  deploy:
+    machine: true
+    steps:
+      - checkout
+      - run:
+          name: push to production
+          command: |
+            source ./prepare.sh
+            docker info
+            docker_build
+            docker_push microcoin/go-git-webhook:latest
+
+  staging:
+    machine: true
+    steps:
+      - checkout
+      - run:
+          name: push to staging
+          command: |
+            source ./prepare.sh
+            docker info
+            docker_build
+            docker_push microcoin/go-git-webhook:staging
+
+workflows:
+  version: 2
+  build-n-deploy:
+    jobs:
+      - test:
+          filters:
+            tags:
+              only: /.*/
+      - staging:
+          context: org-global
+          requires:
+            - test
+          filters:
+            tags:
+              ignore: /^v.*/
+      - deploy:
+          context: org-global
+          requires:
+            - test
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
