@@ -1,32 +1,36 @@
 package commands
 
 import (
-	"os"
 	"flag"
 	"fmt"
+	"log"
+	"os"
 	"strings"
 
 	"github.com/lifei6671/go-git-webhook/models"
 )
+
 // Install 安装
 // 使用方式：go-git-webhook install -account=admin -password=123456 -email=admin@163.com
-func Install()  {
+func Install() {
 
 	if len(os.Args) > 2 && os.Args[1] == "install" {
 
-		account := flag.String("account","admin","Administrator account.")
-		pwd := flag.String("password","","Administrator password.")
-		email := flag.String("email","","Administrator email.")
+		account := flag.String("account", "admin", "Administrator account.")
+		pwd := flag.String("password", "", "Administrator password.")
+		email := flag.String("email", "", "Administrator email.")
 
-		flag.CommandLine.Parse(os.Args[2:])
+		if err := flag.CommandLine.Parse(os.Args[2:]); err != nil {
+			log.Fatal("解析变量失败 ->", err)
+		}
 
 		password := strings.TrimSpace(*pwd)
 
-		if(password == ""){
+		if password == "" {
 			fmt.Println("Administrator password  is required.")
 			os.Exit(0)
 		}
-		if(*email == ""){
+		if *email == "" {
 			fmt.Println("Administrator email is required")
 			os.Exit(0)
 		}
@@ -36,7 +40,7 @@ func Install()  {
 		member.Password = password
 		member.Email = *email
 
-		if err := member.Add();err != nil {
+		if err := member.Add(); err != nil {
 			fmt.Println(err.Error())
 			os.Exit(0)
 		}
