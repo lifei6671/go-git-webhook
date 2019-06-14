@@ -1,14 +1,30 @@
-FROM golang:1.8.1-alpine
+FROM golang:1.9 AS build
 
+ENV PROJECT /go/src/github.com/lifei6671/go-git-webhook
 
-ADD . /go/src/github.com/lifei6671/go-git-webhook
+RUN mkdir -p $PROJECT
 
+WORKDIR ${PROJECT}
 
-WORKDIR /go/src/github.com/lifei6671/go-git-webhook
+COPY . .
 
-RUN chmod +x start.sh
+RUN  curl https://glide.sh/get | sh \
+  && glide install \
+  && go get github.com/beego/bee \
+  && CGO_ENABLED=0 CGO_ENABLED=0 bee pack -o ./bin
 
-RUN  go build -ldflags "-w" && \
-    rm -rf commands controllers models modules routers tasks vendor .gitignore .travis.yml Dockerfile gide.yaml LICENSE main.go README.md
+FROM alpine:3.6
 
-CMD ["./start.sh"]
+ENV PROJECT /go/src/github.com/lifei6671/go-git-webhook
+
+WORKDIR /go-git-webhook
+
+RUN apk add --no-cache ca-certificates \
+  && mkdir logs \
+  && touch logs/log.log
+
+COPY --from=build $PROJECT/bin/* ./
+
+RUN tar -zxvf go-git-webhook.tar.gz \
+    && rm -rf go-git-webhook.tar.gz \
+    && ln -s /go-git-webhook/go-git-webhook /usr/bin/
