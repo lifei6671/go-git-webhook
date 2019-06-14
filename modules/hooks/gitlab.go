@@ -51,17 +51,12 @@ func (p *GitLabWebHook) RepositoryName() (string, error) {
 func (p *GitLabWebHook) BranchName() (string, error) {
 
 	value, err := p.XPath("/ref")
+
 	if err != nil {
 		return "", err
 	}
 
-	// return strings.TrimLeft(value, "refs/heads/"), nil
-	strs := strings.SplitAfterN(value, "/", 2)
-	if len(strs) < 2 {
-		return value, nil
-	}
-	return strs[1], nil
-
+	return strings.TrimPrefix(value, "refs/heads/"), nil
 }
 
 // UserName 获取用户名称.
